@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <chrono>
-#include <cuchar>
 #include <cstdint>
 #include <iomanip>
 #include <iostream>

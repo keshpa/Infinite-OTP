@@ -31,3 +31,11 @@
 *.out
 *.app
 
+.ninja_deps
+.ninja_log
+CMakeCache.txt
+CMakeFiles/
+build.ninja
+cmake_install.cmake
+infinite-otp
+rules.ninja
