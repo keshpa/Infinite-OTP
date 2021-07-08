@@ -35,20 +35,20 @@ static constexpr bool CHECKASSERT = false;
 #define DASSERT(cond) if (CHECKASSERT) { assert(cond); } 
 
 string convertDurationToString(chrono::duration<double, nano> nanoSeconds) {
-	uint64_t timeDuration = nanoSeconds.count();
-	if (timeDuration > 1000 && timeDuration < 10000*1000) {
-		return std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(nanoSeconds).count()) + " microSeconds";  
-	}
-	if (timeDuration > 10000*1000 && timeDuration < uint64_t(10000000)*1000) {
-		return std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(nanoSeconds).count()) + " milliSeconds";
-	}
-	if (timeDuration > uint64_t(10000000)*1000 && timeDuration < uint64_t(10000000)*1000*60) {
-		return std::to_string(std::chrono::duration_cast<std::chrono::seconds>(nanoSeconds).count()) + " seconds";
-	}
-	if (timeDuration > uint64_t(10000000)*1000*60) {
-		return std::to_string(std::chrono::duration_cast<std::chrono::minutes>(nanoSeconds).count()) + " minutes";
-	}
-	return std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(nanoSeconds).count()) + " nanoSeconds";  
+		uint64_t timeDuration = nanoSeconds.count();
+		if (timeDuration > 1000 && timeDuration < 10000*1000) {
+			return std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(nanoSeconds).count()) + " microSeconds";  
+		}
+		if (timeDuration > 10000*1000 && timeDuration < uint64_t(10000000)*1000) {
+				return std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(nanoSeconds).count()) + " milliSeconds";
+		}
+		if (timeDuration > uint64_t(10000000)*1000 && timeDuration < uint64_t(10000000)*1000*60) {
+				return std::to_string(std::chrono::duration_cast<std::chrono::seconds>(nanoSeconds).count()) + " seconds";
+		}
+		if (timeDuration > uint64_t(10000000)*1000*60) {
+				return std::to_string(std::chrono::duration_cast<std::chrono::minutes>(nanoSeconds).count()) + " minutes";
+		}
+		return std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(nanoSeconds).count()) + " nanoSeconds";  
 }
 
 class SubstitutionTable {
@@ -107,13 +107,20 @@ class OTPsections {
 	OTPsections(OTPsections&& other) = delete;
 
 	void apply(vector<uint8_t>& input, uint32_t index1, uint32_t index2, uint32_t OTPind1, uint32_t OTPind2) {
+		uint64_t* pointer1 = reinterpret_cast<uint64_t*>(input.data() + index1);
+		uint64_t* pointer2 = reinterpret_cast<uint64_t*>(input.data() + index2);
 		for (uint32_t i = 0; i < sectionSize; ++i) {
-			uint64_t OTP1=  OTPs[OTPind1][i];
-			uint64_t OTP2=  OTPs[OTPind2][i];
+			uint64_t OTP1 = OTPs[OTPind1][i];
+			uint64_t OTP2 = OTPs[OTPind2][i];
+			*(pointer1 + i) = *(pointer1 + i) ^ OTP1;
+			*(pointer2 + i) = *(pointer2 + i) ^ OTP2;
+
+			/*********************************************************************
 			for (uint32_t j = 0; j < 8; ++j) { // 8 bytes from input need to be sewn together and then XORed with OTP
 				input[j+index1+(i*sizeof(uint64_t))] =  (OTP1 >> (8*(sizeof(uint64_t)-j-1))) ^  input[j+index1+(i*sizeof(uint64_t))];
 				input[j+index2+(i*sizeof(uint64_t))] =  (OTP2 >> (8*(sizeof(uint64_t)-j-1))) ^  input[j+index2+(i*sizeof(uint64_t))];
 			}
+			*********************************************************************/
 		}
 	}
 };
@@ -387,8 +394,11 @@ void reverseReplaceAndFold(vector<uint8_t>& encryptedData, uint32_t start = 0, u
 
 void XorEPUKwithUserData(vector<uint8_t>& userData, vector<uint8_t> EPUK) {
 	DASSERT(EPUK.size() == userData.size()); // both must be 4K bytes
-	for (uint32_t i = 0; i < userData.size(); ++i) {
-		userData[i] = userData[i] ^ EPUK[i];
+	uint64_t* userPointer = reinterpret_cast<uint64_t*>(userData.data());
+	uint64_t* EPUKpointer = reinterpret_cast<uint64_t*>(EPUK.data());
+	for (uint32_t i = 0; i < userData.size() / sizeof(uint64_t); ++i) {
+		*(userPointer + i) = *(userPointer + i) ^ *(EPUKpointer + i);
+		//userData[i] = userData[i] ^ EPUK[i];
 	}
 }
 
@@ -570,9 +580,9 @@ int main() {
 	uint32_t startingInd = 2;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
-	OTPs->apply(input, 2, 5, startingInd, startingInd + 8); // "Encypt" the input
+	OTPs->apply(input, startingInd, startingInd + 8, 2, 5); // "Encypt" the input
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
-	OTPs->apply(input, 2, 5, startingInd, startingInd + 8); // "Decrypt" the input
+	OTPs->apply(input, startingInd, startingInd + 8, 2, 5); // "Decrypt" the input
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
 	cout << "Test 1 is complete. OTPs can be generated and are successfully XORed with input" << endl;
@@ -663,6 +673,7 @@ int main() {
 	uint32_t nibbleIndex = 1;
 	uint32_t originalIndex = 4;
 	uint32_t testIndex = (nibbleIndex % 2 == 0) ? nibbleIndex : (nibbleIndex - 1);
+
 	cout << "Placing byte " << hex << uint16_t(original[originalIndex]) << " at nibble index " << nibbleIndex << " of " << uint16_t(test[testIndex]) << endl;
 	cout << "Placing 4-bits at start: " << endl;
 	insertBits(nibbleIndex, true, original[originalIndex], test, testIndex); 
@@ -670,7 +681,7 @@ int main() {
 	cout << "Placing 4-bits at end: " << endl;
 	insertBits(nibbleIndex, false, original[originalIndex], test, testIndex); 
 	cout << "Results: " << hex <<  uint16_t(test[testIndex]) << endl;
-	 ********************************************************************************************************/
+	********************************************************************************************************/
 
 	// Test superRearrangement function
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
@@ -768,7 +779,12 @@ int main() {
 	XorEPUKwithUserData(copy, EPUK);
 	endTime = std::chrono::high_resolution_clock::now();
 	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(copy.data()), size) != 0);
+
+	XorEPUKwithUserData(copy, EPUK);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(copy.data()), size) == 0);
 	cout << "Time taken for Xoring user data and EPUK : " << convertDurationToString(duration) << endl;
+
 
 	startTime = std::chrono::high_resolution_clock::now();
 	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
@@ -778,7 +794,16 @@ int main() {
 	}
 	endTime = std::chrono::high_resolution_clock::now();
 	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(copy.data()), size) != 0);
+
+	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+		uint32_t index1 = EPUK[(1*userKey.size()) + k]; 
+		uint32_t index2 = EPUK[(1*userKey.size()) + k + 1]; 
+		OTPs->apply(copy, (k*128), (k*128+64), index1, index2);
+	}
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(copy.data()), size) == 0);
 	cout << "Time taken for Xoring user data and OTP : " << convertDurationToString(duration) << endl;
+
 
 	startTime = std::chrono::high_resolution_clock::now();
 	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
@@ -789,12 +814,22 @@ int main() {
 	XorEPUKwithUserData(copy, EPUK);
 	endTime = std::chrono::high_resolution_clock::now();
 	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(copy.data()), size) != 0);
+
+	XorEPUKwithUserData(copy, EPUK);
+	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+		uint32_t index1 = EPUK[(1*userKey.size()) + k]; 
+		uint32_t index2 = EPUK[(1*userKey.size()) + k + 1]; 
+		OTPs->apply(copy, (k*128), (k*128+64), index1, index2);
+	}
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(copy.data()), size) == 0);
 	cout << "Time taken for Xoring user data, OTP, and EPUK : " << convertDurationToString(duration) << endl;
+
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
 	cout << "Test 8 is complete. User Data can be xored with EPUK and OTP" << endl;
-
+	
 	// TEST 9: Test Encryption step 2 =========================================================================
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	int32_t i = 1;
