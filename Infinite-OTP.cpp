@@ -420,18 +420,18 @@ void XorEPUKwithUserData(vector<uint8_t>& userData, vector<uint8_t> EPUK) {
 }
 
 void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
-	//chrono::duration<double, nano> encryptionDuration = chrono::duration<double, nano>();
+	chrono::duration<double, nano> encryptionDuration = chrono::duration<double, nano>();
 
 	int32_t OTPCount = 0;
 	uint32_t userKeySize = 128;
 
-	//encryptionDuration = encryptionDuration.zero();
+	encryptionDuration = encryptionDuration.zero();
 
-	//cout << endl << endl << "Real encryption begins" << endl;
+	cout << endl << endl << "Real encryption begins" << endl;
 
 	// 2. Pass userData through 4 rounds of replace and fold+Xor with OTP&EPUK
 	{
-		//Timer timer("Encryption: Time taken for 4 rounds of replace and fold of user data+XOR with EPUK and OTP : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for 4 rounds of replace and fold of user data+XOR with EPUK and OTP : ", encryptionDuration);
 		for (uint32_t i = 0; i < 4; ++i) {
 			for (uint32_t j = 0; j < 32; ++j) {
 				forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
@@ -448,13 +448,13 @@ void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
 
 	// 3. Pass userData through 1 round of super rearrangement
 	{
-		//Timer timer("Encryption: Time taken for super-rearrangement round on data : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for super-rearrangement round on data : ", encryptionDuration);
 		superRearrangement(userData, true);
 	}
 
 	// 4. Pass userData through 1 round of substitution+Xor with OTP&EPUK
 	{
-		//Timer timer("Encryption: Time taken for just replace (substitution) of user data : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for just replace (substitution) of user data : ", encryptionDuration);
 		for (uint32_t j = 0; j < 32; ++j) {
 			forwardSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
 		}
@@ -462,7 +462,7 @@ void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
 
 
 	{
-		//Timer timer("Encryption: Time taken for xoring EPUK, OTP, and user data : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for xoring EPUK, OTP, and user data : ", encryptionDuration);
 		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
 			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
 			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
@@ -474,7 +474,7 @@ void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
 
 	// 5. Pass userData through 2 rounds of replace and fold+Xor with OTP&EPUK
 	{
-		//Timer timer("Encryption: Time taken for 2 rounds of replace and fold, and xor of EPUK, OTP, and user data : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for 2 rounds of replace and fold, and xor of EPUK, OTP, and user data : ", encryptionDuration);
 		for (uint32_t i = 0; i < 2; ++i) {
 			for (uint32_t j = 0; j < 32; ++j) {
 				forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
@@ -491,19 +491,19 @@ void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
 
 	// 6. Pass userData through 1 round of super rearrangement
 	{
-		//Timer timer("Encryption: Time taken for 1 round of super-rearrangement : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for 1 round of super-rearrangement : ", encryptionDuration);
 		superRearrangement(userData, true);
 	}
 
 	// 7. Pass userData through 1 round of replace and fold+Xor with OTP&EPUK followed by super rearrangement
 	{
-		//Timer timer("Encryption: Time taken for 1 round of replace and fold on user data : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for 1 round of replace and fold on user data : ", encryptionDuration);
 		for (uint32_t j = 0; j < 32; ++j) {
 			forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
 		}
 	}
 	{
-		//Timer timer("Encryption: Time taken for 1 round of xor of OTP and user data : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for 1 round of xor of OTP and user data : ", encryptionDuration);
 		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
 			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
 			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
@@ -512,15 +512,119 @@ void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
 		++OTPCount;
 	}
 	{
-		//Timer timer("Encryption: Time taken for 1 round of xor of EPUK and user data : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for 1 round of xor of EPUK and user data : ", encryptionDuration);
 		XorEPUKwithUserData(userData, EPUK);
 	}
 	{
-		//Timer timer("Encryption: Time taken for 1 round of super-rearrangement : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for 1 round of super-rearrangement : ", encryptionDuration);
 		superRearrangement(userData, true);
 	}
 
-	//cout << "Total time take by the encryption algorithm : " << convertDurationToString(encryptionDuration) << endl;
+	cout << "Total time take by the encryption algorithm : " << convertDurationToString(encryptionDuration) << endl;
+}
+
+void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
+	chrono::duration<double, nano> encryptionDuration = chrono::duration<double, nano>();
+
+	int32_t OTPCount = 0;
+	uint32_t userKeySize = 128;
+
+	encryptionDuration = encryptionDuration.zero();
+
+	cout << endl << endl << "Real encryption begins" << endl;
+
+	// 2. Pass userData through 4 rounds of replace and fold+Xor with OTP&EPUK
+	{
+		Timer timer("Encryption: Time taken for 4 rounds of replace and fold of user data+XOR with EPUK and OTP : ", encryptionDuration);
+		for (uint32_t i = 0; i < 4; ++i) {
+			for (uint32_t j = 0; j < 32; ++j) {
+				forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+			}
+			for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+				uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+				uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+				OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+			}
+			++OTPCount;
+			XorEPUKwithUserData(userData, EPUK);
+		}
+	}
+
+	// 3. Pass userData through 1 round of super rearrangement
+	{
+		Timer timer("Encryption: Time taken for super-rearrangement round on data : ", encryptionDuration);
+		superRearrangement(userData, true);
+	}
+
+	// 4. Pass userData through 1 round of substitution+Xor with OTP&EPUK
+	{
+		Timer timer("Encryption: Time taken for just replace (substitution) of user data : ", encryptionDuration);
+		for (uint32_t j = 0; j < 32; ++j) {
+			forwardSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+		}
+	}
+
+
+	{
+		Timer timer("Encryption: Time taken for xoring EPUK, OTP, and user data : ", encryptionDuration);
+		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+			OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+		}
+		++OTPCount;
+		XorEPUKwithUserData(userData, EPUK);
+	}
+
+	// 5. Pass userData through 2 rounds of replace and fold+Xor with OTP&EPUK
+	{
+		Timer timer("Encryption: Time taken for 2 rounds of replace and fold, and xor of EPUK, OTP, and user data : ", encryptionDuration);
+		for (uint32_t i = 0; i < 2; ++i) {
+			for (uint32_t j = 0; j < 32; ++j) {
+				forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+			}
+			for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+				uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+				uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+				OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+			}
+			++OTPCount;
+			XorEPUKwithUserData(userData, EPUK);
+		}
+	}
+
+	// 6. Pass userData through 1 round of super rearrangement
+	{
+		Timer timer("Encryption: Time taken for 1 round of super-rearrangement : ", encryptionDuration);
+		superRearrangement(userData, true);
+	}
+
+	// 7. Pass userData through 1 round of replace and fold+Xor with OTP&EPUK followed by super rearrangement
+	{
+		Timer timer("Encryption: Time taken for 1 round of replace and fold on user data : ", encryptionDuration);
+		for (uint32_t j = 0; j < 32; ++j) {
+			forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+		}
+	}
+	{
+		Timer timer("Encryption: Time taken for 1 round of xor of OTP and user data : ", encryptionDuration);
+		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+			OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+		}
+		++OTPCount;
+	}
+	{
+		Timer timer("Encryption: Time taken for 1 round of xor of EPUK and user data : ", encryptionDuration);
+		XorEPUKwithUserData(userData, EPUK);
+	}
+	{
+		Timer timer("Encryption: Time taken for 1 round of super-rearrangement : ", encryptionDuration);
+		superRearrangement(userData, true);
+	}
+
+	cout << "Total time take by the encryption algorithm : " << convertDurationToString(encryptionDuration) << endl;
 }
 
 void decryption(vector<uint8_t>& EPUK, vector<uint8_t>& encryptedData) {
@@ -913,11 +1017,7 @@ int main() {
 	// TEST 10: Final Test: Put everything together ===========================================================
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
-	startTime = chrono::high_resolution_clock::now();
 	encryption(EPUK, input);
-	endTime = chrono::high_resolution_clock::now();
-	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
-	cout << "Time taken to encrypt user data: " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
 
