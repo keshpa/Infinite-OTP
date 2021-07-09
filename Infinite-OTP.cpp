@@ -181,14 +181,14 @@ void rotateLeft(vector<uint8_t>& input, int32_t startingInd, uint32_t rotateBetw
 }
 
 // TODO: Take care of little-Endian/big-Endian
-void forwardSubstitution(vector<uint8_t>& input, uint32_t start = 0, uint32_t end = 0) {
+void forwardSubstitution(vector<uint8_t>& input, uint32_t start = 0, uint32_t end = 0, bool skipRotate = false) {
 	if (end == 0) end = input.size();
 	DASSERT((end - start) == (k1 / (sizeof(uint8_t) * 8))); // input must be 1024 bits long
 	uint16_t xorValue = 0;
 	for (uint32_t i = start; i < end; i += 2) {
 		//cout << "Input offset_64b " << i << endl;
 
-//		uint16_t src = (input[i] << 8) | input[i+1];
+		//		uint16_t src = (input[i] << 8) | input[i+1];
 		uint16_t* src = reinterpret_cast<uint16_t *>(input.data() + i);
 
 		if (i != start && i % 16 == 0) {
@@ -203,46 +203,54 @@ void forwardSubstitution(vector<uint8_t>& input, uint32_t start = 0, uint32_t en
 
 		if (i != start && i % 16 == 0) {
 			//cout << "Rotation # " << (i / 16) << " : Starting at " << (i - 16) << endl;
-			rotateRight(input, i - 16, 128);
+			if(!skipRotate) {
+				rotateRight(input, i - 16, 128);
+			}
 		}
 
 		*src = temp;
-//		input[i + 1] = temp & 0xFF;
-//		input[i] = temp >> 8;
+		//		input[i + 1] = temp & 0xFF;
+		//		input[i] = temp >> 8;
 	}
-	rotateRight(input, end - 16, 128);
+	if(!skipRotate) {
+		rotateRight(input, end - 16, 128);
+	}
 }
 
-void reverseSubstitution(vector<uint8_t>& input, int32_t start = 0, uint32_t end = 0) {
+void reverseSubstitution(vector<uint8_t>& input, int32_t start = 0, uint32_t end = 0, bool skipRotate = false) {
 	if (end == 0) end = input.size();
 	DASSERT((end - start) == (k1 / (sizeof(uint8_t) * 8))); // input must be 1024 bits long
 	uint16_t xorValue = 0;
-	rotateLeft(input, end - 16, 128);
+	if (!skipRotate) {
+		rotateLeft(input, end - 16, 128);
+	}
 	for (int32_t i = int32_t(end - 1); i >= start; i -= 2) {
 		//cout << "Input offset_64b " << i << " with start " << start << endl;
 
 		if ((i - 1) != start && (i - 1) % 16 == 0) {
 			DASSERT(i >= start+16);
-			rotateLeft(input, i - 1 - 16, 128);
+			if (!skipRotate) {
+				rotateLeft(input, i - 1 - 16, 128);
+			}
 		}
 
 		if ((i - 1) % 16 != 0) {
 			DASSERT(i > start+2);
-//			xorValue = (input[i - 3] << 8) | input[i - 2];
+			//			xorValue = (input[i - 3] << 8) | input[i - 2];
 			xorValue = *reinterpret_cast<uint16_t *>(input.data() + i - 3);
 		} else {
 			xorValue = 0;
 		}
 
-//		uint16_t src = ((input[i - 1] << 8) | input[i]) ^ xorValue;
+		//		uint16_t src = ((input[i - 1] << 8) | input[i]) ^ xorValue;
 		uint16_t src = *reinterpret_cast<uint16_t *>((input.data() + i - 1)) ^ xorValue;
 
 		uint16_t substitutedVal = uint16_t(sTable->getSubstitutionValue(src));
 
 		//cout << "Xored " << hex << (src ^ xorValue)  << " with " << xorValue << " to get " << src << ". Substituting " << src << " to " << substitutedVal << dec << endl;
 
-//		input[i] = substitutedVal & 0xFF;
-//		input[i - 1] = substitutedVal >> 8;
+		//		input[i] = substitutedVal & 0xFF;
+		//		input[i - 1] = substitutedVal >> 8;
 		*reinterpret_cast<uint16_t *>((input.data() + i - 1)) = substitutedVal;
 	}
 }
@@ -283,19 +291,19 @@ void rearrangement(vector<uint8_t>& input, uint32_t start = 0, uint32_t end = 0)
 		*(reinterpret_cast<uint16_t *>(input.data() + (i*2)+start)) =  temp2;
 
 		/*******************************************************************
-		if (option1) {
-			uint16_t temp2 = *(reinterpret_cast<uint16_t *>(input.data() + (j*2)+start));
-			*(reinterpret_cast<uint16_t *>(input.data() + (j*2)+start)) = *(reinterpret_cast<uint16_t *>(input.data() + (i*2)+start));
-			*(reinterpret_cast<uint16_t *>(input.data() + (i*2)+start)) =  temp2;
-		} else {
-			uint16_t temp = input[(j*2)+start];
-			input[(j*2)+start] = input[(i*2)+start];
-			input[(i*2)+start] = temp;
-			temp = input[(j*2)+start+1];
-			input[(j*2)+start+1] = input[(i*2)+start+1];
-			input[(i*2)+start+1] = temp;
-		}
-		*******************************************************************/
+		  if (option1) {
+		  uint16_t temp2 = *(reinterpret_cast<uint16_t *>(input.data() + (j*2)+start));
+		 *(reinterpret_cast<uint16_t *>(input.data() + (j*2)+start)) = *(reinterpret_cast<uint16_t *>(input.data() + (i*2)+start));
+		 *(reinterpret_cast<uint16_t *>(input.data() + (i*2)+start)) =  temp2;
+		 } else {
+		 uint16_t temp = input[(j*2)+start];
+		 input[(j*2)+start] = input[(i*2)+start];
+		 input[(i*2)+start] = temp;
+		 temp = input[(j*2)+start+1];
+		 input[(j*2)+start+1] = input[(i*2)+start+1];
+		 input[(i*2)+start+1] = temp;
+		 }
+		 *******************************************************************/
 	}
 }
 
@@ -523,7 +531,20 @@ void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
 	cout << "Total time take by the encryption algorithm : " << convertDurationToString(encryptionDuration) << endl;
 }
 
-void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
+void encryptionUpdated1(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
+	// STEPS:
+	// 1. Pass userData through 1 round of substitution and rotate right followed by Xor with EPUK+OTP
+	// 2. Pass userData through 
+	// 		  i. 1 round of substitution 
+	// 		 ii. 1 round of rearrangement 
+	// 		iii. 1 round of rotate right 
+	// 		 iv. followed by Xor with EPUK+OTP
+	// 3. Pass userData through 1 round of forward Substitution followed by Xor with EPUK+OTP
+	// 4. Pass userData through 1 round of super rearrangement
+	// 5. Pass userData through 1 round of forward replace and fold followed by Xor with EPUK+OTP
+	// 6. Pass userData through 1 round of substitution and rotate right followed by Xor with EPUK+OTP
+	// 7. Pass userData throuhg 1 round of substitution followed by Xor with EPUK+OTP
+
 	chrono::duration<double, nano> encryptionDuration = chrono::duration<double, nano>();
 
 	int32_t OTPCount = 0;
@@ -533,38 +554,68 @@ void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
 
 	cout << endl << endl << "Real encryption begins" << endl;
 
-	// 2. Pass userData through 4 rounds of replace and fold+Xor with OTP&EPUK
+	// 1. Pass userData through 1 round of substitution and rotate right followed by Xor with EPUK+OTP
 	{
-		Timer timer("Encryption: Time taken for 4 rounds of replace and fold of user data+XOR with EPUK and OTP : ", encryptionDuration);
-		for (uint32_t i = 0; i < 4; ++i) {
-			for (uint32_t j = 0; j < 32; ++j) {
-				forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
-			}
-			for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
-				uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
-				uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
-				OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
-			}
-			++OTPCount;
-			XorEPUKwithUserData(userData, EPUK);
-		}
-	}
-
-	// 3. Pass userData through 1 round of super rearrangement
-	{
-		Timer timer("Encryption: Time taken for super-rearrangement round on data : ", encryptionDuration);
-		superRearrangement(userData, true);
-	}
-
-	// 4. Pass userData through 1 round of substitution+Xor with OTP&EPUK
-	{
-		Timer timer("Encryption: Time taken for just replace (substitution) of user data : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for 1 round of substitution and rotate right : ", encryptionDuration);
 		for (uint32_t j = 0; j < 32; ++j) {
-			forwardSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+			forwardSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b, true);
 		}
+	} 
+	{ 
+		Timer timer("Encryption: Time taken for Xor with EPUK+OTP : ", encryptionDuration);
+		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+			OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+		}
+		++OTPCount;
+		XorEPUKwithUserData(userData, EPUK);
 	}
 
+	// 2. Pass userData through i. 1 round of substitution ii. 1 round of rearrangement iii. 1 round of rotate right followed by Xor with EPUK+OTP
+	{
+		Timer timer("Encryption: Time taken for 1 round of substitution : ", encryptionDuration);
+		for (uint32_t j = 0; j < 32; ++j) {
+			forwardSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b, true);
+		}
+	} 
+	{
+		Timer timer("Encryption: Time taken for 1 round of rearrangement : ", encryptionDuration);
+		for (uint32_t j = 0; j < 32; ++j) {
+			rearrangement(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+		}
+	} 
+	{
+		Timer timer("Encryption: Time taken for 1 round of rotate right : ", encryptionDuration);
+		for (uint32_t j = 0; j < 32; ++j) {
+			uint32_t start = j*elementsIn1024b;
+			uint32_t end = (j+1)*elementsIn1024b;
+			for (uint32_t i = start; i < end; i += 2) {
+				if (i != start && i % 16 == 0) {
+					rotateRight(userData, i - 16, 128);
+				}
+			}
 
+		}
+	} 
+	{ 
+		Timer timer("Encryption: Time taken for Xor with EPUK+OTP : ", encryptionDuration);
+		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+			OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+		}
+		++OTPCount;
+		XorEPUKwithUserData(userData, EPUK);
+	}
+
+	// 3. Pass userData through 1 round of substitution followed by Xor with EPUK+OTP
+	{
+		Timer timer("Encryption: Time taken for substitution of user data : ", encryptionDuration);
+		for (uint32_t j = 0; j < 32; ++j) {
+			forwardSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b, true);
+		}
+	}
 	{
 		Timer timer("Encryption: Time taken for xoring EPUK, OTP, and user data : ", encryptionDuration);
 		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
@@ -576,52 +627,64 @@ void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
 		XorEPUKwithUserData(userData, EPUK);
 	}
 
-	// 5. Pass userData through 2 rounds of replace and fold+Xor with OTP&EPUK
+	// 4. Pass userData through 1 round of super rearrangement
 	{
-		Timer timer("Encryption: Time taken for 2 rounds of replace and fold, and xor of EPUK, OTP, and user data : ", encryptionDuration);
-		for (uint32_t i = 0; i < 2; ++i) {
-			for (uint32_t j = 0; j < 32; ++j) {
-				forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
-			}
-			for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
-				uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
-				uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
-				OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
-			}
-			++OTPCount;
-			XorEPUKwithUserData(userData, EPUK);
-		}
-	}
-
-	// 6. Pass userData through 1 round of super rearrangement
-	{
-		Timer timer("Encryption: Time taken for 1 round of super-rearrangement : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for super-rearrangement round on data : ", encryptionDuration);
 		superRearrangement(userData, true);
 	}
 
-	// 7. Pass userData through 1 round of replace and fold+Xor with OTP&EPUK followed by super rearrangement
+	// 5. Pass userData through 1 round of forward replace and fold followed by Xor with EPUK+OTP
 	{
-		Timer timer("Encryption: Time taken for 1 round of replace and fold on user data : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for replace and fold of user data : ", encryptionDuration);
 		for (uint32_t j = 0; j < 32; ++j) {
 			forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
 		}
 	}
 	{
-		Timer timer("Encryption: Time taken for 1 round of xor of OTP and user data : ", encryptionDuration);
+		Timer timer("Encryption: Time taken for xoring EPUK, OTP, and user data : ", encryptionDuration);
 		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
 			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
 			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
 			OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
 		}
 		++OTPCount;
-	}
-	{
-		Timer timer("Encryption: Time taken for 1 round of xor of EPUK and user data : ", encryptionDuration);
 		XorEPUKwithUserData(userData, EPUK);
 	}
+
+	// 6. Pass userData through 1 round of substitution and rotate right followed by Xor with EPUK+OTP
 	{
-		Timer timer("Encryption: Time taken for 1 round of super-rearrangement : ", encryptionDuration);
-		superRearrangement(userData, true);
+		Timer timer("Encryption: Time taken for substitution & rotate right of user data : ", encryptionDuration);
+		for (uint32_t j = 0; j < 32; ++j) {
+			forwardSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b, false);
+		}
+	}
+	{
+		Timer timer("Encryption: Time taken for xoring EPUK, OTP, and user data : ", encryptionDuration);
+		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+			OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+		}
+		++OTPCount;
+		XorEPUKwithUserData(userData, EPUK);
+	}
+
+	// 7. Pass userData throuhg 1 round of substitution followed by Xor with EPUK+OTP
+	{
+		Timer timer("Encryption: Time taken for substitution of user data : ", encryptionDuration);
+		for (uint32_t j = 0; j < 32; ++j) {
+			forwardSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b, true);
+		}
+	}
+	{
+		Timer timer("Encryption: Time taken for xoring EPUK, OTP, and user data : ", encryptionDuration);
+		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+			OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+		}
+		++OTPCount;
+		XorEPUKwithUserData(userData, EPUK);
 	}
 
 	cout << "Total time take by the encryption algorithm : " << convertDurationToString(encryptionDuration) << endl;
@@ -691,6 +754,111 @@ void decryption(vector<uint8_t>& EPUK, vector<uint8_t>& encryptedData) {
 	}
 }
 
+void decryptionUpdated1(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
+	// STEPS:
+	// 1. Pass userData throuhg Xor with EPUK+OTP followed by 1 round of substitution (7)
+	// 2. Pass userData through Xor with EPUK+OTP followed by 1 round of rotate left and substitution (6)
+	// 3. Pass userData through Xor with EPUK+OTP followed by 1 round of reverse replace and fold (5)
+	// 4. Pass userData through 1 round of super rearrangement (4)
+	// 5. Pass userData through Xor with EPUK+OTP followed by 1 round of substitution (3)
+	// 6. Pass userData through (2)
+	// 		   i. followed by Xor with EPUK+OTP (iv)
+	// 		  ii. 1 round of rotate right (iii)
+	// 		 iii. 1 round of rearrangement (ii)
+	// 		  iv. 1 round of substitution (i)
+	// 7. Pass userData through Xor with EPUK+OTP followed by 1 round of rotate left and substitution (1) 
+
+	uint32_t userKeySize = 128;
+	int32_t OTPCount = 6 - 1;
+
+	// 1. Pass userData throuhg Xor with EPUK+OTP followed by 1 round of substitution (7)
+	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+		uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+		uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+		OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+	}
+	--OTPCount;
+	XorEPUKwithUserData(userData, EPUK);
+	for (uint32_t j = 0; j < 32; ++j) {
+		reverseSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b, true);
+	}
+
+	// 2. Pass userData through Xor with EPUK+OTP followed by 1 round of substitution and rotate right (6)
+	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+		uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+		uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+		OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+	}
+	--OTPCount;
+	XorEPUKwithUserData(userData, EPUK);
+	for (uint32_t j = 0; j < 32; ++j) {
+		reverseSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b, false);
+	}
+
+	// 3. Pass userData through Xor with EPUK+OTP followed by 1 round of reverse replace and fold (5)
+	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+		uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+		uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+		OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+	}
+	--OTPCount;
+	XorEPUKwithUserData(userData, EPUK);
+	for (uint32_t j = 0; j < 32; ++j) {
+		reverseReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+	}
+
+	// 4. Pass userData through 1 round of super rearrangement (4)
+	superRearrangement(userData, false);
+
+	// 5. Pass userData through Xor with EPUK+OTP followed by 1 round of substitution (3)
+	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+		uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+		uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+		OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+	}
+	--OTPCount;
+	XorEPUKwithUserData(userData, EPUK);
+	for (uint32_t j = 0; j < 32; ++j) {
+		reverseSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b, true);
+	}
+
+	// 6. Pass userData through i. followed by Xor with EPUK+OTP ii. 1 round of rotate left iii. 1 round of rearrangement iv. 1 round of substitution (2)
+	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+		uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+		uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+		OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+	}
+	--OTPCount;
+	XorEPUKwithUserData(userData, EPUK);
+	for (uint32_t j = 0; j < 32; ++j) {
+		uint32_t start = j*elementsIn1024b;
+		uint32_t end = (j+1)*elementsIn1024b;
+		for (uint32_t i = start; i < end; i += 2) {
+			if (i != start && i % 16 == 0) {
+				rotateLeft(userData, i - 16, 128);
+			}
+		}
+	}
+	for (uint32_t j = 0; j < 32; ++j) {
+		rearrangement(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+	}
+	for (uint32_t j = 0; j < 32; ++j) {
+		reverseSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b, true);
+	}
+	 
+	// 7. Pass userData through Xor with EPUK+OTP followed by 1 round of rotate left and substitution (1)
+	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+		uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+		uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+		OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+	}
+	--OTPCount;
+	XorEPUKwithUserData(userData, EPUK);
+	for (uint32_t j = 0; j < 32; ++j) {
+		reverseSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b, true);
+	}
+}
+
 vector<uint8_t> extendedKey(vector<uint8_t> PUK) { // extends 1024-bit PUK to 4K bytes
 	DASSERT(PUK.size() == k1 / (sizeof(uint8_t) * 8)); // PUK must be 1024 bits
 	vector<uint8_t> EPUK;
@@ -729,6 +897,7 @@ int main() {
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
 	cout << "Test 1 is complete. OTPs can be generated and are successfully XORed with input" << endl;
+
 
 	// TEST 2: Test rotateLeft and rotateRight functions ================================================
 	size = (k1 / (sizeof(uint8_t) * 8));
@@ -1023,6 +1192,21 @@ int main() {
 
 	startTime = chrono::high_resolution_clock::now();
 	decryption(EPUK, input);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
+	cout << "Time taken to decrypt user data: " << convertDurationToString(duration) << endl;
+
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+
+	// TEST 11: Final Test: Put everything together (Updated1) ================================================
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+
+	encryptionUpdated1(EPUK, input);
+
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+
+	startTime = chrono::high_resolution_clock::now();
+	decryptionUpdated1(EPUK, input);
 	endTime = chrono::high_resolution_clock::now();
 	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to decrypt user data: " << convertDurationToString(duration) << endl;
