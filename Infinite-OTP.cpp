@@ -34,21 +34,40 @@ static constexpr bool CHECKASSERT = false;
 #define DASSERT(cond) if (CHECKASSERT) { assert(cond); } 
 
 string convertDurationToString(chrono::duration<double, nano> nanoSeconds) {
-		uint64_t timeDuration = nanoSeconds.count();
-		if (timeDuration > 1000 && timeDuration < 10000*1000) {
-			return std::to_string(std::chrono::duration_cast<std::chrono::microseconds>(nanoSeconds).count()) + " microSeconds";  
-		}
-		if (timeDuration > 10000*1000 && timeDuration < uint64_t(10000000)*1000) {
-				return std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(nanoSeconds).count()) + " milliSeconds";
-		}
-		if (timeDuration > uint64_t(10000000)*1000 && timeDuration < uint64_t(10000000)*1000*60) {
-				return std::to_string(std::chrono::duration_cast<std::chrono::seconds>(nanoSeconds).count()) + " seconds";
-		}
-		if (timeDuration > uint64_t(10000000)*1000*60) {
-				return std::to_string(std::chrono::duration_cast<std::chrono::minutes>(nanoSeconds).count()) + " minutes";
-		}
-		return std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(nanoSeconds).count()) + " nanoSeconds";  
+	uint64_t timeDuration = nanoSeconds.count();
+	if (timeDuration > 100000 && timeDuration < 100000*1000UL) {
+		return to_string(chrono::duration_cast<chrono::microseconds>(nanoSeconds).count()) + " microSeconds";  
+	}
+	if (timeDuration > 100000*1000UL && timeDuration < uint64_t(100000*1000*1000UL)) {
+		return to_string(chrono::duration_cast<chrono::milliseconds>(nanoSeconds).count()) + " milliSeconds";
+	}
+	if (timeDuration > uint64_t(100000UL*1000*1000) && timeDuration < uint64_t(100000UL*1000*1000*60)) {
+		return to_string(chrono::duration_cast<chrono::seconds>(nanoSeconds).count()) + " seconds";
+	}
+	if (timeDuration > uint64_t(100000UL*1000*1000*60)) {
+		return to_string(chrono::duration_cast<chrono::minutes>(nanoSeconds).count()) + " minutes";
+	}
+	return to_string(chrono::duration_cast<chrono::nanoseconds>(nanoSeconds).count()) + " nanoSeconds";  
 }
+
+class Timer {
+	chrono::high_resolution_clock::time_point startTime;
+	chrono::high_resolution_clock::time_point endTime;
+	chrono::duration<double, nano> duration;
+	chrono::duration<double, nano>& encryptionDuration;
+	const string desc;
+	public:
+	Timer(const string& desc, chrono::duration<double, nano>& encryptionDuration) : desc(desc), encryptionDuration(encryptionDuration) {
+		startTime = chrono::high_resolution_clock::now();
+	}
+
+	~Timer() {
+		endTime = chrono::high_resolution_clock::now();
+		duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
+		encryptionDuration += duration;
+		cout << desc << convertDurationToString(duration) << endl;
+	}
+};
 
 class SubstitutionTable {
 	uint32_t size;
@@ -115,11 +134,11 @@ class OTPsections {
 			*(pointer2 + i) = *(pointer2 + i) ^ OTP2;
 
 			/*********************************************************************
-			for (uint32_t j = 0; j < 8; ++j) { // 8 bytes from input need to be sewn together and then XORed with OTP
-				input[j+index1+(i*sizeof(uint64_t))] =  (OTP1 >> (8*(sizeof(uint64_t)-j-1))) ^  input[j+index1+(i*sizeof(uint64_t))];
-				input[j+index2+(i*sizeof(uint64_t))] =  (OTP2 >> (8*(sizeof(uint64_t)-j-1))) ^  input[j+index2+(i*sizeof(uint64_t))];
-			}
-			*********************************************************************/
+			  for (uint32_t j = 0; j < 8; ++j) { // 8 bytes from input need to be sewn together and then XORed with OTP
+			  input[j+index1+(i*sizeof(uint64_t))] =  (OTP1 >> (8*(sizeof(uint64_t)-j-1))) ^  input[j+index1+(i*sizeof(uint64_t))];
+			  input[j+index2+(i*sizeof(uint64_t))] =  (OTP2 >> (8*(sizeof(uint64_t)-j-1))) ^  input[j+index2+(i*sizeof(uint64_t))];
+			  }
+			 *********************************************************************/
 		}
 	}
 };
@@ -143,52 +162,22 @@ void printVector(vector<uint8_t>& input, uint32_t start, uint32_t end) {
 	cout << endl; 
 }
 
-void rotateRight(vector<uint8_t>& input, int32_t startingInd, uint32_t rotateBetweenBits, int32_t rotateBytes = 1) {
-	//cout << "Rotating between : " << rotateBetweenBits << endl;
+void rotateRight(vector<uint8_t>& input, int32_t startingInd, uint32_t rotateBetweenBits) {
 	uint32_t length = rotateBetweenBits / (sizeof(uint8_t) * 8);	// Divide by 8 to convert into bytes and then sizeof(uint8_t)
-	//printVector(input, startingInd, length + startingInd);
-
 	uint8_t* pointer = reinterpret_cast<uint8_t*>(input.data());
 	pointer += startingInd * sizeof(uint8_t);
-	vector<uint8_t> lastBytes;
-	lastBytes.resize(rotateBytes);
-	for (uint32_t i = 0; i < rotateBytes; ++i) {
-		lastBytes[i] = *(pointer+length-1-i);
-	}
-
-	memmove(pointer + rotateBytes, pointer, (rotateBetweenBits/8) - rotateBytes);
-	for (uint32_t i = 0; i < rotateBytes; ++i) {
-		*(pointer+i) = lastBytes[rotateBytes - 1 - i];
-	}
-
-	//cout << "End rotation" << endl;
-	//printVector(input, startingInd, length + startingInd);
+	uint8_t lastByte = *(pointer+length-1);
+	memmove(pointer + 1, pointer, (rotateBetweenBits/8) - 1);
+	*pointer = lastByte;
 }
 
-void rotateLeft(vector<uint8_t>& input, int32_t startingInd, uint32_t rotateBetweenBits, int32_t rotateBytes = 1) {
-	//cout << "Rotating between : " << rotateBetweenBits << endl;
+void rotateLeft(vector<uint8_t>& input, int32_t startingInd, uint32_t rotateBetweenBits) {
 	uint32_t length = rotateBetweenBits / (sizeof(uint8_t) * 8);
-	//printVector(input, startingInd, length + startingInd);
-
 	uint8_t* pointer = reinterpret_cast<uint8_t*>(input.data());
 	pointer += startingInd * sizeof(uint8_t);
-	vector<uint8_t> firstBytes;
-	firstBytes.resize(rotateBytes);
-	for (uint32_t i = 0; i < rotateBytes; ++i) {
-		//cout << i << " : " << rotateBytes << " storing ";
-		//cout << hex << (uint16_t)(*(pointer+i)) << dec << endl;
-		firstBytes[i] = (*(pointer+i));
-	}
-	//cout << "First bytes: "<< endl;
-	//printVector(firstBytes, 0, rotateBytes);
-
-	memmove(pointer, pointer + rotateBytes, (rotateBetweenBits/8) - rotateBytes);
-	for (int32_t i = rotateBytes - 1; i >= 0; --i) {
-		*(pointer + length - 1 - i) = firstBytes[rotateBytes - 1 - i];
-	}
-
-	//cout << "End rotation" << endl;
-	//printVector(input, startingInd, length + startingInd);
+	uint8_t firstByte = *pointer;
+	memmove(pointer, pointer + 1, (rotateBetweenBits/8) - 1);
+	*(pointer + length - 1) = firstByte;
 }
 
 // TODO: Take care of little-Endian/big-Endian
@@ -199,13 +188,14 @@ void forwardSubstitution(vector<uint8_t>& input, uint32_t start = 0, uint32_t en
 	for (uint32_t i = start; i < end; i += 2) {
 		//cout << "Input offset_64b " << i << endl;
 
-		uint16_t src = (input[i] << 8) | input[i+1];
+//		uint16_t src = (input[i] << 8) | input[i+1];
+		uint16_t* src = reinterpret_cast<uint16_t *>(input.data() + i);
 
 		if (i != start && i % 16 == 0) {
 			xorValue = 0;
 		}
 
-		uint16_t temp = sTable->getSubstitutionValue(src) ^ xorValue;	
+		uint16_t temp = sTable->getSubstitutionValue(*src) ^ xorValue;	
 
 		//cout << "Substituting " << hex << src << " to " << (temp ^ xorValue) << ". Xored with " << xorValue << " to get " << temp << dec << endl;
 
@@ -216,8 +206,9 @@ void forwardSubstitution(vector<uint8_t>& input, uint32_t start = 0, uint32_t en
 			rotateRight(input, i - 16, 128);
 		}
 
-		input[i + 1] = temp & 0xFF;
-		input[i] = temp >> 8;
+		*src = temp;
+//		input[i + 1] = temp & 0xFF;
+//		input[i] = temp >> 8;
 	}
 	rotateRight(input, end - 16, 128);
 }
@@ -237,19 +228,22 @@ void reverseSubstitution(vector<uint8_t>& input, int32_t start = 0, uint32_t end
 
 		if ((i - 1) % 16 != 0) {
 			DASSERT(i > start+2);
-			xorValue = (input[i - 3] << 8) | input[i - 2];
+//			xorValue = (input[i - 3] << 8) | input[i - 2];
+			xorValue = *reinterpret_cast<uint16_t *>(input.data() + i - 3);
 		} else {
 			xorValue = 0;
 		}
 
-		uint16_t src = ((input[i - 1] << 8) | input[i]) ^ xorValue;
+//		uint16_t src = ((input[i - 1] << 8) | input[i]) ^ xorValue;
+		uint16_t src = *reinterpret_cast<uint16_t *>((input.data() + i - 1)) ^ xorValue;
 
 		uint16_t substitutedVal = uint16_t(sTable->getSubstitutionValue(src));
 
 		//cout << "Xored " << hex << (src ^ xorValue)  << " with " << xorValue << " to get " << src << ". Substituting " << src << " to " << substitutedVal << dec << endl;
 
-		input[i] = substitutedVal & 0xFF;
-		input[i - 1] = substitutedVal >> 8;
+//		input[i] = substitutedVal & 0xFF;
+//		input[i - 1] = substitutedVal >> 8;
+		*reinterpret_cast<uint16_t *>((input.data() + i - 1)) = substitutedVal;
 	}
 }
 
@@ -273,6 +267,9 @@ void rearrangement(vector<uint8_t>& input, uint32_t start = 0, uint32_t end = 0)
 	if (end == 0) end = input.size();
 	DASSERT((end - start) == k1 / (sizeof(uint8_t) * 8)); // the input must be 1024 bits
 
+
+	int option1 = 0;
+
 	//cout << "Starting rearrangement at " << start << " to " << end << endl;
 
 	for(uint32_t j = 0; j < 64; ++j) {
@@ -281,12 +278,24 @@ void rearrangement(vector<uint8_t>& input, uint32_t start = 0, uint32_t end = 0)
 			continue;
 		}
 		//cout << j << ". Moving " << (j*2)+start << " to " << (i*2)+start << endl;
-		uint16_t temp = input[(j*2)+start];
-		input[(j*2)+start] = input[(i*2)+start];
-		input[(i*2)+start] = temp;
-		temp = input[(j*2)+start+1];
-		input[(j*2)+start+1] = input[(i*2)+start+1];
-		input[(i*2)+start+1] = temp;
+		uint16_t temp2 = *(reinterpret_cast<uint16_t *>(input.data() + (j*2)+start));
+		*(reinterpret_cast<uint16_t *>(input.data() + (j*2)+start)) = *(reinterpret_cast<uint16_t *>(input.data() + (i*2)+start));
+		*(reinterpret_cast<uint16_t *>(input.data() + (i*2)+start)) =  temp2;
+
+		/*******************************************************************
+		if (option1) {
+			uint16_t temp2 = *(reinterpret_cast<uint16_t *>(input.data() + (j*2)+start));
+			*(reinterpret_cast<uint16_t *>(input.data() + (j*2)+start)) = *(reinterpret_cast<uint16_t *>(input.data() + (i*2)+start));
+			*(reinterpret_cast<uint16_t *>(input.data() + (i*2)+start)) =  temp2;
+		} else {
+			uint16_t temp = input[(j*2)+start];
+			input[(j*2)+start] = input[(i*2)+start];
+			input[(i*2)+start] = temp;
+			temp = input[(j*2)+start+1];
+			input[(j*2)+start+1] = input[(i*2)+start+1];
+			input[(i*2)+start+1] = temp;
+		}
+		*******************************************************************/
 	}
 }
 
@@ -378,10 +387,19 @@ void superRearrangement(vector<uint8_t>& input, bool forwardRearrangement) {
 }
 
 void forwardReplaceAndFold(vector<uint8_t>& input, uint32_t start = 0, uint32_t end = 0) {
-	if (end == 0) end = input.size();
+	if (end == 0) {
+		end = input.size();
+	}
+	chrono::duration<double, nano> duration;
 	DASSERT((end - start) == k1 / (sizeof(uint8_t) * 8)); // user data must be 1024 bits
-	forwardSubstitution(input, start, end);
-	rearrangement(input, start, end);
+	{
+		//Timer timer("Forward substitution : ", duration);
+		forwardSubstitution(input, start, end);
+	}
+	{
+		//Timer timer("Rearrangement : ", duration);
+		rearrangement(input, start, end);
+	}
 }
 
 void reverseReplaceAndFold(vector<uint8_t>& encryptedData, uint32_t start = 0, uint32_t end = 0) {
@@ -401,103 +419,125 @@ void XorEPUKwithUserData(vector<uint8_t>& userData, vector<uint8_t> EPUK) {
 	}
 }
 
-void encryption(vector<uint8_t> userKey, vector<uint8_t>& userData) {
-	vector<uint8_t> original(userData);
-	int32_t OTPCount = 0;
+void encryption(vector<uint8_t>& EPUK, vector<uint8_t>& userData) {
+	//chrono::duration<double, nano> encryptionDuration = chrono::duration<double, nano>();
 
-	// 1. Pass userKey through 4 rounds of replace and fold	and then extend it
-	//startTime = std::chrono::high_resolution_clock::now();
-	for (uint32_t i = 0; i < 4; ++i) {
-		forwardReplaceAndFold(userKey);
-	}
-	vector<uint8_t> EPUK = extendedKey(userKey);
-	//endTime = std::chrono::high_resolution_clock::now();
-	//duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
-	//cout << "Time taken for encryption step 1 : " << convertDurationToString(duration) << endl;
+	int32_t OTPCount = 0;
+	uint32_t userKeySize = 128;
+
+	//encryptionDuration = encryptionDuration.zero();
+
+	//cout << endl << endl << "Real encryption begins" << endl;
 
 	// 2. Pass userData through 4 rounds of replace and fold+Xor with OTP&EPUK
-	//startTime = std::chrono::high_resolution_clock::now();
-	for (uint32_t i = 0; i < 4; ++i) {
-		for (uint32_t j = 0; j < 32; ++j) {
-			forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+	{
+		//Timer timer("Encryption: Time taken for 4 rounds of replace and fold of user data+XOR with EPUK and OTP : ", encryptionDuration);
+		for (uint32_t i = 0; i < 4; ++i) {
+			for (uint32_t j = 0; j < 32; ++j) {
+				forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+			}
+			for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+				uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+				uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+				OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+			}
+			++OTPCount;
+			XorEPUKwithUserData(userData, EPUK);
 		}
-		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
-			uint32_t index1 = EPUK[(OTPCount*userKey.size()) + k]; 
-			uint32_t index2 = EPUK[(OTPCount*userKey.size()) + k + 1]; 
-			OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
-		}
-		++OTPCount;
-		XorEPUKwithUserData(userData, EPUK);
 	}
-	//endTime = std::chrono::high_resolution_clock::now();
-	//duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
-	//cout << "Time taken for encryption step 2 : " << convertDurationToString(duration) << endl;
 
 	// 3. Pass userData through 1 round of super rearrangement
-	superRearrangement(userData, true);
+	{
+		//Timer timer("Encryption: Time taken for super-rearrangement round on data : ", encryptionDuration);
+		superRearrangement(userData, true);
+	}
 
 	// 4. Pass userData through 1 round of substitution+Xor with OTP&EPUK
-	for (uint32_t j = 0; j < 32; ++j) {
-		forwardSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
-	}
-	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
-		uint32_t index1 = EPUK[(OTPCount*userKey.size()) + k]; 
-		uint32_t index2 = EPUK[(OTPCount*userKey.size()) + k + 1]; 
-		OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
-	}
-	++OTPCount;
-	XorEPUKwithUserData(userData, EPUK);
-
-	// 5. Pass userData through 2 rounds of replace and fold+Xor with OTP&EPUK
-	for (uint32_t i = 0; i < 2; ++i) {
+	{
+		//Timer timer("Encryption: Time taken for just replace (substitution) of user data : ", encryptionDuration);
 		for (uint32_t j = 0; j < 32; ++j) {
-			forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+			forwardSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
 		}
+	}
+
+
+	{
+		//Timer timer("Encryption: Time taken for xoring EPUK, OTP, and user data : ", encryptionDuration);
 		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
-			uint32_t index1 = EPUK[(OTPCount*userKey.size()) + k]; 
-			uint32_t index2 = EPUK[(OTPCount*userKey.size()) + k + 1]; 
+			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
 			OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
 		}
 		++OTPCount;
 		XorEPUKwithUserData(userData, EPUK);
+	}
+
+	// 5. Pass userData through 2 rounds of replace and fold+Xor with OTP&EPUK
+	{
+		//Timer timer("Encryption: Time taken for 2 rounds of replace and fold, and xor of EPUK, OTP, and user data : ", encryptionDuration);
+		for (uint32_t i = 0; i < 2; ++i) {
+			for (uint32_t j = 0; j < 32; ++j) {
+				forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+			}
+			for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+				uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+				uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+				OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+			}
+			++OTPCount;
+			XorEPUKwithUserData(userData, EPUK);
+		}
 	}
 
 	// 6. Pass userData through 1 round of super rearrangement
-	superRearrangement(userData, true);
+	{
+		//Timer timer("Encryption: Time taken for 1 round of super-rearrangement : ", encryptionDuration);
+		superRearrangement(userData, true);
+	}
 
 	// 7. Pass userData through 1 round of replace and fold+Xor with OTP&EPUK followed by super rearrangement
-	for (uint32_t j = 0; j < 32; ++j) {
-		forwardSubstitution(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+	{
+		//Timer timer("Encryption: Time taken for 1 round of replace and fold on user data : ", encryptionDuration);
+		for (uint32_t j = 0; j < 32; ++j) {
+			forwardReplaceAndFold(userData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+		}
 	}
-	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
-		uint32_t index1 = EPUK[(OTPCount*userKey.size()) + k]; 
-		uint32_t index2 = EPUK[(OTPCount*userKey.size()) + k + 1]; 
-		OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+	{
+		//Timer timer("Encryption: Time taken for 1 round of xor of OTP and user data : ", encryptionDuration);
+		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
+			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
+			OTPs->apply(userData, (k*128), (k*128+64), index1, index2);
+		}
+		++OTPCount;
 	}
-	++OTPCount;
-	XorEPUKwithUserData(userData, EPUK);
-	superRearrangement(userData, true);
+	{
+		//Timer timer("Encryption: Time taken for 1 round of xor of EPUK and user data : ", encryptionDuration);
+		XorEPUKwithUserData(userData, EPUK);
+	}
+	{
+		//Timer timer("Encryption: Time taken for 1 round of super-rearrangement : ", encryptionDuration);
+		superRearrangement(userData, true);
+	}
+
+	//cout << "Total time take by the encryption algorithm : " << convertDurationToString(encryptionDuration) << endl;
 }
 
-void decryption(vector<uint8_t> userKey, vector<uint8_t>& encryptedData) {
+void decryption(vector<uint8_t>& EPUK, vector<uint8_t>& encryptedData) {
+	uint32_t userKeySize = 128;
 	int32_t OTPCount = 7;
-	// 1. Pass userKey through 4 rounds of replace and fold	and then extend it (1)
-	for (uint32_t i = 0; i < 4; ++i) {
-		forwardReplaceAndFold(userKey);
-	}
-	vector<uint8_t> EPUK = extendedKey(userKey);
 
 	// 2. Pass userData through 1 round of replace and fold+Xor with OTP&EPUK by super rearrangement (7)
 	superRearrangement(encryptedData, false);
 	XorEPUKwithUserData(encryptedData, EPUK);
 	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
-		uint32_t index1 = EPUK[(OTPCount*userKey.size()) + k]; 
-		uint32_t index2 = EPUK[(OTPCount*userKey.size()) + k + 1]; 
+		uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+		uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
 		OTPs->apply(encryptedData, (k*128), (k*128+64), index1, index2);
 	}
 	--OTPCount;
 	for (uint32_t j = 0; j < 32; ++j) {
-		reverseSubstitution(encryptedData, j*elementsIn1024b, (j+1)*elementsIn1024b);
+		reverseReplaceAndFold(encryptedData, j*elementsIn1024b, (j+1)*elementsIn1024b);
 	}
 
 	// 3. Pass encryptedData through 1 round of super rearrangement (6)
@@ -507,8 +547,8 @@ void decryption(vector<uint8_t> userKey, vector<uint8_t>& encryptedData) {
 	for (uint32_t i = 0; i < 2; ++i) {
 		XorEPUKwithUserData(encryptedData, EPUK);
 		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
-			uint32_t index1 = EPUK[(OTPCount*userKey.size()) + k]; 
-			uint32_t index2 = EPUK[(OTPCount*userKey.size()) + k + 1]; 
+			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
 			OTPs->apply(encryptedData, (k*128), (k*128+64), index1, index2);
 		}
 		--OTPCount;
@@ -520,8 +560,8 @@ void decryption(vector<uint8_t> userKey, vector<uint8_t>& encryptedData) {
 	// 5. Pass encryptedData through 1 round of substitution+Xor with OTP&EPUK (4)
 	XorEPUKwithUserData(encryptedData, EPUK);
 	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
-		uint32_t index1 = EPUK[(OTPCount*userKey.size()) + k]; 
-		uint32_t index2 = EPUK[(OTPCount*userKey.size()) + k + 1]; 
+		uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+		uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
 		OTPs->apply(encryptedData, (k*128), (k*128+64), index1, index2);
 	}
 	--OTPCount;
@@ -536,8 +576,8 @@ void decryption(vector<uint8_t> userKey, vector<uint8_t>& encryptedData) {
 	for (uint32_t i = 0; i < 4; ++i) {
 		XorEPUKwithUserData(encryptedData, EPUK);
 		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
-			uint32_t index1 = EPUK[(OTPCount*userKey.size()) + k]; 
-			uint32_t index2 = EPUK[(OTPCount*userKey.size()) + k + 1]; 
+			uint32_t index1 = EPUK[(OTPCount*userKeySize) + k]; 
+			uint32_t index2 = EPUK[(OTPCount*userKeySize) + k + 1]; 
 			OTPs->apply(encryptedData, (k*128), (k*128+64), index1, index2);
 		}
 		--OTPCount;
@@ -552,7 +592,7 @@ vector<uint8_t> extendedKey(vector<uint8_t> PUK) { // extends 1024-bit PUK to 4K
 	vector<uint8_t> EPUK;
 	EPUK.resize(k32 / (sizeof(uint8_t) * 8));
 	for (uint32_t i = 0; i < 32; ++i) {
-		rotateLeft(PUK, 0, PUK.size()*sizeof(uint8_t)*8, 1); 
+		rotateLeft(PUK, 0, PUK.size()*sizeof(uint8_t)*8); 
 		for (uint32_t j = 0; j < PUK.size(); ++j) {
 			EPUK[j+(i*PUK.size())] = PUK[j];
 		}
@@ -561,9 +601,9 @@ vector<uint8_t> extendedKey(vector<uint8_t> PUK) { // extends 1024-bit PUK to 4K
 }
 
 int main() {
-	std::chrono::high_resolution_clock::time_point startTime;
-	std::chrono::high_resolution_clock::time_point endTime;
-	std::chrono::duration<double, std::nano> duration;
+	chrono::high_resolution_clock::time_point startTime;
+	chrono::high_resolution_clock::time_point endTime;
+	chrono::duration<double, nano> duration;
 
 	initialize();
 
@@ -596,18 +636,18 @@ int main() {
 	input = original;
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
-	rotateLeft(input, 16, 128, 2);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	startTime = chrono::high_resolution_clock::now();
+	rotateLeft(input, 16, 128);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to left shift a 1024-bit section of user data : " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
-	rotateRight(input, 16, 128, 2);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	startTime = chrono::high_resolution_clock::now();
+	rotateRight(input, 16, 128);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to right shift a 1024-bit section of user data : " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
@@ -627,18 +667,18 @@ int main() {
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	forwardSubstitution(input, start, start+elementsIn1024b);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to forward substitute a 1024-bit section of user data : " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	reverseSubstitution(input, start, start+elementsIn1024b);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to reverse substitute a 1024-bit section of user data : " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
@@ -650,10 +690,10 @@ int main() {
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	rearrangement(input, start, start+elementsIn1024b);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to rearrange 1024-bit section of user data : " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
@@ -680,23 +720,23 @@ int main() {
 	cout << "Placing 4-bits at end: " << endl;
 	insertBits(nibbleIndex, false, original[originalIndex], test, testIndex); 
 	cout << "Results: " << hex <<  uint16_t(test[testIndex]) << endl;
-	********************************************************************************************************/
+	 ********************************************************************************************************/
 
 	// Test superRearrangement function
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	superRearrangement(input, true);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to super rearrange user data : " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	superRearrangement(input, false);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to reverse super rearrangement of user data : " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
@@ -707,22 +747,22 @@ int main() {
 	// Test replace and fold on 4K byte input
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	for(uint32_t i = 0; i < 32; ++i) {
 		forwardReplaceAndFold(input, i*elementsIn1024b, (i+1)*elementsIn1024b);
 	}
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to pass user data through 1 round of forward replace and fold (forwardRepalceAndFold called 32 times) : " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	for(uint32_t i = 0; i < 32; ++i) {
 		reverseReplaceAndFold(input, i*elementsIn1024b, (i+1)*elementsIn1024b);
 	}
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to pass user data through 1 round reverse of forward replace and fold (reverseRepalceAndFold called 32 times) : " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
@@ -738,16 +778,15 @@ int main() {
 
 	vector<uint8_t> puk(userKey);
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	for(uint32_t i = 0; i < 4; ++i) {
 		forwardReplaceAndFold(puk, 0, size);
 	}
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to process user key (i.e. 4 rounds of replace and fold) : " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(userKey.data()), reinterpret_cast<const char*>(puk.data()), size) != 0);
-	cout << "reversing" << endl;
 	for(uint32_t i = 0; i < 4; ++i) {
 		reverseReplaceAndFold(puk, 0, size);
 	}
@@ -756,10 +795,10 @@ int main() {
 	cout << "Test 6 is complete. Replace and fold algorithm works (for forward and reverse)" << endl;
 
 	// TEST 7: Test extendedKey function =====================================================================
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	vector<uint8_t> EPUK = extendedKey(puk);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken to extend processed user key : " << convertDurationToString(duration) << endl;
 
 	//cout << "PUK: " << endl;
@@ -774,10 +813,10 @@ int main() {
 	// TEST 8: Test XOR with OTP and EPUK =====================================================================
 	vector<uint8_t> copy(input);
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	XorEPUKwithUserData(copy, EPUK);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(copy.data()), size) != 0);
 
 	XorEPUKwithUserData(copy, EPUK);
@@ -785,14 +824,14 @@ int main() {
 	cout << "Time taken for Xoring user data and EPUK : " << convertDurationToString(duration) << endl;
 
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
 		uint32_t index1 = EPUK[(1*userKey.size()) + k]; 
 		uint32_t index2 = EPUK[(1*userKey.size()) + k + 1]; 
 		OTPs->apply(copy, (k*128), (k*128+64), index1, index2);
 	}
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(copy.data()), size) != 0);
 
 	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
@@ -804,15 +843,15 @@ int main() {
 	cout << "Time taken for Xoring user data and OTP : " << convertDurationToString(duration) << endl;
 
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
 		uint32_t index1 = EPUK[(1*userKey.size()) + k]; 
 		uint32_t index2 = EPUK[(1*userKey.size()) + k + 1]; 
 		OTPs->apply(copy, (k*128), (k*128+64), index1, index2);
 	}
 	XorEPUKwithUserData(copy, EPUK);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(copy.data()), size) != 0);
 
 	XorEPUKwithUserData(copy, EPUK);
@@ -828,12 +867,12 @@ int main() {
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
 	cout << "Test 8 is complete. User Data can be xored with EPUK and OTP" << endl;
-	
+
 	// TEST 9: Test Encryption step 2 =========================================================================
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	int32_t i = 1;
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	for(int32_t OTPCount = 0; OTPCount < i; ++OTPCount) {
 		for (uint32_t j = 0; j < 32; ++j) {
 			forwardReplaceAndFold(input, j*elementsIn1024b, (j+1)*elementsIn1024b);
@@ -845,13 +884,13 @@ int main() {
 		}
 		XorEPUKwithUserData(input, EPUK);
 	}
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken for encrypting user data (4K Bytes) through " << i << " rounds of replace and fold + Xor with EPUK and UTP: " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
+	startTime = chrono::high_resolution_clock::now();
 	for(int32_t OTPCount = i-1; OTPCount >= 0; --OTPCount) {
 		XorEPUKwithUserData(input, EPUK);
 		for (uint32_t k = 0; k < 4*8; ++k) { // We xor OTPs 128-bytes at a time
@@ -863,8 +902,8 @@ int main() {
 			reverseReplaceAndFold(input, j*elementsIn1024b, (j+1)*elementsIn1024b);
 		}
 	}
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
 	cout << "Time taken for decrypting user data (4K Bytes) through " << i << " rounds of replace and fold + Xor with EPUK and UTP: " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
@@ -874,19 +913,19 @@ int main() {
 	// TEST 10: Final Test: Put everything together ===========================================================
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
-	encryption(puk, input);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
-	cout << "Time taken to encryption user data: " << convertDurationToString(duration) << endl;
+	startTime = chrono::high_resolution_clock::now();
+	encryption(EPUK, input);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
+	cout << "Time taken to encrypt user data: " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
 
-	startTime = std::chrono::high_resolution_clock::now();
-	decryption(puk, input);
-	endTime = std::chrono::high_resolution_clock::now();
-	duration = std::chrono::duration_cast<std::chrono::duration<double, std::nano>>(endTime - startTime);
-	cout << "Time taken to decryption user data: " << convertDurationToString(duration) << endl;
+	startTime = chrono::high_resolution_clock::now();
+	decryption(EPUK, input);
+	endTime = chrono::high_resolution_clock::now();
+	duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
+	cout << "Time taken to decrypt user data: " << convertDurationToString(duration) << endl;
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
