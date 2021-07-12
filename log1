@@ -1,0 +1,28 @@
+Test 1 is complete. OTPs can be generated and are successfully XORed with input
+Time taken to left shift a 1024-bit section of user data : 1290 nanoSeconds
+Time taken to right shift a 1024-bit section of user data : 995 nanoSeconds
+Test 2 is complete. Input can be rotated 1 byte to the left and right
+Time taken to forward substitute a 1024-bit section of user data : 2149 nanoSeconds
+Time taken to reverse substitute a 1024-bit section of user data : 1786 nanoSeconds
+Test 3 is complete. Substition algorithm works; it can encrypt and decrypt data
+Time taken to rearrange 1024-bit section of user data : 1302 nanoSeconds
+Test 4 is complete. Rearrangement algorithm works
+Time taken to super rearrange user data : 40544 nanoSeconds
+Time taken to reverse super rearrangement of user data : 36361 nanoSeconds
+Test 5 is complete. Super Rearrangement algorithm works
+Time taken to pass user data through 1 round of forward replace and fold (forwardRepalceAndFold called 32 times) : 22228 nanoSeconds
+Time taken to pass user data through 1 round reverse of forward replace and fold (reverseRepalceAndFold called 32 times) : 24903 nanoSeconds
+Time taken to process user key (i.e. 4 rounds of replace and fold) : 4385 nanoSeconds
+Test 6 is complete. Replace and fold algorithm works (for forward and reverse)
+Time taken to extend processed user key : 11986 nanoSeconds
+Test 7 is complete. Extended Key function works
+Time taken for Xoring user data and EPUK : 5711 nanoSeconds
+Time taken for Xoring user data and OTP : 2215 nanoSeconds
+Time taken for Xoring user data, OTP, and EPUK : 3409 nanoSeconds
+Test 8 is complete. User Data can be xored with EPUK and OTP
+Time taken for encrypting user data (4K Bytes) through 1 rounds of replace and fold + Xor with EPUK and UTP: 19644 nanoSeconds
+Time taken for decrypting user data (4K Bytes) through 1 rounds of replace and fold + Xor with EPUK and UTP: 22436 nanoSeconds
+Test 9 is complete. EPUK and OTP-Xor works (even with rotation and replace&fold/tested with 1)
+Time taken to encrypt user data: 260 microSeconds
+Time taken to decrypt user data: 271 microSeconds
+DONE
