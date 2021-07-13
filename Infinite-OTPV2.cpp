@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
 #include <unistd.h>
 #include <vector>
 
@@ -1681,7 +1682,7 @@ void superRearrangementUpdated1(vector<uint16_t>& input, bool forwardRearrangeme
 	uint32_t size = k4 / sizeof(uint16_t);
 	DASSERT(input.size() == size); // the input must be 4K bytes
 	uint8_t output[k4];
-	bzero(output, size*sizeof(uint16_t));
+	memset(output, 0U, size*sizeof(uint16_t));
 
 	for (int k = 0; k < k4; ++k) {
 		assert(output[k] == 0x00);
@@ -1789,7 +1790,7 @@ int main() {
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	{
-		Timer timer("Time taken for first 2 replace and fold cycles on 4K byte input : ", duration);
+		Timer timer("Time taken for first 4 replace and fold cycles on 4K byte input : ", duration);
 		for (uint32_t i = 0; i < 32; ++i) {
 			replaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
 		}
@@ -1798,7 +1799,7 @@ int main() {
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
 
 	{
-		Timer timer("Time taken for first 2 reverse replace and fold cycles on 4K byte input : ", duration);
+		Timer timer("Time taken for first 4 reverse replace and fold cycles on 4K byte input : ", duration);
 		for (int32_t i = 32 - 1; i >= 0; i -= 1) {
 			reverseReplaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
 		}
