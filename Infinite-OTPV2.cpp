@@ -11,7 +11,7 @@
 
 using namespace std;
 
-bool CHECKASSERT = true;
+bool CHECKASSERT = false;
 #define DASSERT(cond) if (CHECKASSERT) { assert(cond); }
 
 vector<uint16_t> substitutionTable;
@@ -1791,7 +1791,7 @@ int main() {
 	{
 		Timer timer("Time taken for first 2 replace and fold cycles on 4K byte input : ", duration);
 		for (uint32_t i = 0; i < 32; ++i) {
-			replaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 2, EPUK, OTPsectionCount);
+			replaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
 		}
 	}
 
@@ -1800,7 +1800,7 @@ int main() {
 	{
 		Timer timer("Time taken for first 2 reverse replace and fold cycles on 4K byte input : ", duration);
 		for (int32_t i = 32 - 1; i >= 0; i -= 1) {
-			reverseReplaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 2, EPUK, OTPsectionCount);
+			reverseReplaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
 		}
 	}
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
