@@ -66,7 +66,7 @@ void createTable() {
 	uint8_t startingB = *b;
 	uint8_t lastValue = galoisTable.at(255);
 	for (uint32_t i = 0; i < k64; ++i) {
-		cout << hex << i << " " << uint16_t(*a) << " : " << uint16_t(*b)  << " => " << uint16_t((uint16_t(*a) << 8) | (*b)) << endl;
+		//cout << hex << i << " " << uint16_t(*a) << " : " << uint16_t(*b)  << " => " << uint16_t((uint16_t(*a) << 8) | (*b)) << endl;
 		uint16_t substitutionValue = (uint16_t(*a) << 8) | (*b);
 
 		if (reverseSubstitutionTable.at(substitutionValue) != -1) {
@@ -87,27 +87,27 @@ void createTable() {
 			++a;
 		}
 		if ((i & 0xFF) == 0xFF) {
-			cout << "Reached " << hex << i << ". Old starting value: " << (uint16_t)startingA << " and " 
-				<< (uint16_t)startingB << endl;
-			cout << "Note: b+1 : " << hex << uint16_t(*(b+1)) << dec << endl;
-			cout << "Note: a+1 : " << hex << uint16_t(*(a+1)) << dec << endl;
-			cout << "Note: b-1 : " << hex << uint16_t(*(b-1)) << dec << endl;
-			cout << "Note: a-1 : " << hex << uint16_t(*(a-1)) << dec << endl;
-			cout << "Note: b : " << hex << uint16_t(*(b)) << dec << endl;
+			//cout << "Reached " << hex << i << ". Old starting value: " << (uint16_t)startingA << " and " 
+			//<< (uint16_t)startingB << endl;
+			//cout << "Note: b+1 : " << hex << uint16_t(*(b+1)) << dec << endl;
+			//cout << "Note: a+1 : " << hex << uint16_t(*(a+1)) << dec << endl;
+			//cout << "Note: b-1 : " << hex << uint16_t(*(b-1)) << dec << endl;
+			//cout << "Note: a-1 : " << hex << uint16_t(*(a-1)) << dec << endl;
+			//cout << "Note: b : " << hex << uint16_t(*(b)) << dec << endl;
 
 			assert(*a == startingA);
 			if (*a == lastValue) {
 				a = reinterpret_cast<uint8_t*>(galoisTable.data());
 			} else {
-			++a;
+				++a;
 			}
 			assert(*(b+1) == startingB);
 			if (*b == galoisTable.at(0)) {
 				b = reinterpret_cast<uint8_t*>(galoisTable.data()+255);
 			} else {
-			--b;
+				--b;
 			}
-			cout << ". New: " << (uint16_t)(*a) << " and " << uint16_t(*(b+2)) << endl;
+			//cout << ". New: " << (uint16_t)(*a) << " and " << uint16_t(*(b+2)) << endl;
 
 			startingA = *a;
 			startingB = *b;
@@ -139,11 +139,67 @@ void createTableOLD() {
 	}
 }
 
+void correctSpread() {
+	int32_t j = -1;
+	for (int32_t i = 0; i < k64; ++i) {
+		uint16_t val = substitutionTable.at(i);
+		if ((val & 0xFF) == (i & 0xFF) || (val & 0xFF00) == (i & 0xFF00)) {
+			if (j != -1) {
+				uint16_t temp = substitutionTable.at(j);
+				if ((val & 0xFF) == (j & 0xFF) || (val & 0xFF00) == (j & 0xFF00) || 
+						(temp & 0xFF) == (i & 0xFF) || (temp & 0xFF00) == (i & 0xFF00)) {
+				} else {
+					substitutionTable.at(j) = substitutionTable.at(i);
+					substitutionTable.at(i) = temp;
+					j = -1;
+				}
+			} else {
+				j = i;
+			}
+		}
+	}
+}
+
+void verifySpread() {
+	cout << "Pairs with common bytes: " << endl;
+	for (uint32_t i = 0; i < k64; ++i) {
+		uint16_t val = substitutionTable.at(i);
+		if ((val & 0xFF) == (i & 0xFF) || (val & 0xFF00) == (i & 0xFF00)) {
+			cout << hex << i << " and " << substitutionTable.at(i) << endl;
+		}
+	}
+}
+
+void ultraSpecialCase() {
+	// I know for a fact that currently after doing verfySpread twice, c1a2 is the only value who has a byte with its 
+	// substituted value. So, here I have hard-coded a swap between c1a2 and fff0, as a way to ensure no number has any byte in 
+	// common with its substituted value.
+	uint16_t i = 0xc1a2;
+	uint16_t j = 0xfff0;
+	uint16_t val = substitutionTable.at(i);
+	uint16_t temp = substitutionTable.at(j);
+	if ((val & 0xFF) == (j & 0xFF) || (val & 0xFF00) == (j & 0xFF00) || 
+			(temp & 0xFF) == (i & 0xFF) || (temp & 0xFF00) == (i & 0xFF00)) {
+		assert(false);
+	}
+	substitutionTable.at(j) = substitutionTable.at(i);
+	substitutionTable.at(i) = temp;
+
+}
+
 int main() {
 	initialize();
 	//	printGaloisTable();
 	createTable();
-	cout << "Success: " << endl;
-	printTable();
+	cout << "Created Table " << endl;
+	correctSpread();
+	cout << "Corrected spread" << endl;
+	correctSpread();
+	cout << "Corrected spread again" << endl;
+	ultraSpecialCase();
+	verifySpread();
+	cout << "Done " << endl;
+	//cout << "Success: " << endl;
+	//printTable();
 	return 0;
 }
