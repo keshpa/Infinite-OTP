@@ -1,15 +1,16 @@
 #include <iostream>
 #include <string>
+#include <boost/preprocessor/arithmetic/mul.hpp>
 
 using namespace std;
 
-#define myVar_impl(a, ...) a
-#define myVar(sec, ...) myVar_impl(sec*4, __VA_ARGS__)
-#define createV_impl(sec) a ## sec
-#define createV(...) createV_impl(__VA_ARGS__)
+#define myVar(var1, ...)	BOOST_PP_MUL(var1, 4)
+#define createV(var1)		createV_(var1)
+#define createV_(var1)		a ## var1
 
 int main() {
-	int createV(myVar(1)) = 5;
+	int createV(BOOST_PP_MUL(1, 4)) = 5;
+	int b = BOOST_PP_MUL(1, 4);
 	a4 = 10;
 	
 	return 0;
