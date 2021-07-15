@@ -1,3 +1,10 @@
+#include <iostream>
+#include <vector>
+#include <assert.h>
+#include <cstdint>
+
+using namespace std;
+
 /* The following macros help create variables to short each short in 4K input. portionN is the 1024-bit portion number, sectionN is the 
  * 128-bit section number within the given portion, and shortN is the short position within the given section. All these variables must 
  * be 0-indexed.
@@ -6,11 +13,11 @@
 #define PORTION_SIZE			1024	/* bits */
 #define SECTION_SIZE			128	/* bits */
 
-#define SWAP_SHORTS((a), (b))				\
+#define SWAP_SHORTS(a, b)				\
 	do {						\
-		uint16_t temp = (a);			\
-		(a) = (b);				\
-		(b) = temp;				\
+		uint16_t temp = a;			\
+		a = b;					\
+		b = temp;				\
 	} while(0)
 
 
@@ -18,34 +25,193 @@
 
 #define V(portionN, sectionN, shortN)		v_ ## portionN_ ## sectionN_ ## shortN 
 
-#define LOAD_SECTION(ptr, portionN, sectionN)										\
-	uint16_t V(portionN, sectionN, 0) = *S(ptr, portionN, sectionN, 0); 						\
-	uint16_t V(portionN, sectionN, 1) = *S(ptr, portionN, sectionN, 1); 						\
-	uint16_t V(portionN, sectionN, 2) = *S(ptr, portionN, sectionN, 2); 						\
-	uint16_t V(portionN, sectionN, 3) = *S(ptr, portionN, sectionN, 3); 						\
-	uint16_t V(portionN, sectionN, 4) = *S(ptr, portionN, sectionN, 4); 						\
-	uint16_t V(portionN, sectionN, 5) = *S(ptr, portionN, sectionN, 5); 						\
-	uint16_t V(portionN, sectionN, 6) = *S(ptr, portionN, sectionN, 6); 						\
+#define ROTATE_SECTION_LEFT(portionN, sectionN)						\
+/* S0 - S1 - S2 - S3 - S4 - S5 - S6 - S7 */						\
+do {											\
+	uint16_t prev, next;								\
+	prev = (V(portionN, sectionN, 0) & 0xFF);					\
+	next = (V(portionN, sectionN, 7) & 0xFF);					\
+											\
+	V(portionN, sectionN, 7) = (V(portionN, sectionN, 7) << 8) | prev;		\
+	prev = next;									\
+	next = V(portionN, sectionN, 6) & 0xFF;						\
+											\
+	V(portionN, sectionN, 6) = (V(portionN, sectionN, 6) << 8) | prev;		\
+	prev = next;									\
+	next = V(portionN, sectionN, 5) & 0xFF;						\
+											\
+	V(portionN, sectionN, 5) = (V(portionN, sectionN, 5) << 8) | prev;		\
+	prev = next;									\
+	next = V(portionN, sectionN, 4) & 0xFF;						\
+											\
+	V(portionN, sectionN, 4) = (V(portionN, sectionN, 4) << 8) | prev;		\
+	prev = next;									\
+	next = V(portionN, sectionN, 3) & 0xFF;						\
+											\
+	V(portionN, sectionN, 3) = (V(portionN, sectionN, 3) << 8) | prev;		\
+	prev = next;									\
+	next = V(portionN, sectionN, 2) & 0xFF;						\
+											\
+	V(portionN, sectionN, 2) = (V(portionN, sectionN, 2) << 8) | prev;		\
+	prev = next;									\
+	next = V(portionN, sectionN, 1) & 0xFF;						\
+											\
+	V(portionN, sectionN, 1) = (V(portionN, sectionN, 1) << 8) | prev;		\
+	prev = next;									\
+											\
+	V(portionN, sectionN, 0) = (V(portionN, sectionN, 0) << 8) | prev;		\
+} while(0)
+
+#define ROTATE_SECTION_RIGHT(portionN, sectionN)					\
+/* S0 - S1 - S2 - S3 - S4 - S5 - S6 - S7 */						\
+do {											\
+	uint16_t prev, next;								\
+	prev = (V(portionN, sectionN, 7) & 0xFF) << 8;					\
+	next = (V(portionN, sectionN, 0) & 0xFF) << 8;					\
+											\
+	V(portionN, sectionN, 0) = (V(portionN, sectionN, 0) >> 8) | prev;		\
+	prev = next;									\
+	next = (V(portionN, sectionN, 1) & 0xFF) << 8;					\
+											\
+	V(portionN, sectionN, 1) = (V(portionN, sectionN, 1) >> 8) | prev;		\
+	prev = next;									\
+	next = (V(portionN, sectionN, 1) & 0xFF) << 8;					\
+											\
+	V(portionN, sectionN, 2) = (V(portionN, sectionN, 2) >> 8) | prev;		\
+	prev = next;									\
+	next = (V(portionN, sectionN, 1) & 0xFF) << 8;					\
+											\
+	V(portionN, sectionN, 3) = (V(portionN, sectionN, 3) >> 8) | prev;		\
+	prev = next;									\
+	next = (V(portionN, sectionN, 1) & 0xFF) << 8;					\
+											\
+	V(portionN, sectionN, 4) = (V(portionN, sectionN, 4) >> 8) | prev;		\
+	prev = next;									\
+	next = (V(portionN, sectionN, 1) & 0xFF) << 8;					\
+											\
+	V(portionN, sectionN, 5) = (V(portionN, sectionN, 5) >> 8) | prev;		\
+	prev = next;									\
+	next = (V(portionN, sectionN, 1) & 0xFF) << 8;					\
+											\
+	V(portionN, sectionN, 6) = (V(portionN, sectionN, 6) >> 8) | prev;		\
+	prev = next;									\
+											\
+	V(portionN, sectionN, 7) = (V(portionN, sectionN, 7) >> 8) | prev;		\
+} while (0)
+
+#define ROTATE_PORTION_LEFT(portionN) 							\
+	ROTATE_SECTION_LEFT(portionN, 0);						\
+	ROTATE_SECTION_LEFT(portionN, 1);						\
+	ROTATE_SECTION_LEFT(portionN, 2);						\
+	ROTATE_SECTION_LEFT(portionN, 3);						\
+	ROTATE_SECTION_LEFT(portionN, 4);						\
+	ROTATE_SECTION_LEFT(portionN, 5);						\
+	ROTATE_SECTION_LEFT(portionN, 6);						\
+
+#define ROTATE_PORTION_RIGHT(portionN) 							\
+	ROTATE_SECTION_RIGHT(portionN, 0);						\
+	ROTATE_SECTION_RIGHT(portionN, 1);						\
+	ROTATE_SECTION_RIGHT(portionN, 2);						\
+	ROTATE_SECTION_RIGHT(portionN, 3);						\
+	ROTATE_SECTION_RIGHT(portionN, 4);						\
+	ROTATE_SECTION_RIGHT(portionN, 5);						\
+	ROTATE_SECTION_RIGHT(portionN, 6);						\
+	ROTATE_SECTION_RIGHT(portionN, 7)
+
+#define ROTATE_PORTION_LEFT_ALL()							\
+	ROTATE_PORTION_LEFT(0);							\
+	ROTATE_PORTION_LEFT(1);							\
+	ROTATE_PORTION_LEFT(2);							\
+	ROTATE_PORTION_LEFT(3);							\
+	ROTATE_PORTION_LEFT(4);							\
+	ROTATE_PORTION_LEFT(5);							\
+	ROTATE_PORTION_LEFT(6);							\
+	ROTATE_PORTION_LEFT(7);							\
+	ROTATE_PORTION_LEFT(8);							\
+	ROTATE_PORTION_LEFT(9);							\
+	ROTATE_PORTION_LEFT(10);							\
+	ROTATE_PORTION_LEFT(11);							\
+	ROTATE_PORTION_LEFT(12);							\
+	ROTATE_PORTION_LEFT(14);							\
+	ROTATE_PORTION_LEFT(15);							\
+	ROTATE_PORTION_LEFT(16);							\
+	ROTATE_PORTION_LEFT(17);							\
+	ROTATE_PORTION_LEFT(18);							\
+	ROTATE_PORTION_LEFT(19);							\
+	ROTATE_PORTION_LEFT(20);							\
+	ROTATE_PORTION_LEFT(21);							\
+	ROTATE_PORTION_LEFT(22);							\
+	ROTATE_PORTION_LEFT(23);							\
+	ROTATE_PORTION_LEFT(24);							\
+	ROTATE_PORTION_LEFT(25);							\
+	ROTATE_PORTION_LEFT(26);							\
+	ROTATE_PORTION_LEFT(27);							\
+	ROTATE_PORTION_LEFT(28);							\
+	ROTATE_PORTION_LEFT(29);							\
+	ROTATE_PORTION_LEFT(30);							\
+	ROTATE_PORTION_LEFT(31)
+
+#define ROTATE_PORTION_RIGHT_ALL()							\
+	ROTATE_PORTION_RIGHT(0);							\
+	ROTATE_PORTION_RIGHT(1);							\
+	ROTATE_PORTION_RIGHT(2);							\
+	ROTATE_PORTION_RIGHT(3);							\
+	ROTATE_PORTION_RIGHT(4);							\
+	ROTATE_PORTION_RIGHT(5);							\
+	ROTATE_PORTION_RIGHT(6);							\
+	ROTATE_PORTION_RIGHT(7);							\
+	ROTATE_PORTION_RIGHT(8);							\
+	ROTATE_PORTION_RIGHT(9);							\
+	ROTATE_PORTION_RIGHT(10);							\
+	ROTATE_PORTION_RIGHT(11);							\
+	ROTATE_PORTION_RIGHT(12);							\
+	ROTATE_PORTION_RIGHT(14);							\
+	ROTATE_PORTION_RIGHT(15);							\
+	ROTATE_PORTION_RIGHT(16);							\
+	ROTATE_PORTION_RIGHT(17);							\
+	ROTATE_PORTION_RIGHT(18);							\
+	ROTATE_PORTION_RIGHT(19);							\
+	ROTATE_PORTION_RIGHT(20);							\
+	ROTATE_PORTION_RIGHT(21);							\
+	ROTATE_PORTION_RIGHT(22);							\
+	ROTATE_PORTION_RIGHT(23);							\
+	ROTATE_PORTION_RIGHT(24);							\
+	ROTATE_PORTION_RIGHT(25);							\
+	ROTATE_PORTION_RIGHT(26);							\
+	ROTATE_PORTION_RIGHT(27);							\
+	ROTATE_PORTION_RIGHT(28);							\
+	ROTATE_PORTION_RIGHT(29);							\
+	ROTATE_PORTION_RIGHT(30);							\
+	ROTATE_PORTION_RIGHT(31)
+
+#define LOAD_SECTION(ptr, portionN, sectionN)						\
+	uint16_t V(portionN, sectionN, 0) = *S(ptr, portionN, sectionN, 0); 		\
+	uint16_t V(portionN, sectionN, 1) = *S(ptr, portionN, sectionN, 1); 		\
+	uint16_t V(portionN, sectionN, 2) = *S(ptr, portionN, sectionN, 2); 		\
+	uint16_t V(portionN, sectionN, 3) = *S(ptr, portionN, sectionN, 3); 		\
+	uint16_t V(portionN, sectionN, 4) = *S(ptr, portionN, sectionN, 4); 		\
+	uint16_t V(portionN, sectionN, 5) = *S(ptr, portionN, sectionN, 5); 		\
+	uint16_t V(portionN, sectionN, 6) = *S(ptr, portionN, sectionN, 6); 		\
 	uint16_t V(portionN, sectionN, 7) = *S(ptr, portionN, sectionN, 7)
 
-#define LOAD_PORTION(ptr, portionN)											\
-	LOAD_SECTION(ptr, portionN, 0);											\
-	LOAD_SECTION(ptr, portionN, 1);											\
-	LOAD_SECTION(ptr, portionN, 2);											\
-	LOAD_SECTION(ptr, portionN, 3);											\
-	LOAD_SECTION(ptr, portionN, 4);											\
-	LOAD_SECTION(ptr, portionN, 5);											\
-	LOAD_SECTION(ptr, portionN, 6);											\
+#define LOAD_PORTION(ptr, portionN)							\
+	LOAD_SECTION(ptr, portionN, 0);							\
+	LOAD_SECTION(ptr, portionN, 1);							\
+	LOAD_SECTION(ptr, portionN, 2);							\
+	LOAD_SECTION(ptr, portionN, 3);							\
+	LOAD_SECTION(ptr, portionN, 4);							\
+	LOAD_SECTION(ptr, portionN, 5);							\
+	LOAD_SECTION(ptr, portionN, 6);							\
 	LOAD_SECTION(ptr, portionN, 7);
 
-#define SUBSTITUTE_SECTION(portionN, sectionN) 										\
-	V(portionN, sectionN, 0) = substitutionTable[V(portionN, sectionN, 0)];						\
-	V(portionN, sectionN, 1) = substitutionTable[V(portionN, sectionN, 1)];						\
-	V(portionN, sectionN, 2) = substitutionTable[V(portionN, sectionN, 2)];						\
-	V(portionN, sectionN, 3) = substitutionTable[V(portionN, sectionN, 3)];						\
-	V(portionN, sectionN, 4) = substitutionTable[V(portionN, sectionN, 4)];						\
-	V(portionN, sectionN, 5) = substitutionTable[V(portionN, sectionN, 5)];						\
-	V(portionN, sectionN, 6) = substitutionTable[V(portionN, sectionN, 6)];						\
+#define SUBSTITUTE_SECTION(portionN, sectionN) 						\
+	V(portionN, sectionN, 0) = substitutionTable[V(portionN, sectionN, 0)];		\
+	V(portionN, sectionN, 1) = substitutionTable[V(portionN, sectionN, 1)];		\
+	V(portionN, sectionN, 2) = substitutionTable[V(portionN, sectionN, 2)];		\
+	V(portionN, sectionN, 3) = substitutionTable[V(portionN, sectionN, 3)];		\
+	V(portionN, sectionN, 4) = substitutionTable[V(portionN, sectionN, 4)];		\
+	V(portionN, sectionN, 5) = substitutionTable[V(portionN, sectionN, 5)];		\
+	V(portionN, sectionN, 6) = substitutionTable[V(portionN, sectionN, 6)];		\
 	V(portionN, sectionN, 7) = substitutionTable[V(portionN, sectionN, 7)]
 
 #define SUBSTITUTE_PORTION(portionN)							\
@@ -98,7 +264,7 @@
 	XOR_SECTION_REVERSE(portionN, 6);						\
 	XOR_SECTION_REVERSE(portionN, 7)
 
-#define ROTATE_SECTION_RIGHT(portionN, sectionN)					\
+#define OLD_ROTATE_SECTION_RIGHT(portionN, sectionN)					\
 	do {										\
 		uint16_t addLeft, carry;						\
 		addLeft = (V(portionN, sectionN, 7) & 0xFF) << 8;			\
@@ -823,6 +989,7 @@
 	SWAP_SHORTS(V(30, 7, 6)) = SWAP_SHORT(V(31, 7, 4)); 				\
 	SWAP_SHORTS(V(30, 7, 7)) = SWAP_SHORT(V(31, 7, 5))
 
+/*****************************************************************************************************
 void replaceFoldCyclesUpdated3(vector<uint16_t>& input, uint32_t pNumber, int numRounds, vector<uint16_t>& EPUK, uint32_t& startOTPSectionCount) {
 	DASSERT(input.size() == (k4 / sizeof(uint16_t))); // input must be 4K bytes long
 
@@ -1486,4 +1653,11 @@ void replaceFoldCyclesUpdated3(vector<uint16_t>& input, uint32_t pNumber, int nu
 		//cout << "Encrypted " << endl;
 		//printVector(input, 56, 65);
 	}
+}
+}
+}
+*****************************************************************************************************/
+
+int main() {
+return 0;
 }
