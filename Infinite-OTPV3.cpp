@@ -13,6 +13,8 @@ constexpr uint32_t k64 = 64*k1;
 
 vector<uint16_t> substitutionTable;
 vector<uint16_t> reverseSubstitutionTable;
+vector<vector<uint16_t>> OTPs;
+vector<uint16_t> EPUK;
 
 /* The following macros help create variables to short each short in 4K input. portionN is the 1024-bit portion number, sectionN is the 
  * 128-bit section number within the given portion, and shortN is the short position within the given section. All these variables must 
@@ -32,129 +34,219 @@ vector<uint16_t> reverseSubstitutionTable;
 
 #define S(ptr, portionN, sectionN, shortN)	(reinterpret_cast<uint16_t *>(ptr)+(portionN*(PORTION_SIZE/(sizeof(uint16_t)*8)))+(sectionN*(SECTION_SIZE/(sizeof(uint16_t)*8)))+shortN)
 
-#define V(type, portionN, sectionN, shortN)	v ## _ ## type ## _ ## portionN ## _ ## sectionN ## _ ## shortN 
+#define V_impl(type, portionN, sectionN, shortN)		v ## _ ## type ## _ ## portionN ## _ ## sectionN ## _ ## shortN 
+#define V_impl_wrapper(type, portionN, sectionN, shortN) 	V_impl(type, portionN, sectionN, shortN)
+#define V_wrapper(type, portionN, sectionN, shortN)		V_impl_wrapper(type, portionN, sectionN, shortN)
+#define V(type, portionN, sectionN, shortN)			V_wrapper(type, portionN, sectionN, shortN)	
 
-#define XOR_OTP_EPUK_FOUR_SECTIONS(portionN, sectionN, OTPSectionCount, roundNumber) 							\
-	uint8_t EPUK_portion = roundNumber;												\
-	uint8_t EPUK_section = (OTPSectionCount / 8) - (roundNumber * 8); 								\
-	uint8_t EPUK_short = (OTPSectionCount / 2) - (roundNumber * 32) - (EPUK_section * 4); 						\
-																	\
-	V('d', portionN, sectionN, 0) ^= V('k', portionN, sectionN, 0) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][0];	\
-	V('d', portionN, sectionN, 1) ^= V('k', portionN, sectionN, 1) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][1];	\
-	V('d', portionN, sectionN, 2) ^= V('k', portionN, sectionN, 2) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][2];	\
-	V('d', portionN, sectionN, 3) ^= V('k', portionN, sectionN, 3) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][3];	\
-	V('d', portionN, sectionN, 4) ^= V('k', portionN, sectionN, 4) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][4];	\
-	V('d', portionN, sectionN, 5) ^= V('k', portionN, sectionN, 5) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][5];	\
-	V('d', portionN, sectionN, 6) ^= V('k', portionN, sectionN, 6) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][6];	\
-	V('d', portionN, sectionN, 7) ^= V('k', portionN, sectionN, 7) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][7];	\
-	++sectionN;															\
-																	\
-	V('d', portionN, sectionN, 0) ^= V('k', portionN, sectionN, 0) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][8];	\
-	V('d', portionN, sectionN, 1) ^= V('k', portionN, sectionN, 1) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][9];	\
-	V('d', portionN, sectionN, 2) ^= V('k', portionN, sectionN, 2) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][10];	\
-	V('d', portionN, sectionN, 3) ^= V('k', portionN, sectionN, 3) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][11];	\
-	V('d', portionN, sectionN, 4) ^= V('k', portionN, sectionN, 4) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][12];	\
-	V('d', portionN, sectionN, 5) ^= V('k', portionN, sectionN, 5) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][13];	\
-	V('d', portionN, sectionN, 6) ^= V('k', portionN, sectionN, 6) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][14];	\
-	V('d', portionN, sectionN, 7) ^= V('k', portionN, sectionN, 7) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][15];	\
-	++sectionN;															\
-																	\
-	V('d', portionN, sectionN, 0) ^= V('k', portionN, sectionN, 0) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][16];	\
-	V('d', portionN, sectionN, 1) ^= V('k', portionN, sectionN, 1) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][17];	\
-	V('d', portionN, sectionN, 2) ^= V('k', portionN, sectionN, 2) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][18];	\
-	V('d', portionN, sectionN, 3) ^= V('k', portionN, sectionN, 3) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][19];	\
-	V('d', portionN, sectionN, 4) ^= V('k', portionN, sectionN, 4) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][20];	\
-	V('d', portionN, sectionN, 5) ^= V('k', portionN, sectionN, 5) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][21];	\
-	V('d', portionN, sectionN, 6) ^= V('k', portionN, sectionN, 6) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][22];	\
-	V('d', portionN, sectionN, 7) ^= V('k', portionN, sectionN, 7) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][23];	\
-	++sectionN;															\
-																	\
-	V('d', portionN, sectionN, 0) ^= V('k', portionN, sectionN, 0) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][24];	\
-	V('d', portionN, sectionN, 1) ^= V('k', portionN, sectionN, 1) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][25];	\
-	V('d', portionN, sectionN, 2) ^= V('k', portionN, sectionN, 2) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][26];	\
-	V('d', portionN, sectionN, 3) ^= V('k', portionN, sectionN, 3) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][27];	\
-	V('d', portionN, sectionN, 4) ^= V('k', portionN, sectionN, 4) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][28];	\
-	V('d', portionN, sectionN, 5) ^= V('k', portionN, sectionN, 5) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][29];	\
-	V('d', portionN, sectionN, 6) ^= V('k', portionN, sectionN, 6) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][30];	\
-	V('d', portionN, sectionN, 7) ^= V('k', portionN, sectionN, 7) ^ OTPs[V('k', EPUK_portion, EPUK_section, EPUK_short)][31];	\
-	++sectionN;															\
+// TODO: Decrement OTP section count after each BACKWARD_XOR_OTP_EPUK_PORTION()
+#define BACKWARD_XOR_OTP_EPUK_PORTION_ALL(OTPSectionCount, roundNumber)								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(31, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(30, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(29, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(28, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(27, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(26, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(25, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(24, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(23, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(22, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(21, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(20, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(19, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(18, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(17, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(16, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(15, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(14, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(13, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(12, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(11, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(10, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(9, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(8, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(7, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(6, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(5, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(4, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(3, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(2, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(1, OTPSectionCount, roundNumber);								\
+	BACKWARD_XOR_OTP_EPUK_PORTION(0, OTPSectionCount, roundNumber)
+	
+
+// TODO: Increment OTP section count after each FORWARD_XOR_OTP_EPUK_PORTION()
+#define FORWARD_XOR_OTP_EPUK_PORTION_ALL(OTPSectionCount, roundNumber)								\
+	FORWARD_XOR_OTP_EPUK_PORTION(0, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(1, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(2, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(3, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(4, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(5, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(6, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(7, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(8, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(9, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(10, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(11, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(12, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(13, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(15, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(16, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(17, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(18, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(19, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(20, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(21, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(22, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(23, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(25, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(26, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(27, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(28, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(29, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(30, OTPSectionCount, roundNumber);								\
+	FORWARD_XOR_OTP_EPUK_PORTION(31, OTPSectionCount, roundNumber)
+	
+#define FORWARD_XOR_OTP_EPUK_PORTION(portionN, OTPSectionCount, roundNumber)							\
+	{															\
+	uint16_t OTPSectionC = (portionN*2)+(roundNumber*2*32);									\
+	assert(OTPSectionCount == OTPSectionC);											\
+	XOR_OTP_EPUK_FOUR_SECTIONS(portionN, 0, OTPSectionC, roundNumber);							\
+																\
+	XOR_OTP_EPUK_FOUR_SECTIONS(portionN, 4, OTPSectionC+1, roundNumber);							\
+	}
+
+#define BACKWARD_XOR_OTP_EPUK_PORTION(portionN, OTPSectionCount, roundNumber)							\
+	{															\
+	uint16_t OTPSectionC = (portionN*2)+(roundNumber*2*32);									\
+	assert(OTPSectionCount == OTPSectionC);											\
+	XOR_OTP_EPUK_FOUR_SECTIONS(portionN, 4, OTPSectionC, roundNumber);							\
+																\
+	XOR_OTP_EPUK_FOUR_SECTIONS(portionN, 0, OTPSectionC-1, roundNumber);							\
+	}
+
+#define XOR_OTP_EPUK_FOUR_SECTIONS(portionN, sectionN, OTPSectionCount, roundNumber) 						\
+	uint8_t EPUK_portion = roundNumber;											\
+	uint8_t EPUK_section = (OTPSectionCount / 8) - (roundNumber * 8); 							\
+	uint8_t EPUK_short = (OTPSectionCount / 2) - (roundNumber * 32) - (EPUK_section * 4); 					\
+	uint32_t index = V(k, roundNumber, (OTPSectionCount / 8) - (roundNumber * 8), (OTPSectionCount / 2) - (roundNumber * 32) - (((OTPSectionCount / 8) - (roundNumber * 8))*4));												\
+																\
+	V(d, portionN, sectionN, 0) ^= V(k, portionN, sectionN, 0) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][0];	\
+	V(d, portionN, sectionN, 1) ^= V(k, portionN, sectionN, 1) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][1];	\
+	V(d, portionN, sectionN, 2) ^= V(k, portionN, sectionN, 2) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][2];	\
+	V(d, portionN, sectionN, 3) ^= V(k, portionN, sectionN, 3) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][3];	\
+	V(d, portionN, sectionN, 4) ^= V(k, portionN, sectionN, 4) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][4];	\
+	V(d, portionN, sectionN, 5) ^= V(k, portionN, sectionN, 5) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][5];	\
+	V(d, portionN, sectionN, 6) ^= V(k, portionN, sectionN, 6) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][6];	\
+	V(d, portionN, sectionN, 7) ^= V(k, portionN, sectionN, 7) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][7];	\
+
+	/***********************************************************************************************************************
+																\
+	V(d, portionN, sectionN+1, 0) ^= V(k, portionN, sectionN, 0) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][8];	\
+	V(d, portionN, sectionN+1, 1) ^= V(k, portionN, sectionN, 1) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][9];	\
+	V(d, portionN, sectionN+1, 2) ^= V(k, portionN, sectionN, 2) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][10];	\
+	V(d, portionN, sectionN+1, 3) ^= V(k, portionN, sectionN, 3) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][11];	\
+	V(d, portionN, sectionN+1, 4) ^= V(k, portionN, sectionN, 4) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][12];	\
+	V(d, portionN, sectionN+1, 5) ^= V(k, portionN, sectionN, 5) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][13];	\
+	V(d, portionN, sectionN+1, 6) ^= V(k, portionN, sectionN, 6) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][14];	\
+	V(d, portionN, sectionN+1, 7) ^= V(k, portionN, sectionN, 7) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][15];	\
+																\
+	V(d, portionN, sectionN+2, 0) ^= V(k, portionN, sectionN, 0) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][16];	\
+	V(d, portionN, sectionN+2, 1) ^= V(k, portionN, sectionN, 1) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][17];	\
+	V(d, portionN, sectionN+2, 2) ^= V(k, portionN, sectionN, 2) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][18];	\
+	V(d, portionN, sectionN+2, 3) ^= V(k, portionN, sectionN, 3) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][19];	\
+	V(d, portionN, sectionN+2, 4) ^= V(k, portionN, sectionN, 4) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][20];	\
+	V(d, portionN, sectionN+2, 5) ^= V(k, portionN, sectionN, 5) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][21];	\
+	V(d, portionN, sectionN+2, 6) ^= V(k, portionN, sectionN, 6) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][22];	\
+	V(d, portionN, sectionN+2, 7) ^= V(k, portionN, sectionN, 7) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][23];	\
+																\
+	V(d, portionN, sectionN+3, 0) ^= V(k, portionN, sectionN, 0) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][24];	\
+	V(d, portionN, sectionN+3, 1) ^= V(k, portionN, sectionN, 1) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][25];	\
+	V(d, portionN, sectionN+3, 2) ^= V(k, portionN, sectionN, 2) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][26];	\
+	V(d, portionN, sectionN+3, 3) ^= V(k, portionN, sectionN, 3) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][27];	\
+	V(d, portionN, sectionN+3, 4) ^= V(k, portionN, sectionN, 4) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][28];	\
+	V(d, portionN, sectionN+3, 5) ^= V(k, portionN, sectionN, 5) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][29];	\
+	V(d, portionN, sectionN+3, 6) ^= V(k, portionN, sectionN, 6) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][30];	\
+	V(d, portionN, sectionN+3, 7) ^= V(k, portionN, sectionN, 7) ^ OTPs[V(k, EPUK_portion, EPUK_section, EPUK_short)][31];	\
+	***********************************************************************************************************************/
 
 
 #define ROTATE_SECTION_LEFT(type, portionN, sectionN)					\
 /* S0 - S1 - S2 - S3 - S4 - S5 - S6 - S7 */						\
 do {											\
 	uint16_t prev, next;								\
-	prev = (V(type, portionN, sectionN, 0) & 0xFF);					\
-	next = (V(type, portionN, sectionN, 7) & 0xFF);					\
+	prev = (V(type, portionN, sectionN, 0) & 0xFF00) >> 8;				\
+	next = (V(type, portionN, sectionN, 7) & 0xFF00) >> 8;				\
 											\
-	V(type, portionN, sectionN, 7) = (V(type, portionN, sectionN, 7) << 8) | prev;		\
+	V(type, portionN, sectionN, 7) = (V(type, portionN, sectionN, 7) << 8) | prev;	\
 	prev = next;									\
-	next = V(type, portionN, sectionN, 6) & 0xFF;						\
+	next = (V(type, portionN, sectionN, 6) & 0xFF00) >> 8;				\
 											\
-	V(type, portionN, sectionN, 6) = (V(type, portionN, sectionN, 6) << 8) | prev;		\
+	V(type, portionN, sectionN, 6) = (V(type, portionN, sectionN, 6) << 8) | prev;	\
 	prev = next;									\
-	next = V(type, portionN, sectionN, 5) & 0xFF;						\
+	next = (V(type, portionN, sectionN, 5) & 0xFF00) >> 8;				\
 											\
-	V(type, portionN, sectionN, 5) = (V(type, portionN, sectionN, 5) << 8) | prev;		\
+	V(type, portionN, sectionN, 5) = (V(type, portionN, sectionN, 5) << 8) | prev;	\
 	prev = next;									\
-	next = V(type, portionN, sectionN, 4) & 0xFF;						\
+	next = (V(type, portionN, sectionN, 4) & 0xFF00) >> 8;				\
 											\
-	V(type, portionN, sectionN, 4) = (V(type, portionN, sectionN, 4) << 8) | prev;		\
+	V(type, portionN, sectionN, 4) = (V(type, portionN, sectionN, 4) << 8) | prev;	\
 	prev = next;									\
-	next = V(type, portionN, sectionN, 3) & 0xFF;						\
+	next = (V(type, portionN, sectionN, 3) & 0xFF00) >> 8;				\
 											\
-	V(type, portionN, sectionN, 3) = (V(type, portionN, sectionN, 3) << 8) | prev;		\
+	V(type, portionN, sectionN, 3) = (V(type, portionN, sectionN, 3) << 8) | prev;	\
 	prev = next;									\
-	next = V(type, portionN, sectionN, 2) & 0xFF;						\
+	next = (V(type, portionN, sectionN, 2) & 0xFF00) >> 8;				\
 											\
-	V(type, portionN, sectionN, 2) = (V(type, portionN, sectionN, 2) << 8) | prev;		\
+	V(type, portionN, sectionN, 2) = (V(type, portionN, sectionN, 2) << 8) | prev;	\
 	prev = next;									\
-	next = V(type, portionN, sectionN, 1) & 0xFF;						\
+	next = (V(type, portionN, sectionN, 1) & 0xFF00) >> 8;				\
 											\
-	V(type, portionN, sectionN, 1) = (V(type, portionN, sectionN, 1) << 8) | prev;		\
+	V(type, portionN, sectionN, 1) = (V(type, portionN, sectionN, 1) << 8) | prev;	\
 	prev = next;									\
 											\
-	V(type, portionN, sectionN, 0) = (V(type, portionN, sectionN, 0) << 8) | prev;		\
+	V(type, portionN, sectionN, 0) = (V(type, portionN, sectionN, 0) << 8) | prev;	\
 } while(0)
 
 #define ROTATE_SECTION_RIGHT(type, portionN, sectionN)					\
 /* S0 - S1 - S2 - S3 - S4 - S5 - S6 - S7 */						\
 do {											\
 	uint16_t prev, next;								\
-	prev = (V(type, portionN, sectionN, 7) & 0xFF) << 8;					\
-	next = (V(type, portionN, sectionN, 0) & 0xFF) << 8;					\
+	prev = (V(type, portionN, sectionN, 7) & 0xFF) << 8;				\
+	next = (V(type, portionN, sectionN, 0) & 0xFF) << 8;				\
 											\
-	V(type, portionN, sectionN, 0) = (V(type, portionN, sectionN, 0) >> 8) | prev;		\
+	V(type, portionN, sectionN, 0) = (V(type, portionN, sectionN, 0) >> 8) | prev;	\
 	prev = next;									\
-	next = (V(type, portionN, sectionN, 1) & 0xFF) << 8;					\
+	next = (V(type, portionN, sectionN, 1) & 0xFF) << 8;				\
 											\
-	V(type, portionN, sectionN, 1) = (V(type, portionN, sectionN, 1) >> 8) | prev;		\
+	V(type, portionN, sectionN, 1) = (V(type, portionN, sectionN, 1) >> 8) | prev;	\
 	prev = next;									\
-	next = (V(type, portionN, sectionN, 1) & 0xFF) << 8;					\
+	next = (V(type, portionN, sectionN, 2) & 0xFF) << 8;				\
 											\
-	V(type, portionN, sectionN, 2) = (V(type, portionN, sectionN, 2) >> 8) | prev;		\
+	V(type, portionN, sectionN, 2) = (V(type, portionN, sectionN, 2) >> 8) | prev;	\
 	prev = next;									\
-	next = (V(type, portionN, sectionN, 1) & 0xFF) << 8;					\
+	next = (V(type, portionN, sectionN, 3) & 0xFF) << 8;				\
 											\
-	V(type, portionN, sectionN, 3) = (V(type, portionN, sectionN, 3) >> 8) | prev;		\
+	V(type, portionN, sectionN, 3) = (V(type, portionN, sectionN, 3) >> 8) | prev;	\
 	prev = next;									\
-	next = (V(type, portionN, sectionN, 1) & 0xFF) << 8;					\
+	next = (V(type, portionN, sectionN, 4) & 0xFF) << 8;				\
 											\
-	V(type, portionN, sectionN, 4) = (V(type, portionN, sectionN, 4) >> 8) | prev;		\
+	V(type, portionN, sectionN, 4) = (V(type, portionN, sectionN, 4) >> 8) | prev;	\
 	prev = next;									\
-	next = (V(type, portionN, sectionN, 1) & 0xFF) << 8;					\
+	next = (V(type, portionN, sectionN, 5) & 0xFF) << 8;				\
 											\
-	V(type, portionN, sectionN, 5) = (V(type, portionN, sectionN, 5) >> 8) | prev;		\
+	V(type, portionN, sectionN, 5) = (V(type, portionN, sectionN, 5) >> 8) | prev;	\
 	prev = next;									\
-	next = (V(type, portionN, sectionN, 1) & 0xFF) << 8;					\
+	next = (V(type, portionN, sectionN, 6) & 0xFF) << 8;				\
 											\
-	V(type, portionN, sectionN, 6) = (V(type, portionN, sectionN, 6) >> 8) | prev;		\
+	V(type, portionN, sectionN, 6) = (V(type, portionN, sectionN, 6) >> 8) | prev;	\
 	prev = next;									\
 											\
-	V(type, portionN, sectionN, 7) = (V(type, portionN, sectionN, 7) >> 8) | prev;		\
+	V(type, portionN, sectionN, 7) = (V(type, portionN, sectionN, 7) >> 8) | prev;	\
 } while (0)
 
-#define ROTATE_PORTION_LEFT(type, portionN) 							\
+#define ROTATE_PORTION_LEFT(type, portionN) 						\
 	ROTATE_SECTION_LEFT(type, portionN, 0);						\
 	ROTATE_SECTION_LEFT(type, portionN, 1);						\
 	ROTATE_SECTION_LEFT(type, portionN, 2);						\
@@ -162,6 +254,7 @@ do {											\
 	ROTATE_SECTION_LEFT(type, portionN, 4);						\
 	ROTATE_SECTION_LEFT(type, portionN, 5);						\
 	ROTATE_SECTION_LEFT(type, portionN, 6);						\
+	ROTATE_SECTION_LEFT(type, portionN, 7)
 
 #define ROTATE_PORTION_RIGHT(type, portionN) 							\
 	ROTATE_SECTION_RIGHT(type, portionN, 0);						\
@@ -259,6 +352,40 @@ do {											\
 	LOAD_SECTION(type, ptr, portionN, 6);							\
 	LOAD_SECTION(type, ptr, portionN, 7);
 
+#define LOAD_PORTION_ALL(ptr)									\
+	LOAD_PORTION(d, ptr, 0);								\
+	LOAD_PORTION(d, ptr, 1);								\
+	LOAD_PORTION(d, ptr, 2);								\
+	LOAD_PORTION(d, ptr, 3);								\
+	LOAD_PORTION(d, ptr, 4);								\
+	LOAD_PORTION(d, ptr, 5);								\
+	LOAD_PORTION(d, ptr, 6);								\
+	LOAD_PORTION(d, ptr, 7);								\
+	LOAD_PORTION(d, ptr, 8);								\
+	LOAD_PORTION(d, ptr, 9);								\
+	LOAD_PORTION(d, ptr, 10);								\
+	LOAD_PORTION(d, ptr, 11);								\
+	LOAD_PORTION(d, ptr, 12);								\
+	LOAD_PORTION(d, ptr, 13);								\
+	LOAD_PORTION(d, ptr, 14);								\
+	LOAD_PORTION(d, ptr, 15);								\
+	LOAD_PORTION(d, ptr, 16);								\
+	LOAD_PORTION(d, ptr, 17);								\
+	LOAD_PORTION(d, ptr, 18);								\
+	LOAD_PORTION(d, ptr, 19);								\
+	LOAD_PORTION(d, ptr, 20);								\
+	LOAD_PORTION(d, ptr, 21);								\
+	LOAD_PORTION(d, ptr, 22);								\
+	LOAD_PORTION(d, ptr, 23);								\
+	LOAD_PORTION(d, ptr, 24);								\
+	LOAD_PORTION(d, ptr, 25);								\
+	LOAD_PORTION(d, ptr, 26);								\
+	LOAD_PORTION(d, ptr, 27);								\
+	LOAD_PORTION(d, ptr, 28);								\
+	LOAD_PORTION(d, ptr, 29);								\
+	LOAD_PORTION(d, ptr, 30);								\
+	LOAD_PORTION(d, ptr, 31)
+
 #define SET_SECTION(type, ptr, portionN, sectionN)						\
 	*S(ptr, portionN, sectionN, 0) = V(type, portionN, sectionN, 0);			\
 	*S(ptr, portionN, sectionN, 1) = V(type, portionN, sectionN, 1);			\
@@ -278,6 +405,39 @@ do {											\
 	SET_SECTION(type, ptr, portionN, 5);							\
 	SET_SECTION(type, ptr, portionN, 6);							\
 	SET_SECTION(type, ptr, portionN, 7)
+
+#define SET_PORTION_ALL(ptr)									\
+	SET_PORTION(d, ptr, 0);								\
+	SET_PORTION(d, ptr, 1);								\
+	SET_PORTION(d, ptr, 2);								\
+	SET_PORTION(d, ptr, 3);								\
+	SET_PORTION(d, ptr, 4);								\
+	SET_PORTION(d, ptr, 5);								\
+	SET_PORTION(d, ptr, 6);								\
+	SET_PORTION(d, ptr, 7);								\
+	SET_PORTION(d, ptr, 8);								\
+	SET_PORTION(d, ptr, 9);								\
+	SET_PORTION(d, ptr, 10);								\
+	SET_PORTION(d, ptr, 11);								\
+	SET_PORTION(d, ptr, 12);								\
+	SET_PORTION(d, ptr, 13);								\
+	SET_PORTION(d, ptr, 14);								\
+	SET_PORTION(d, ptr, 15);								\
+	SET_PORTION(d, ptr, 16);								\
+	SET_PORTION(d, ptr, 17);								\
+	SET_PORTION(d, ptr, 18);								\
+	SET_PORTION(d, ptr, 19);								\
+	SET_PORTION(d, ptr, 20);								\
+	SET_PORTION(d, ptr, 21);								\
+	SET_PORTION(d, ptr, 22);								\
+	SET_PORTION(d, ptr, 23);								\
+	SET_PORTION(d, ptr, 24);								\
+	SET_PORTION(d, ptr, 25);								\
+	SET_PORTION(d, ptr, 26);								\
+	SET_PORTION(d, ptr, 27);								\
+	SET_PORTION(d, ptr, 28);								\
+	SET_PORTION(d, ptr, 29);								\
+	SET_PORTION(d, ptr, 30);								\
 
 #define SUBSTITUTE_SECTION(type, portionN, sectionN) 						\
 	V(type, portionN, sectionN, 0) = substitutionTable[V(type, portionN, sectionN, 0)];		\
@@ -329,15 +489,15 @@ do {											\
 	V(type, portionN, sectionN, 7) ^= V(type, portionN, sectionN, 6);				\
 	V(type, portionN, sectionN, 0) ^= V(type, portionN, sectionN, 7)
 
-#define XOR_SECTION_REVERSE(type, portionN, sectionN)						\
-	V(type, portionN, sectionN, 0) ^= V(type, portionN, sectionN, 7)				\
+#define XOR_SECTION_REVERSE(type, portionN, sectionN)							\
+	V(type, portionN, sectionN, 0) ^= V(type, portionN, sectionN, 7);				\
 	V(type, portionN, sectionN, 7) ^= V(type, portionN, sectionN, 6);				\
 	V(type, portionN, sectionN, 6) ^= V(type, portionN, sectionN, 5);				\
 	V(type, portionN, sectionN, 5) ^= V(type, portionN, sectionN, 4);				\
 	V(type, portionN, sectionN, 4) ^= V(type, portionN, sectionN, 3);				\
 	V(type, portionN, sectionN, 3) ^= V(type, portionN, sectionN, 2);				\
 	V(type, portionN, sectionN, 2) ^= V(type, portionN, sectionN, 1);				\
-	V(type, portionN, sectionN, 1) ^= V(type, portionN, sectionN, 0);
+	V(type, portionN, sectionN, 1) ^= V(type, portionN, sectionN, 0)
 
 #define XOR_PORTION_FORWARD(type, portionN)							\
 	XOR_SECTION_FORWARD(type, portionN, 0);						\
@@ -368,7 +528,7 @@ do {											\
 	while (0)
 
 #define REPLACEMENT_PORTION_FORWARD(type, portionN)						\
-	SUBSTITUTION_PORTION(type, portionN);							\
+	SUBSTITUTE_PORTION(type, portionN);							\
 	XOR_PORTION_FORWARD(type, portionN)
 
 #define REPLACEMENT_PORTION_FORWARD_ALL(type)						\
@@ -407,7 +567,7 @@ do {											\
 
 #define REPLACEMENT_PORTION_REVERSE(type, portionN)						\
 	XOR_PORTION_REVERSE(type, portionN);							\
-	REVERSE_SUBSTITUTION_PORTION(type, portionN)
+	REVERSE_SUBSTITUTE_PORTION(type, portionN)
 
 #define REPLACEMENT_PORTION_REVERSE_ALL(type)						\
 	REPLACEMENT_PORTION_REVERSE(type, 0);							\
@@ -513,9 +673,43 @@ do {											\
 	PORTION_REARRANGE(type, 30);								\
 	PORTION_REARRANGE(type, 31)
 
+#define SUPER_REARRANGEMENT_PORTION_ALL()							\
+	SUPER_REARRANGEMENT_PORTION0(d);							\
+	SUPER_REARRANGEMENT_PORTION1(d);							\
+	SUPER_REARRANGEMENT_PORTION2(d);							\
+	SUPER_REARRANGEMENT_PORTION3(d);							\
+	SUPER_REARRANGEMENT_PORTION4(d);							\
+	SUPER_REARRANGEMENT_PORTION5(d);							\
+	SUPER_REARRANGEMENT_PORTION6(d);							\
+	SUPER_REARRANGEMENT_PORTION7(d);							\
+	SUPER_REARRANGEMENT_PORTION8(d);							\
+	SUPER_REARRANGEMENT_PORTION9(d);							\
+	SUPER_REARRANGEMENT_PORTION10(d);							\
+	SUPER_REARRANGEMENT_PORTION11(d);							\
+	SUPER_REARRANGEMENT_PORTION12(d);							\
+	SUPER_REARRANGEMENT_PORTION13(d);							\
+	SUPER_REARRANGEMENT_PORTION14(d);							\
+	SUPER_REARRANGEMENT_PORTION15(d);							\
+	SUPER_REARRANGEMENT_PORTION16(d);							\
+	SUPER_REARRANGEMENT_PORTION17(d);							\
+	SUPER_REARRANGEMENT_PORTION18(d);							\
+	SUPER_REARRANGEMENT_PORTION19(d);							\
+	SUPER_REARRANGEMENT_PORTION20(d);							\
+	SUPER_REARRANGEMENT_PORTION21(d);							\
+	SUPER_REARRANGEMENT_PORTION22(d);							\
+	SUPER_REARRANGEMENT_PORTION23(d);							\
+	SUPER_REARRANGEMENT_PORTION24(d);							\
+	SUPER_REARRANGEMENT_PORTION25(d);							\
+	SUPER_REARRANGEMENT_PORTION26(d);							\
+	SUPER_REARRANGEMENT_PORTION27(d);							\
+	SUPER_REARRANGEMENT_PORTION28(d);							\
+	SUPER_REARRANGEMENT_PORTION29(d);							\
+	SUPER_REARRANGEMENT_PORTION30(d);							\
+	SUPER_REARRANGEMENT_PORTION31(d)
+
 #define SUPER_REARRANGEMENT_PORTION0_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 0, sectionN, 0), V(type, (sectionN*4), 0, 0));				\
-	SWAP_SHORTS(V(type, 0, sectionN, 1), V(type, (sectionN*4), 0, 1));				\
+	SWAP_SHORTS(V(type, 0, sectionN, 0), V(type, (sectionN*4), 0, 0));			\
+	SWAP_SHORTS(V(type, 0, sectionN, 1), V(type, (sectionN*4), 0, 1));			\
 	SWAP_SHORTS(V(type, 0, sectionN, 2), V(type, (sectionN*4+1), 0, 0));			\
 	SWAP_SHORTS(V(type, 0, sectionN, 3), V(type, (sectionN*4+1), 0, 1));			\
 	SWAP_SHORTS(V(type, 0, sectionN, 4), V(type, (sectionN*4+2), 0, 0));			\
@@ -524,13 +718,13 @@ do {											\
 	SWAP_SHORTS(V(type, 0, sectionN, 7), V(type, (sectionN*4+3), 0, 1))
 
 #define SUPER_REARRANGEMENT_PORTION0(type) 							\
-	SWAP_SHORTS(V(type, 0, 0, 2), V(type, 1, 0, 0));						\
-	SWAP_SHORTS(V(type, 0, 0, 3), V(type, 1, 0, 1));						\
-	SWAP_SHORTS(V(type, 0, 0, 4), V(type, 2, 0, 0));						\
-	SWAP_SHORTS(V(type, 0, 0, 5), V(type, 2, 0, 1));						\
-	SWAP_SHORTS(V(type, 0, 0, 6), V(type, 3, 0, 0));						\
-	SWAP_SHORTS(V(type, 0, 0, 7), V(type, 3, 0, 1));						\
-											\
+	SWAP_SHORTS(V(type, 0, 0, 2), V(type, 1, 0, 0));					\
+	SWAP_SHORTS(V(type, 0, 0, 3), V(type, 1, 0, 1));					\
+	SWAP_SHORTS(V(type, 0, 0, 4), V(type, 2, 0, 0));					\
+	SWAP_SHORTS(V(type, 0, 0, 5), V(type, 2, 0, 1));					\
+	SWAP_SHORTS(V(type, 0, 0, 6), V(type, 3, 0, 0));					\
+	SWAP_SHORTS(V(type, 0, 0, 7), V(type, 3, 0, 1));					\
+												\
 	SUPER_REARRANGEMENT_PORTION0_HELPER(type, 1);						\
 	SUPER_REARRANGEMENT_PORTION0_HELPER(type, 2);						\
 	SUPER_REARRANGEMENT_PORTION0_HELPER(type, 3);						\
@@ -540,8 +734,8 @@ do {											\
 	SUPER_REARRANGEMENT_PORTION0_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION1_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 1, sectionN, 0), V(type, (sectionN*4), 0, 2));				\
-	SWAP_SHORTS(V(type, 1, sectionN, 1), V(type, (sectionN*4), 0, 3));				\
+	SWAP_SHORTS(V(type, 1, sectionN, 0), V(type, (sectionN*4), 0, 2));			\
+	SWAP_SHORTS(V(type, 1, sectionN, 1), V(type, (sectionN*4), 0, 3));			\
 	SWAP_SHORTS(V(type, 1, sectionN, 2), V(type, (sectionN*4+1), 0, 2));			\
 	SWAP_SHORTS(V(type, 1, sectionN, 3), V(type, (sectionN*4+1), 0, 3));			\
 	SWAP_SHORTS(V(type, 1, sectionN, 4), V(type, (sectionN*4+2), 0, 2));			\
@@ -550,11 +744,11 @@ do {											\
 	SWAP_SHORTS(V(type, 1, sectionN, 7), V(type, (sectionN*4+3), 0, 3))
 
 #define SUPER_REARRANGEMENT_PORTION1(type) 							\
-	SWAP_SHORTS(V(type, 1, 0, 4), V(type, 2, 0, 2));						\
-	SWAP_SHORTS(V(type, 1, 0, 5), V(type, 2, 0, 3));						\
-	SWAP_SHORTS(V(type, 1, 0, 6), V(type, 3, 0, 2));						\
-	SWAP_SHORTS(V(type, 1, 0, 7), V(type, 3, 0, 3));						\
-											\
+	SWAP_SHORTS(V(type, 1, 0, 4), V(type, 2, 0, 2));					\
+	SWAP_SHORTS(V(type, 1, 0, 5), V(type, 2, 0, 3));					\
+	SWAP_SHORTS(V(type, 1, 0, 6), V(type, 3, 0, 2));					\
+	SWAP_SHORTS(V(type, 1, 0, 7), V(type, 3, 0, 3));					\
+												\
 	SUPER_REARRANGEMENT_PORTION1_HELPER(type, 1);						\
 	SUPER_REARRANGEMENT_PORTION1_HELPER(type, 2);						\
 	SUPER_REARRANGEMENT_PORTION1_HELPER(type, 3);						\
@@ -564,8 +758,8 @@ do {											\
 	SUPER_REARRANGEMENT_PORTION1_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION2_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 2, sectionN, 0), V(type, (sectionN*4), 0, 4));				\
-	SWAP_SHORTS(V(type, 2, sectionN, 1), V(type, (sectionN*4), 0, 5));				\
+	SWAP_SHORTS(V(type, 2, sectionN, 0), V(type, (sectionN*4), 0, 4));			\
+	SWAP_SHORTS(V(type, 2, sectionN, 1), V(type, (sectionN*4), 0, 5));			\
 	SWAP_SHORTS(V(type, 2, sectionN, 2), V(type, (sectionN*4+1), 0, 4));			\
 	SWAP_SHORTS(V(type, 2, sectionN, 3), V(type, (sectionN*4+1), 0, 5));			\
 	SWAP_SHORTS(V(type, 2, sectionN, 4), V(type, (sectionN*4+2), 0, 4));			\
@@ -574,9 +768,9 @@ do {											\
 	SWAP_SHORTS(V(type, 2, sectionN, 7), V(type, (sectionN*4+3), 0, 5))
 
 #define SUPER_REARRANGEMENT_PORTION2(type) 							\
-	SWAP_SHORTS(V(type, 2, 0, 6), V(type, 3, 0, 4));						\
-	SWAP_SHORTS(V(type, 2, 0, 7), V(type, 3, 0, 5));						\
-											\
+	SWAP_SHORTS(V(type, 2, 0, 6), V(type, 3, 0, 4));					\
+	SWAP_SHORTS(V(type, 2, 0, 7), V(type, 3, 0, 5));					\
+												\
 	SUPER_REARRANGEMENT_PORTION2_HELPER(type, 1);						\
 	SUPER_REARRANGEMENT_PORTION2_HELPER(type, 2);						\
 	SUPER_REARRANGEMENT_PORTION2_HELPER(type, 3);						\
@@ -586,8 +780,8 @@ do {											\
 	SUPER_REARRANGEMENT_PORTION2_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION3_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 3, sectionN, 0), V(type, (sectionN*4), 0, 6));				\
-	SWAP_SHORTS(V(type, 3, sectionN, 1), V(type, (sectionN*4), 0, 7));				\
+	SWAP_SHORTS(V(type, 3, sectionN, 0), V(type, (sectionN*4), 0, 6));			\
+	SWAP_SHORTS(V(type, 3, sectionN, 1), V(type, (sectionN*4), 0, 7));			\
 	SWAP_SHORTS(V(type, 3, sectionN, 2), V(type, (sectionN*4+1), 0, 6));			\
 	SWAP_SHORTS(V(type, 3, sectionN, 3), V(type, (sectionN*4+1), 0, 7));			\
 	SWAP_SHORTS(V(type, 3, sectionN, 4), V(type, (sectionN*4+2), 0, 6));			\
@@ -605,8 +799,8 @@ do {											\
 	SUPER_REARRANGEMENT_PORTION3_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION4_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 4, sectionN, 0), V(type, (sectionN*4), 1, 0));				\
-	SWAP_SHORTS(V(type, 4, sectionN, 1), V(type, (sectionN*4), 1, 1));				\
+	SWAP_SHORTS(V(type, 4, sectionN, 0), V(type, (sectionN*4), 1, 0));			\
+	SWAP_SHORTS(V(type, 4, sectionN, 1), V(type, (sectionN*4), 1, 1));			\
 	SWAP_SHORTS(V(type, 4, sectionN, 2), V(type, (sectionN*4+1), 1, 0));			\
 	SWAP_SHORTS(V(type, 4, sectionN, 3), V(type, (sectionN*4+1), 1, 1));			\
 	SWAP_SHORTS(V(type, 4, sectionN, 4), V(type, (sectionN*4+2), 1, 0));			\
@@ -621,7 +815,7 @@ do {											\
 	SWAP_SHORTS(V(type, 4, 1, 5)) = SWAP_SHORT(V(type, 6, 1, 1)); 				\
 	SWAP_SHORTS(V(type, 4, 1, 6)) = SWAP_SHORT(V(type, 7, 1, 0)); 				\
 	SWAP_SHORTS(V(type, 4, 1, 7)) = SWAP_SHORT(V(type, 7, 1, 1)); 				\
-											\
+												\
 	SUPER_REARRANGEMENT_PORTION4_HELPER(type, 2);						\
 	SUPER_REARRANGEMENT_PORTION4_HELPER(type, 3);						\
 	SUPER_REARRANGEMENT_PORTION4_HELPER(type, 4);						\
@@ -630,8 +824,8 @@ do {											\
 	SUPER_REARRANGEMENT_PORTION4_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION5_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 5, sectionN, 0), V(type, (sectionN*4), 1, 2));				\
-	SWAP_SHORTS(V(type, 5, sectionN, 1), V(type, (sectionN*4), 1, 3));				\
+	SWAP_SHORTS(V(type, 5, sectionN, 0), V(type, (sectionN*4), 1, 2));			\
+	SWAP_SHORTS(V(type, 5, sectionN, 1), V(type, (sectionN*4), 1, 3));			\
 	SWAP_SHORTS(V(type, 5, sectionN, 2), V(type, (sectionN*4+1), 1, 2));			\
 	SWAP_SHORTS(V(type, 5, sectionN, 3), V(type, (sectionN*4+1), 1, 3));			\
 	SWAP_SHORTS(V(type, 5, sectionN, 4), V(type, (sectionN*4+2), 1, 2));			\
@@ -644,7 +838,7 @@ do {											\
 	SWAP_SHORTS(V(type, 5, 1, 5)) = SWAP_SHORT(V(type, 6, 1, 3)); 				\
 	SWAP_SHORTS(V(type, 5, 1, 6)) = SWAP_SHORT(V(type, 7, 1, 2)); 				\
 	SWAP_SHORTS(V(type, 5, 1, 7)) = SWAP_SHORT(V(type, 7, 1, 3)); 				\
-											\
+												\
 	SUPER_REARRANGEMENT_PORTION5_HELPER(type, 2);						\
 	SUPER_REARRANGEMENT_PORTION5_HELPER(type, 3);						\
 	SUPER_REARRANGEMENT_PORTION5_HELPER(type, 4);						\
@@ -653,8 +847,8 @@ do {											\
 	SUPER_REARRANGEMENT_PORTION5_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION6_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 6, sectionN, 0), V(type, (sectionN*4), 1, 4));				\
-	SWAP_SHORTS(V(type, 6, sectionN, 1), V(type, (sectionN*4), 1, 5));				\
+	SWAP_SHORTS(V(type, 6, sectionN, 0), V(type, (sectionN*4), 1, 4));			\
+	SWAP_SHORTS(V(type, 6, sectionN, 1), V(type, (sectionN*4), 1, 5));			\
 	SWAP_SHORTS(V(type, 6, sectionN, 2), V(type, (sectionN*4+1), 1, 4));			\
 	SWAP_SHORTS(V(type, 6, sectionN, 3), V(type, (sectionN*4+1), 1, 5));			\
 	SWAP_SHORTS(V(type, 6, sectionN, 4), V(type, (sectionN*4+2), 1, 4));			\
@@ -665,7 +859,7 @@ do {											\
 #define SUPER_REARRANGEMENT_PORTION6(type) 							\
 	SWAP_SHORTS(V(type, 6, 1, 6)) = SWAP_SHORT(V(type, 7, 1, 4)); 				\
 	SWAP_SHORTS(V(type, 6, 1, 7)) = SWAP_SHORT(V(type, 7, 1, 5)); 				\
-											\
+												\
 	SUPER_REARRANGEMENT_PORTION6_HELPER(type, 2);						\
 	SUPER_REARRANGEMENT_PORTION6_HELPER(type, 3);						\
 	SUPER_REARRANGEMENT_PORTION6_HELPER(type, 4);						\
@@ -674,8 +868,8 @@ do {											\
 	SUPER_REARRANGEMENT_PORTION6_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION7_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 7, sectionN, 0), V(type, (sectionN*4), 1, 6));				\
-	SWAP_SHORTS(V(type, 7, sectionN, 1), V(type, (sectionN*4), 1, 7));				\
+	SWAP_SHORTS(V(type, 7, sectionN, 0), V(type, (sectionN*4), 1, 6));			\
+	SWAP_SHORTS(V(type, 7, sectionN, 1), V(type, (sectionN*4), 1, 7));			\
 	SWAP_SHORTS(V(type, 7, sectionN, 2), V(type, (sectionN*4+1), 1, 6));			\
 	SWAP_SHORTS(V(type, 7, sectionN, 3), V(type, (sectionN*4+1), 1, 7));			\
 	SWAP_SHORTS(V(type, 7, sectionN, 4), V(type, (sectionN*4+2), 1, 6));			\
@@ -692,8 +886,8 @@ do {											\
 	SUPER_REARRANGEMENT_PORTION7_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION8_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 8, sectionN, 0), V(type, (sectionN*4), 2, 0));				\
-	SWAP_SHORTS(V(type, 8, sectionN, 1), V(type, (sectionN*4), 2, 1));				\
+	SWAP_SHORTS(V(type, 8, sectionN, 0), V(type, (sectionN*4), 2, 0));			\
+	SWAP_SHORTS(V(type, 8, sectionN, 1), V(type, (sectionN*4), 2, 1));			\
 	SWAP_SHORTS(V(type, 8, sectionN, 2), V(type, (sectionN*4+1), 2, 0));			\
 	SWAP_SHORTS(V(type, 8, sectionN, 3), V(type, (sectionN*4+1), 2, 1));			\
 	SWAP_SHORTS(V(type, 8, sectionN, 4), V(type, (sectionN*4+2), 2, 0));			\
@@ -708,7 +902,7 @@ do {											\
 	SWAP_SHORTS(V(type, 8, 2, 5)) = SWAP_SHORT(V(type, 10, 2, 1)); 				\
 	SWAP_SHORTS(V(type, 8, 2, 6)) = SWAP_SHORT(V(type, 11, 2, 0)); 				\
 	SWAP_SHORTS(V(type, 8, 2, 7)) = SWAP_SHORT(V(type, 11, 2, 1)); 				\
-											\
+												\
 	SUPER_REARRANGEMENT_PORTION8_HELPER(type, 3);						\
 	SUPER_REARRANGEMENT_PORTION8_HELPER(type, 4);						\
 	SUPER_REARRANGEMENT_PORTION8_HELPER(type, 5);						\
@@ -716,8 +910,8 @@ do {											\
 	SUPER_REARRANGEMENT_PORTION8_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION9_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 9, sectionN, 0), V(type, (sectionN*4), 2, 2));				\
-	SWAP_SHORTS(V(type, 9, sectionN, 1), V(type, (sectionN*4), 2, 3));				\
+	SWAP_SHORTS(V(type, 9, sectionN, 0), V(type, (sectionN*4), 2, 2));			\
+	SWAP_SHORTS(V(type, 9, sectionN, 1), V(type, (sectionN*4), 2, 3));			\
 	SWAP_SHORTS(V(type, 9, sectionN, 2), V(type, (sectionN*4+1), 2, 2));			\
 	SWAP_SHORTS(V(type, 9, sectionN, 3), V(type, (sectionN*4+1), 2, 3));			\
 	SWAP_SHORTS(V(type, 9, sectionN, 4), V(type, (sectionN*4+2), 2, 2));			\
@@ -730,7 +924,7 @@ do {											\
 	SWAP_SHORTS(V(type, 9, 2, 5)) = SWAP_SHORT(V(type, 10, 2, 3)); 				\
 	SWAP_SHORTS(V(type, 9, 2, 6)) = SWAP_SHORT(V(type, 11, 2, 2)); 				\
 	SWAP_SHORTS(V(type, 9, 2, 7)) = SWAP_SHORT(V(type, 11, 2, 3)); 				\
-											\
+												\
 	SUPER_REARRANGEMENT_PORTION9_HELPER(type, 3);						\
 	SUPER_REARRANGEMENT_PORTION9_HELPER(type, 4);						\
 	SUPER_REARRANGEMENT_PORTION9_HELPER(type, 5);						\
@@ -738,8 +932,8 @@ do {											\
 	SUPER_REARRANGEMENT_PORTION9_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION10_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 10, sectionN, 0), V(type, (sectionN*4), 2, 4));				\
-	SWAP_SHORTS(V(type, 10, sectionN, 1), V(type, (sectionN*4), 2, 5));				\
+	SWAP_SHORTS(V(type, 10, sectionN, 0), V(type, (sectionN*4), 2, 4));			\
+	SWAP_SHORTS(V(type, 10, sectionN, 1), V(type, (sectionN*4), 2, 5));			\
 	SWAP_SHORTS(V(type, 10, sectionN, 2), V(type, (sectionN*4+1), 2, 4));			\
 	SWAP_SHORTS(V(type, 10, sectionN, 3), V(type, (sectionN*4+1), 2, 5));			\
 	SWAP_SHORTS(V(type, 10, sectionN, 4), V(type, (sectionN*4+2), 2, 4));			\
@@ -747,19 +941,19 @@ do {											\
 	SWAP_SHORTS(V(type, 10, sectionN, 6), V(type, (sectionN*4+3), 2, 4));			\
 	SWAP_SHORTS(V(type, 10, sectionN, 7), V(type, (sectionN*4+3), 2, 5))
 
-#define SUPER_REARRANGEMENT_PORTION10(type) 						\
-	SWAP_SHORTS(V(type, 10, 2, 6)) = SWAP_SHORT(V(type, 11, 2, 4)); 				\
-	SWAP_SHORTS(V(type, 10, 2, 7)) = SWAP_SHORT(V(type, 11, 2, 5)); 				\
-											\
-	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 3);					\
-	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 4);					\
-	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 5);					\
-	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 6);					\
+#define SUPER_REARRANGEMENT_PORTION10(type) 							\
+	SWAP_SHORTS(V(type, 10, 2, 6)) = SWAP_SHORT(V(type, 11, 2, 4)); 			\
+	SWAP_SHORTS(V(type, 10, 2, 7)) = SWAP_SHORT(V(type, 11, 2, 5)); 			\
+												\
+	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 3);						\
+	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 4);						\
+	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 5);						\
+	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 6);						\
 	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION11_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 11, sectionN, 0), V(type, (sectionN*4), 2, 6));				\
-	SWAP_SHORTS(V(type, 11, sectionN, 1), V(type, (sectionN*4), 2, 7));				\
+	SWAP_SHORTS(V(type, 11, sectionN, 0), V(type, (sectionN*4), 2, 6));			\
+	SWAP_SHORTS(V(type, 11, sectionN, 1), V(type, (sectionN*4), 2, 7));			\
 	SWAP_SHORTS(V(type, 11, sectionN, 2), V(type, (sectionN*4+1), 2, 6));			\
 	SWAP_SHORTS(V(type, 11, sectionN, 3), V(type, (sectionN*4+1), 2, 7));			\
 	SWAP_SHORTS(V(type, 11, sectionN, 4), V(type, (sectionN*4+2), 2, 6));			\
@@ -767,16 +961,16 @@ do {											\
 	SWAP_SHORTS(V(type, 11, sectionN, 6), V(type, (sectionN*4+3), 2, 6));			\
 	SWAP_SHORTS(V(type, 11, sectionN, 7), V(type, (sectionN*4+3), 2, 7))
 
-#define SUPER_REARRANGEMENT_PORTION11(type) 						\
-	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 3);					\
-	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 4);					\
-	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 5);					\
-	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 6);					\
+#define SUPER_REARRANGEMENT_PORTION11(type) 							\
+	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 3);						\
+	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 4);						\
+	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 5);						\
+	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 6);						\
 	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION12_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 12, sectionN, 0), V(type, (sectionN*4), 3, 0));				\
-	SWAP_SHORTS(V(type, 12, sectionN, 1), V(type, (sectionN*4), 3, 1));				\
+	SWAP_SHORTS(V(type, 12, sectionN, 0), V(type, (sectionN*4), 3, 0));			\
+	SWAP_SHORTS(V(type, 12, sectionN, 1), V(type, (sectionN*4), 3, 1));			\
 	SWAP_SHORTS(V(type, 12, sectionN, 2), V(type, (sectionN*4+1), 3, 0));			\
 	SWAP_SHORTS(V(type, 12, sectionN, 3), V(type, (sectionN*4+1), 3, 1));			\
 	SWAP_SHORTS(V(type, 12, sectionN, 4), V(type, (sectionN*4+2), 3, 0));			\
@@ -784,22 +978,22 @@ do {											\
 	SWAP_SHORTS(V(type, 12, sectionN, 6), V(type, (sectionN*4+3), 3, 0));			\
 	SWAP_SHORTS(V(type, 12, sectionN, 7), V(type, (sectionN*4+3), 3, 1))
 
-#define SUPER_REARRANGEMENT_PORTION12(type) 						\
-	SWAP_SHORTS(V(type, 12, 3, 2)) = SWAP_SHORT(V(type, 13, 3, 0)); 				\
-	SWAP_SHORTS(V(type, 12, 3, 3)) = SWAP_SHORT(V(type, 13, 3, 1)); 				\
-	SWAP_SHORTS(V(type, 12, 3, 4)) = SWAP_SHORT(V(type, 14, 3, 0)); 				\
-	SWAP_SHORTS(V(type, 12, 3, 5)) = SWAP_SHORT(V(type, 14, 3, 1)); 				\
-	SWAP_SHORTS(V(type, 12, 3, 6)) = SWAP_SHORT(V(type, 15, 3, 0)); 				\
-	SWAP_SHORTS(V(type, 12, 3, 7)) = SWAP_SHORT(V(type, 15, 3, 1)); 				\
-											\
-	SUPER_REARRANGEMENT_PORTION12_HELPER(type, 4);					\
-	SUPER_REARRANGEMENT_PORTION12_HELPER(type, 5);					\
-	SUPER_REARRANGEMENT_PORTION12_HELPER(type, 6);					\
+#define SUPER_REARRANGEMENT_PORTION12(type) 							\
+	SWAP_SHORTS(V(type, 12, 3, 2)) = SWAP_SHORT(V(type, 13, 3, 0)); 			\
+	SWAP_SHORTS(V(type, 12, 3, 3)) = SWAP_SHORT(V(type, 13, 3, 1)); 			\
+	SWAP_SHORTS(V(type, 12, 3, 4)) = SWAP_SHORT(V(type, 14, 3, 0)); 			\
+	SWAP_SHORTS(V(type, 12, 3, 5)) = SWAP_SHORT(V(type, 14, 3, 1)); 			\
+	SWAP_SHORTS(V(type, 12, 3, 6)) = SWAP_SHORT(V(type, 15, 3, 0)); 			\
+	SWAP_SHORTS(V(type, 12, 3, 7)) = SWAP_SHORT(V(type, 15, 3, 1)); 			\
+												\
+	SUPER_REARRANGEMENT_PORTION12_HELPER(type, 4);						\
+	SUPER_REARRANGEMENT_PORTION12_HELPER(type, 5);						\
+	SUPER_REARRANGEMENT_PORTION12_HELPER(type, 6);						\
 	SUPER_REARRANGEMENT_PORTION12_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION13_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 13, sectionN, 0), V(type, (sectionN*4), 3, 2));				\
-	SWAP_SHORTS(V(type, 13, sectionN, 1), V(type, (sectionN*4), 3, 3));				\
+	SWAP_SHORTS(V(type, 13, sectionN, 0), V(type, (sectionN*4), 3, 2));			\
+	SWAP_SHORTS(V(type, 13, sectionN, 1), V(type, (sectionN*4), 3, 3));			\
 	SWAP_SHORTS(V(type, 13, sectionN, 2), V(type, (sectionN*4+1), 3, 2));			\
 	SWAP_SHORTS(V(type, 13, sectionN, 3), V(type, (sectionN*4+1), 3, 3));			\
 	SWAP_SHORTS(V(type, 13, sectionN, 4), V(type, (sectionN*4+2), 3, 2));			\
@@ -807,20 +1001,20 @@ do {											\
 	SWAP_SHORTS(V(type, 13, sectionN, 6), V(type, (sectionN*4+3), 3, 2));			\
 	SWAP_SHORTS(V(type, 13, sectionN, 7), V(type, (sectionN*4+3), 3, 3))
 
-#define SUPER_REARRANGEMENT_PORTION13(type) 						\
-	SWAP_SHORTS(V(type, 13, 3, 4)) = SWAP_SHORT(V(type, 14, 3, 2)); 				\
-	SWAP_SHORTS(V(type, 13, 3, 5)) = SWAP_SHORT(V(type, 14, 3, 3)); 				\
-	SWAP_SHORTS(V(type, 13, 3, 6)) = SWAP_SHORT(V(type, 15, 3, 2)); 				\
-	SWAP_SHORTS(V(type, 13, 3, 7)) = SWAP_SHORT(V(type, 15, 3, 3)); 				\
-											\
-	SUPER_REARRANGEMENT_PORTION13_HELPER(type, 4);					\
-	SUPER_REARRANGEMENT_PORTION13_HELPER(type, 5);					\
-	SUPER_REARRANGEMENT_PORTION13_HELPER(type, 6);					\
+#define SUPER_REARRANGEMENT_PORTION13(type) 							\
+	SWAP_SHORTS(V(type, 13, 3, 4)) = SWAP_SHORT(V(type, 14, 3, 2)); 			\
+	SWAP_SHORTS(V(type, 13, 3, 5)) = SWAP_SHORT(V(type, 14, 3, 3)); 			\
+	SWAP_SHORTS(V(type, 13, 3, 6)) = SWAP_SHORT(V(type, 15, 3, 2)); 			\
+	SWAP_SHORTS(V(type, 13, 3, 7)) = SWAP_SHORT(V(type, 15, 3, 3)); 			\
+												\
+	SUPER_REARRANGEMENT_PORTION13_HELPER(type, 4);						\
+	SUPER_REARRANGEMENT_PORTION13_HELPER(type, 5);						\
+	SUPER_REARRANGEMENT_PORTION13_HELPER(type, 6);						\
 	SUPER_REARRANGEMENT_PORTION13_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION14_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 14, sectionN, 0), V(type, (sectionN*4), 3, 4));				\
-	SWAP_SHORTS(V(type, 14, sectionN, 1), V(type, (sectionN*4), 3, 5));				\
+	SWAP_SHORTS(V(type, 14, sectionN, 0), V(type, (sectionN*4), 3, 4));			\
+	SWAP_SHORTS(V(type, 14, sectionN, 1), V(type, (sectionN*4), 3, 5));			\
 	SWAP_SHORTS(V(type, 14, sectionN, 2), V(type, (sectionN*4+1), 3, 4));			\
 	SWAP_SHORTS(V(type, 14, sectionN, 3), V(type, (sectionN*4+1), 3, 5));			\
 	SWAP_SHORTS(V(type, 14, sectionN, 4), V(type, (sectionN*4+2), 3, 4));			\
@@ -828,18 +1022,18 @@ do {											\
 	SWAP_SHORTS(V(type, 14, sectionN, 6), V(type, (sectionN*4+3), 3, 4));			\
 	SWAP_SHORTS(V(type, 14, sectionN, 7), V(type, (sectionN*4+3), 3, 5))
 
-#define SUPER_REARRANGEMENT_PORTION14(type) 						\
-	SWAP_SHORTS(V(type, 14, 3, 6)) = SWAP_SHORT(V(type, 15, 3, 4)); 				\
-	SWAP_SHORTS(V(type, 14, 3, 7)) = SWAP_SHORT(V(type, 15, 3, 5)); 				\
-											\
-	SUPER_REARRANGEMENT_PORTION14_HELPER(type, 4);					\
-	SUPER_REARRANGEMENT_PORTION14_HELPER(type, 5);					\
-	SUPER_REARRANGEMENT_PORTION14_HELPER(type, 6);					\
+#define SUPER_REARRANGEMENT_PORTION14(type) 							\
+	SWAP_SHORTS(V(type, 14, 3, 6)) = SWAP_SHORT(V(type, 15, 3, 4)); 			\
+	SWAP_SHORTS(V(type, 14, 3, 7)) = SWAP_SHORT(V(type, 15, 3, 5)); 			\
+												\
+	SUPER_REARRANGEMENT_PORTION14_HELPER(type, 4);						\
+	SUPER_REARRANGEMENT_PORTION14_HELPER(type, 5);						\
+	SUPER_REARRANGEMENT_PORTION14_HELPER(type, 6);						\
 	SUPER_REARRANGEMENT_PORTION14_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION15_HELPER(type, sectionN)					\
-	SWAP_SHORTS(V(type, 15, sectionN, 0), V(type, (sectionN*4), 3, 6));				\
-	SWAP_SHORTS(V(type, 15, sectionN, 1), V(type, (sectionN*4), 3, 7));				\
+	SWAP_SHORTS(V(type, 15, sectionN, 0), V(type, (sectionN*4), 3, 6));			\
+	SWAP_SHORTS(V(type, 15, sectionN, 1), V(type, (sectionN*4), 3, 7));			\
 	SWAP_SHORTS(V(type, 15, sectionN, 2), V(type, (sectionN*4+1), 3, 6));			\
 	SWAP_SHORTS(V(type, 15, sectionN, 3), V(type, (sectionN*4+1), 3, 7));			\
 	SWAP_SHORTS(V(type, 15, sectionN, 4), V(type, (sectionN*4+2), 3, 6));			\
@@ -1761,6 +1955,14 @@ void initialize() {
 		substitutionTable[i] = temp;
 		reverseSubstitutionTable[temp] = i;
 	}
+
+	OTPs.resize(k64);
+	for (uint32_t i = 0; i < k64; ++i) {
+		OTPs[i].resize(32);
+		for (uint32_t j = 0; j < 32; ++j) {
+			OTPs[i][j] = rand();
+		}
+	}
 }
 
 void printVector(uint32_t start, uint32_t end, vector<uint16_t>& vec) {
@@ -1779,30 +1981,126 @@ int main() {
 		original.at(i) = rand();
 	}
 	vector<uint16_t> input(original);
-	char type = 'd';
+	EPUK = original;
 
 	// TEST 0: Load Input Vector ==========================================================================================
-	LOAD_PORTION(type, reinterpret_cast<uint16_t*>(input.data()), 0);
-	LOAD_PORTION(type, reinterpret_cast<uint16_t*>(input.data()), 5);
-	
+	LOAD_PORTION_ALL(reinterpret_cast<uint16_t*>(input.data()));
+
 	// TEST 1: Substitution ===============================================================================================
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
-	SUBSTITUTE_SECTION(type, 5, 0);
-	SET_SECTION(type, input.data(), 5, 0);
+	SUBSTITUTE_SECTION(d, 5, 0);
+	SET_SECTION(d, input.data(), 5, 0);
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
-	REVERSE_SUBSTITUTE_SECTION(type, 5, 0);
-	SET_SECTION(type, input.data(), 5, 0);
+	REVERSE_SUBSTITUTE_SECTION(d, 5, 0);
+	SET_SECTION(d, input.data(), 5, 0);
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	cout << "Forward and reverse substituted a section" << endl;
 	
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
-	SUBSTITUTE_PORTION(type, 0);
-	SET_PORTION(type, input.data(), 0);
+	SUBSTITUTE_PORTION(d, 0);
+	SET_PORTION(d, input.data(), 0);
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
-	REVERSE_SUBSTITUTE_PORTION(type, 0);
-	SET_PORTION(type, input.data(), 0);
+	REVERSE_SUBSTITUTE_PORTION(d, 0);
+	SET_PORTION(d, input.data(), 0);
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	cout << "Forward and reverse substituted a portion" << endl;
+
+	// TEST 2: Rotate =====================================================================================================
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	ROTATE_SECTION_LEFT(d, 0, 0);
+	SET_PORTION(d, input.data(), 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	ROTATE_SECTION_RIGHT(d, 0, 0);
+	SET_PORTION(d, input.data(), 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Left and right rotated a section" << endl;
+
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	ROTATE_PORTION_LEFT(d, 5);
+	SET_PORTION(d, input.data(), 5);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	ROTATE_PORTION_RIGHT(d, 5);
+	SET_PORTION(d, input.data(), 5);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Left and right rotated a portion" << endl;
+
+	// TEST 3: Rearragenment ==============================================================================================
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	PORTION_REARRANGE(d, 5);
+	SET_PORTION(d, input.data(), 5);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	PORTION_REARRANGE(d, 5);
+	SET_PORTION(d, input.data(), 5);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Rearrangement a portion" << endl;
+
+	// TEST 4: Circular xor ===============================================================================================
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	XOR_SECTION_FORWARD(d, 0, 0);
+	SET_PORTION(d, input.data(), 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	XOR_SECTION_REVERSE(d, 0, 0);
+	SET_PORTION(d, input.data(), 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Circular xored a section" << endl;
+
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	XOR_PORTION_FORWARD(d, 5);
+	SET_PORTION(d, input.data(), 5);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	XOR_PORTION_REVERSE(d, 5);
+	SET_PORTION(d, input.data(), 5);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Circular xored a portion" << endl;
+
+	// TEST 5: Replacement ===============================================================================================
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	REPLACEMENT_PORTION_FORWARD(d, 0);
+	SET_PORTION(d, input.data(), 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	REPLACEMENT_PORTION_REVERSE(d, 0);
+	SET_PORTION(d, input.data(), 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Replacement on a portion" << endl;
+	
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	REPLACEMENT_PORTION_FORWARD_ALL(d);
+	SET_PORTION_ALL(input.data());
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	REPLACEMENT_PORTION_REVERSE_ALL(d);
+	SET_PORTION_ALL(input.data());
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Replacement on entire 4K page" << endl;
+	
+	// TEST 6: Super rearrangement ========================================================================================
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	SUPER_REARRANGEMENT_PORTION0(d);
+	SET_PORTION(d, input.data(), 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	SUPER_REARRANGEMENT_PORTION0(d);
+	SET_PORTION(d, input.data(), 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Super rearrangement on a portion" << endl;
+	
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	REPLACEMENT_PORTION_FORWARD_ALL(d);
+	SET_PORTION_ALL(input.data());
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	REPLACEMENT_PORTION_REVERSE_ALL(d);
+	SET_PORTION_ALL(input.data());
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Replacement on entire 4K page" << endl;
+
+	// TEST 4: Xor data, EPUK, and OTP ====================================================================================
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	//XOR_OTP_EPUK_FOUR_SECTIONS(0, 0, 0, 0);
+	//SET_SECTION(d, input.data(), 0, 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	//XOR_OTP_EPUK_FOUR_SECTIONS(0, 0, 0, 0);
+	//SET_SECTION(d, input.data(), 0, 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Forward and reverse xored four sections" << endl;
+	
 	
 	return 0;
 }
