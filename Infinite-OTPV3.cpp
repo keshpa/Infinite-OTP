@@ -34,25 +34,25 @@ vector<uint16_t> EPUK;
 		b = temp;				\
 	} while(0)
 
-#define ADD(a, b) 					\
-	static_assert(a < 255, "Addition variable must be smaller than 256);				\
-	static_assert(b < 255, "Addition variable must be smaller than 256);				\
-	BOOST_PP_ADD(a, b)
+#define SUB(a, b)					\
+	static_assert(a < 255, "Subtraction variable 'a' must be less than 255"); \
+	static_assert(b < 255, "Subtraction variable 'b' must be less than 255"); \
+	BOOST_PP_SUB(a, b)				\
 
-#define DIV(a, b) 					\
-	static_assert(a < 255, "Division variables must be smaller than 256);				\
-	static_assert(b < 255, "Division variables must be smaller than 256);				\
-	BOOST_PP_DIV(a, b)
+#define DIV(a, b)					\
+	static_assert(a < 255, "Division variable 'a' must be less than 255"); \
+	static_assert(b < 255, "Division variable 'b' must be less than 255"); \
+	BOOST_PP_DIV(a, b)				\
 
-#define SUB(a, b) 					\
-	static_assert(a < 255, "Subtraction variables must be smaller than 256);				\
-	static_assert(b < 255, "Subtraction variables must be smaller than 256);				\
-	BOOST_PP_SUB(a, b)
+#define ADD(a, b)					\
+	static_assert(a < 255, "Addition variable 'a' must be less than 255"); \
+	static_assert(b < 255, "Addition variable 'b' must be less than 255"); \
+	BOOST_PP_ADD(a, b)				\
 
-#define MUL(a, b) 					\
-	static_assert(a < 255, "Multiplication variables must be smaller than 256);				\
-	static_assert(b < 255, "Multiplication variables must be smaller than 256);				\
-	BOOST_PP_MUL(a, b)
+#define MUL(a, b)					\
+	static_assert(a < 255, "Multiplication variable 'a' must be less than 255"); \
+	static_assert(b < 255, "Multiplication variable 'b' must be less than 255"); \
+	BOOST_PP_MUL(a, b)				\
 
 #define S(ptr, portionN, sectionN, shortN)	(reinterpret_cast<uint16_t *>(ptr)+(portionN*(PORTION_SIZE/(sizeof(uint16_t)*8)))+(sectionN*(SECTION_SIZE/(sizeof(uint16_t)*8)))+shortN)
 
@@ -373,6 +373,26 @@ do {															\
 	SET_SECTION(type, ptr, portionN, 5);							\
 	SET_SECTION(type, ptr, portionN, 6);							\
 	SET_SECTION(type, ptr, portionN, 7)
+
+#define LOAD_PORTION_FROM_OTHER_PORTION(type, ptr, destP, sourceP)					\
+	LOAD_SECTION_FROM_OTHER_SECTION(type, ptr, destP, sourceP, 0, 0);			\
+	LOAD_SECTION_FROM_OTHER_SECTION(type, ptr, destP, sourceP, 1, 1);			\
+	LOAD_SECTION_FROM_OTHER_SECTION(type, ptr, destP, sourceP, 2, 2);			\
+	LOAD_SECTION_FROM_OTHER_SECTION(type, ptr, destP, sourceP, 3, 3);			\
+	LOAD_SECTION_FROM_OTHER_SECTION(type, ptr, destP, sourceP, 4, 4);			\
+	LOAD_SECTION_FROM_OTHER_SECTION(type, ptr, destP, sourceP, 5, 5);			\
+	LOAD_SECTION_FROM_OTHER_SECTION(type, ptr, destP, sourceP, 6, 6);			\
+	LOAD_SECTION_FROM_OTHER_SECTION(type, ptr, destP, sourceP, 7, 7)
+
+#define LOAD_SECTION_FROM_OTHER_SECTION(type, ptr, destP, sourceP, destS, sourceS)					\
+	uint16_t V(ptr, destP, destS, 0) = V(type, sourceP, sourceS, 0);			\
+	uint16_t V(ptr, destP, destS, 1) = V(type, sourceP, sourceS, 1);			\
+	uint16_t V(ptr, destP, destS, 2) = V(type, sourceP, sourceS, 2);			\
+	uint16_t V(ptr, destP, destS, 3) = V(type, sourceP, sourceS, 3);			\
+	uint16_t V(ptr, destP, destS, 4) = V(type, sourceP, sourceS, 4);			\
+	uint16_t V(ptr, destP, destS, 5) = V(type, sourceP, sourceS, 5);			\
+	uint16_t V(ptr, destP, destS, 6) = V(type, sourceP, sourceS, 6);			\
+	uint16_t V(ptr, destP, destS, 7) = V(type, sourceP, sourceS, 7)
 
 #define SET_PORTION_ALL(type, ptr)									\
 	SET_PORTION(type, ptr, 0);								\
@@ -1931,11 +1951,188 @@ void printVector(uint32_t start, uint32_t end, vector<uint16_t>& vec) {
 	cout << endl;
 }
 
+#define EXTEND_USER_KEY()									\
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 1, 0);					\
+	ROTATE_PORTION_LEFT(k, 1);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 2, 1);					\
+	ROTATE_PORTION_LEFT(k, 2);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 3, 2);					\
+	ROTATE_PORTION_LEFT(k, 3);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 4, 3);					\
+	ROTATE_PORTION_LEFT(k, 4);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 5, 4);					\
+	ROTATE_PORTION_LEFT(k, 5);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 6, 5);					\
+	ROTATE_PORTION_LEFT(k, 6);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 7, 6);					\
+	ROTATE_PORTION_LEFT(k, 7);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 8, 7);					\
+	ROTATE_PORTION_LEFT(k, 8);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 9, 8);					\
+	ROTATE_PORTION_LEFT(k, 9);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 10, 9);					\
+	ROTATE_PORTION_LEFT(k, 10);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 11, 10);					\
+	ROTATE_PORTION_LEFT(k, 11);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 12, 11);					\
+	ROTATE_PORTION_LEFT(k, 12);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 13, 12);					\
+	ROTATE_PORTION_LEFT(k, 13);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 14, 13);					\
+	ROTATE_PORTION_LEFT(k, 14);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 15, 14);					\
+	ROTATE_PORTION_LEFT(k, 15);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 16, 15);					\
+	ROTATE_PORTION_LEFT(k, 16);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 17, 16);					\
+	ROTATE_PORTION_LEFT(k, 17);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 18, 17);					\
+	ROTATE_PORTION_LEFT(k, 18);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 19, 18);					\
+	ROTATE_PORTION_LEFT(k, 19);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 20, 19);					\
+	ROTATE_PORTION_LEFT(k, 20);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 21, 20);					\
+	ROTATE_PORTION_LEFT(k, 21);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 22, 21);					\
+	ROTATE_PORTION_LEFT(k, 22);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 23, 22);					\
+	ROTATE_PORTION_LEFT(k, 23);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 24, 23);					\
+	ROTATE_PORTION_LEFT(k, 24);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 25, 24);					\
+	ROTATE_PORTION_LEFT(k, 25);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 26, 25);					\
+	ROTATE_PORTION_LEFT(k, 26);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 27, 26);					\
+	ROTATE_PORTION_LEFT(k, 27);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 28, 27);					\
+	ROTATE_PORTION_LEFT(k, 28);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 29, 28);					\
+	ROTATE_PORTION_LEFT(k, 29);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 30, 29);					\
+	ROTATE_PORTION_LEFT(k, 30);								\
+
+	LOAD_PORTION_FROM_OTHER_PORTION(k, 31, 30);					\
+	ROTATE_PORTION_LEFT(k, 31)
+
+#define PROCESS_USER_KEY()									\
+	REPLACEMENT_PORTION_FORWARD(k, 0);							\
+	REPLACEMENT_PORTION_FORWARD(k, 0);							\
+	PORTION_REARRANGE(k, 0);								\
+	REPLACEMENT_PORTION_FORWARD(k, 0);							\
+	REPLACEMENT_PORTION_FORWARD(k, 0);							\
+	EXTEND_USER_KEY()
+
+#define ENCRYPTION(input, userKey)									\
+	/* STEP 1: Load user key (1024-bits) and data (4K bytes). */				\
+	LOAD_PORTION_ALL(d, input.data());							\
+	LOAD_PORTION(k, userKey.data(), 0);							\
+												\
+	/* STEP 2: Create extended process user key */						\
+	PROCESS_USER_KEY();									\
+												\
+	/* STEP 3: Put entire user data through 2 rounds of replacement */			\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(0);								\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(1);								\
+												\
+	/* STEP 4: Put entire user key through 1 round of rearrangement */			\
+	REARRANGE_ALL_PORTIONS();								\
+												\
+	/* STEP 5: Put entire user key through 2 round of replacement */			\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(2);								\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(3);								\
+												\
+	/* STEP 6: Super rearrange user data */							\
+	SUPER_REARRANGEMENT_PORTION_ALL();							\
+												\
+	/* STEP 7: Put entire user key through 2 round of replacement */			\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(4);								\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(5);								\
+												\
+	/* STEP 8: Store te encrypted text */							\
+	SET_PORTION_ALL(input)
+
+#define DECRYPTION(input, userKey)									\
+	/* STEP 1: Load user key (1024-bits) and data (4K bytes). */				\
+	LOAD_PORTION_ALL(d, input.data());							\
+	LOAD_PORTION(k, userKey.data(), 0);							\
+												\
+	/* STEP 2: Create extended process user key */						\
+	PROCESS_USER_KEY();									\
+												\
+	/* STEP 3: Put entire user data through 2 rounds of replacement (7) */			\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(0);								\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(1);								\
+												\
+	/* STEP 4: Super rearrange user data (6) */							\
+	SUPER_REARRANGEMENT_PORTION_ALL();							\
+												\
+	/* STEP 5: Put entire user key through 2 round of replacement (5) */			\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(2);								\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(3);								\
+												\
+	/* STEP 6: Put entire user key through 1 round of rearrangement (4) */			\
+	REARRANGE_ALL_PORTIONS();								\
+												\
+	/* STEP 7: Put entire user key through 2 round of replacement (3) */			\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(4);								\
+	REPLACEMENT_PORTION_FORWARD_ALL(d);							\
+	XOR_OTP_EPUK_PORTION_ALL(5);								\
+												\
+	/* STEP 8: Store te encrypted text */							\
+	SET_PORTION_ALL(input)
+
 int main() {
 	initialize();
 
 	uint32_t size = k4 / sizeof(uint16_t); // 4K bytes
+	uint32_t sizeUK = k1 / sizeof(uint16_t); // 1K bytes
 	vector<uint16_t> original(size);
+	vector<uint16_t> userKey(sizeUK);
+	for (uint16_t i = 0; i < userKey.size(); ++i) {
+		userKey.at(i) = rand();
+	}
 	for (uint16_t i = 0; i < original.size(); ++i) {
 		original.at(i) = rand();
 	}
@@ -2051,7 +2248,7 @@ int main() {
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	cout << "Super rearrange on entire 4K page" << endl;
 
-	// TEST 4: Xor data, EPUK, and OTP ====================================================================================
+	// TEST 7: Xor data, EPUK, and OTP ====================================================================================
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	XOR_OTP_EPUK_FOUR_SECTIONS(0, 0, 0, 0, 0);
 	SET_SECTION(d, input.data(), 0, 0);
@@ -2087,6 +2284,15 @@ int main() {
 	SET_PORTION_ALL(d, input.data());
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	cout << "Forward and reverse xored entire 4K user data (diff round #)" << endl;
+
+	// TEST 8: Final Test =================================================================================================
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	ENCRYPTION(input, userKey);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	DECRYPTION(input, userKey);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Encryption and decryption of entire user data page" << endl;
+	
 
 	return 0;
 }
