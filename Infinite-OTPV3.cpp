@@ -43,8 +43,8 @@ vector<uint16_t> EPUK;
 
 #define XOR_OTP_EPUK_PORTION(portionN, EPUK_PORTION, EPUK_SECTION, EPUK_SHORT)							\
 {																\
-	XOR_OTP_EPUK_FOUR_SECTIONS(portionN, 0, EPUK_PORTION, EPUC_SECTION, EPUK_SHORT);					\
-	XOR_OTP_EPUK_FOUR_SECTIONS(portionN, 4, EPUK_PORTION, EPUC_SECTION, BOOST_PP_ADD(EPUK_SHORT, 1));			\
+	XOR_OTP_EPUK_FOUR_SECTIONS(portionN, 0, EPUK_PORTION, EPUK_SECTION, EPUK_SHORT);					\
+	XOR_OTP_EPUK_FOUR_SECTIONS(portionN, 4, EPUK_PORTION, EPUK_SECTION, BOOST_PP_ADD(EPUK_SHORT, 1));			\
 }
 
 #define XOR_OTP_EPUK_FOUR_SECTIONS(portionN, sectionN, EPUK_PORTION, EPUK_SECTION, EPUK_SHORT)					\
@@ -301,39 +301,39 @@ do {															\
 	LOAD_SECTION(type, ptr, portionN, 6);							\
 	LOAD_SECTION(type, ptr, portionN, 7);
 
-#define LOAD_PORTION_ALL(ptr)									\
-	LOAD_PORTION(d, ptr, 0);								\
-	LOAD_PORTION(d, ptr, 1);								\
-	LOAD_PORTION(d, ptr, 2);								\
-	LOAD_PORTION(d, ptr, 3);								\
-	LOAD_PORTION(d, ptr, 4);								\
-	LOAD_PORTION(d, ptr, 5);								\
-	LOAD_PORTION(d, ptr, 6);								\
-	LOAD_PORTION(d, ptr, 7);								\
-	LOAD_PORTION(d, ptr, 8);								\
-	LOAD_PORTION(d, ptr, 9);								\
-	LOAD_PORTION(d, ptr, 10);								\
-	LOAD_PORTION(d, ptr, 11);								\
-	LOAD_PORTION(d, ptr, 12);								\
-	LOAD_PORTION(d, ptr, 13);								\
-	LOAD_PORTION(d, ptr, 14);								\
-	LOAD_PORTION(d, ptr, 15);								\
-	LOAD_PORTION(d, ptr, 16);								\
-	LOAD_PORTION(d, ptr, 17);								\
-	LOAD_PORTION(d, ptr, 18);								\
-	LOAD_PORTION(d, ptr, 19);								\
-	LOAD_PORTION(d, ptr, 20);								\
-	LOAD_PORTION(d, ptr, 21);								\
-	LOAD_PORTION(d, ptr, 22);								\
-	LOAD_PORTION(d, ptr, 23);								\
-	LOAD_PORTION(d, ptr, 24);								\
-	LOAD_PORTION(d, ptr, 25);								\
-	LOAD_PORTION(d, ptr, 26);								\
-	LOAD_PORTION(d, ptr, 27);								\
-	LOAD_PORTION(d, ptr, 28);								\
-	LOAD_PORTION(d, ptr, 29);								\
-	LOAD_PORTION(d, ptr, 30);								\
-	LOAD_PORTION(d, ptr, 31)
+#define LOAD_PORTION_ALL(type, ptr)									\
+	LOAD_PORTION(type, ptr, 0);								\
+	LOAD_PORTION(type, ptr, 1);								\
+	LOAD_PORTION(type, ptr, 2);								\
+	LOAD_PORTION(type, ptr, 3);								\
+	LOAD_PORTION(type, ptr, 4);								\
+	LOAD_PORTION(type, ptr, 5);								\
+	LOAD_PORTION(type, ptr, 6);								\
+	LOAD_PORTION(type, ptr, 7);								\
+	LOAD_PORTION(type, ptr, 8);								\
+	LOAD_PORTION(type, ptr, 9);								\
+	LOAD_PORTION(type, ptr, 10);								\
+	LOAD_PORTION(type, ptr, 11);								\
+	LOAD_PORTION(type, ptr, 12);								\
+	LOAD_PORTION(type, ptr, 13);								\
+	LOAD_PORTION(type, ptr, 14);								\
+	LOAD_PORTION(type, ptr, 15);								\
+	LOAD_PORTION(type, ptr, 16);								\
+	LOAD_PORTION(type, ptr, 17);								\
+	LOAD_PORTION(type, ptr, 18);								\
+	LOAD_PORTION(type, ptr, 19);								\
+	LOAD_PORTION(type, ptr, 20);								\
+	LOAD_PORTION(type, ptr, 21);								\
+	LOAD_PORTION(type, ptr, 22);								\
+	LOAD_PORTION(type, ptr, 23);								\
+	LOAD_PORTION(type, ptr, 24);								\
+	LOAD_PORTION(type, ptr, 25);								\
+	LOAD_PORTION(type, ptr, 26);								\
+	LOAD_PORTION(type, ptr, 27);								\
+	LOAD_PORTION(type, ptr, 28);								\
+	LOAD_PORTION(type, ptr, 29);								\
+	LOAD_PORTION(type, ptr, 30);								\
+	LOAD_PORTION(type, ptr, 31)
 
 #define SET_SECTION(type, ptr, portionN, sectionN)						\
 	*S(ptr, portionN, sectionN, 0) = V(type, portionN, sectionN, 0);			\
@@ -355,38 +355,38 @@ do {															\
 	SET_SECTION(type, ptr, portionN, 6);							\
 	SET_SECTION(type, ptr, portionN, 7)
 
-#define SET_PORTION_ALL(ptr)									\
-	SET_PORTION(d, ptr, 0);								\
-	SET_PORTION(d, ptr, 1);								\
-	SET_PORTION(d, ptr, 2);								\
-	SET_PORTION(d, ptr, 3);								\
-	SET_PORTION(d, ptr, 4);								\
-	SET_PORTION(d, ptr, 5);								\
-	SET_PORTION(d, ptr, 6);								\
-	SET_PORTION(d, ptr, 7);								\
-	SET_PORTION(d, ptr, 8);								\
-	SET_PORTION(d, ptr, 9);								\
-	SET_PORTION(d, ptr, 10);								\
-	SET_PORTION(d, ptr, 11);								\
-	SET_PORTION(d, ptr, 12);								\
-	SET_PORTION(d, ptr, 13);								\
-	SET_PORTION(d, ptr, 14);								\
-	SET_PORTION(d, ptr, 15);								\
-	SET_PORTION(d, ptr, 16);								\
-	SET_PORTION(d, ptr, 17);								\
-	SET_PORTION(d, ptr, 18);								\
-	SET_PORTION(d, ptr, 19);								\
-	SET_PORTION(d, ptr, 20);								\
-	SET_PORTION(d, ptr, 21);								\
-	SET_PORTION(d, ptr, 22);								\
-	SET_PORTION(d, ptr, 23);								\
-	SET_PORTION(d, ptr, 24);								\
-	SET_PORTION(d, ptr, 25);								\
-	SET_PORTION(d, ptr, 26);								\
-	SET_PORTION(d, ptr, 27);								\
-	SET_PORTION(d, ptr, 28);								\
-	SET_PORTION(d, ptr, 29);								\
-	SET_PORTION(d, ptr, 30);								\
+#define SET_PORTION_ALL(type, ptr)									\
+	SET_PORTION(type, ptr, 0);								\
+	SET_PORTION(type, ptr, 1);								\
+	SET_PORTION(type, ptr, 2);								\
+	SET_PORTION(type, ptr, 3);								\
+	SET_PORTION(type, ptr, 4);								\
+	SET_PORTION(type, ptr, 5);								\
+	SET_PORTION(type, ptr, 6);								\
+	SET_PORTION(type, ptr, 7);								\
+	SET_PORTION(type, ptr, 8);								\
+	SET_PORTION(type, ptr, 9);								\
+	SET_PORTION(type, ptr, 10);								\
+	SET_PORTION(type, ptr, 11);								\
+	SET_PORTION(type, ptr, 12);								\
+	SET_PORTION(type, ptr, 13);								\
+	SET_PORTION(type, ptr, 14);								\
+	SET_PORTION(type, ptr, 15);								\
+	SET_PORTION(type, ptr, 16);								\
+	SET_PORTION(type, ptr, 17);								\
+	SET_PORTION(type, ptr, 18);								\
+	SET_PORTION(type, ptr, 19);								\
+	SET_PORTION(type, ptr, 20);								\
+	SET_PORTION(type, ptr, 21);								\
+	SET_PORTION(type, ptr, 22);								\
+	SET_PORTION(type, ptr, 23);								\
+	SET_PORTION(type, ptr, 24);								\
+	SET_PORTION(type, ptr, 25);								\
+	SET_PORTION(type, ptr, 26);								\
+	SET_PORTION(type, ptr, 27);								\
+	SET_PORTION(type, ptr, 28);								\
+	SET_PORTION(type, ptr, 29);								\
+	SET_PORTION(type, ptr, 30);								\
 
 #define SUBSTITUTE_SECTION(type, portionN, sectionN) 						\
 	V(type, portionN, sectionN, 0) = substitutionTable[V(type, portionN, sectionN, 0)];		\
@@ -1924,7 +1924,8 @@ int main() {
 	EPUK = original;
 
 	// TEST 0: Load Input Vector ==========================================================================================
-	LOAD_PORTION_ALL(reinterpret_cast<uint16_t*>(input.data()));
+	LOAD_PORTION_ALL(d, reinterpret_cast<uint16_t*>(input.data()));
+	LOAD_PORTION_ALL(k, reinterpret_cast<uint16_t*>(EPUK.data()));
 
 	// TEST 1: Substitution ===============================================================================================
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
@@ -2005,14 +2006,15 @@ int main() {
 	
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	REPLACEMENT_PORTION_FORWARD_ALL(d);
-	SET_PORTION_ALL(input.data());
+	SET_PORTION_ALL(d, input.data());
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
 	REPLACEMENT_PORTION_REVERSE_ALL(d);
-	SET_PORTION_ALL(input.data());
+	SET_PORTION_ALL(d, input.data());
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	cout << "Replacement on entire 4K page" << endl;
 	
 	// TEST 6: Super rearrangement ========================================================================================
+	/**********************************************************************************************************************
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	SUPER_REARRANGEMENT_PORTION0(d);
 	SET_PORTION(d, input.data(), 0);
@@ -2024,23 +2026,50 @@ int main() {
 	
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	SUPER_REARRANGEMENT_PORTION_ALL();
-	SET_PORTION_ALL(input.data());
+	SET_PORTION_ALL(d, input.data());
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
 	SUPER_REARRANGEMENT_PORTION_ALL();
-	SET_PORTION_ALL(input.data());
+	SET_PORTION_ALL(d, input.data());
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	cout << "Super rearrange on entire 4K page" << endl;
+	**********************************************************************************************************************/
 
 	// TEST 4: Xor data, EPUK, and OTP ====================================================================================
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
-	//XOR_OTP_EPUK_FOUR_SECTIONS(0, 0, 0, 0);
-	//SET_SECTION(d, input.data(), 0, 0);
+	XOR_OTP_EPUK_FOUR_SECTIONS(0, 0, 0, 0, 0);
+	SET_SECTION(d, input.data(), 0, 0);
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
-	//XOR_OTP_EPUK_FOUR_SECTIONS(0, 0, 0, 0);
-	//SET_SECTION(d, input.data(), 0, 0);
+	XOR_OTP_EPUK_FOUR_SECTIONS(0, 0, 0, 0, 0);
+	SET_SECTION(d, input.data(), 0, 0);
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	cout << "Forward and reverse xored four sections" << endl;
 	
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	XOR_OTP_EPUK_PORTION(0, 4, 2, 0);
+	SET_PORTION(d, input.data(), 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	XOR_OTP_EPUK_PORTION(0, 4, 2, 0);
+	SET_PORTION(d, input.data(), 0);
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Forward and reverse xored a portion" << endl;
 	
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	XOR_OTP_EPUK_PORTION_ALL(4);
+	SET_PORTION_ALL(d, input.data());
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	XOR_OTP_EPUK_PORTION_ALL(4);
+	SET_PORTION_ALL(d, input.data());
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Forward and reverse xored entire 4K user data" << endl;
+	
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	XOR_OTP_EPUK_PORTION_ALL(7);
+	SET_PORTION_ALL(d, input.data());
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	XOR_OTP_EPUK_PORTION_ALL(7);
+	SET_PORTION_ALL(d, input.data());
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	cout << "Forward and reverse xored entire 4K user data (diff round #)" << endl;
+
 	return 0;
 }
