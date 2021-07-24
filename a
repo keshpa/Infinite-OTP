@@ -1,0 +1,35 @@
+string convertDurationToString(chrono::duration<double, nano> nanoSeconds) {
+	uint64_t timeDuration = nanoSeconds.count();
+	if (timeDuration > 100000 && timeDuration < 100000*1000UL) {
+		return to_string(chrono::duration_cast<chrono::microseconds>(nanoSeconds).count()) + " microSeconds";  
+	}
+	if (timeDuration > 100000*1000UL && timeDuration < uint64_t(100000*1000*1000UL)) {
+		return to_string(chrono::duration_cast<chrono::milliseconds>(nanoSeconds).count()) + " milliSeconds";
+	}
+	if (timeDuration > uint64_t(100000UL*1000*1000) && timeDuration < uint64_t(100000UL*1000*1000*60)) {
+		return to_string(chrono::duration_cast<chrono::seconds>(nanoSeconds).count()) + " seconds";
+	}
+	if (timeDuration > uint64_t(100000UL*1000*1000*60)) {
+		return to_string(chrono::duration_cast<chrono::minutes>(nanoSeconds).count()) + " minutes";
+	}
+	return to_string(chrono::duration_cast<chrono::nanoseconds>(nanoSeconds).count()) + " nanoSeconds";  
+}
+
+class Timer {
+	chrono::high_resolution_clock::time_point startTime;
+	chrono::high_resolution_clock::time_point endTime;
+	chrono::duration<double, nano> duration;
+	chrono::duration<double, nano>& encryptionDuration;
+	const string desc;
+	public:
+	Timer(const string& desc, chrono::duration<double, nano>& encryptionDuration) : desc(desc), encryptionDuration(encryptionDuration) {
+		startTime = chrono::high_resolution_clock::now();
+	}
+
+	~Timer() {
+		endTime = chrono::high_resolution_clock::now();
+		duration = chrono::duration_cast<chrono::duration<double, nano>>(endTime - startTime);
+		encryptionDuration += duration;
+		cout << desc << convertDurationToString(duration) << endl;
+	}
+};

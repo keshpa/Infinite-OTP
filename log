@@ -1,0 +1,13 @@
+Time taken for first 4 replace and fold cycles on 1024-bit input : 3283 nanoSeconds
+OTP Count: 8
+Time taken for first 4 reverse replace and fold cycles on 1024-bit input : 2999 nanoSeconds
+Time taken for first 4 replace and fold cycles on 4K byte input : 26449 nanoSeconds
+Time taken for first 4 reverse replace and fold cycles on 4K byte input : 19582 nanoSeconds
+Time taken for forward super rearrangement on 4K byte input : 12291 nanoSeconds
+Time taken for reverse super rearrangement on 4K byte input : 11914 nanoSeconds
+Time taken for first 4 replace and fold cycles on 4K byte input : 19680 nanoSeconds
+Time taken for first 4 reverse replace and fold cycles on 4K byte input : 18869 nanoSeconds
+Time taken for encryption : 52829 nanoSeconds
+Time taken for decryption : 51100 nanoSeconds
+Time taken to encrypt 1000000 times : 45240 milliSeconds
+Time taken to decrypt 1000000 times : 45783 milliSeconds

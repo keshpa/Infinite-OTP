@@ -140,9 +140,9 @@ void initializeOTPsections() {
 
 void replaceFoldCycles(vector<uint16_t>& input, uint32_t start, uint32_t end, int numRounds, vector<uint16_t>& EPUK, uint32_t& startOTPSectionCount) {
 	if (end == 0) end = input.size();
-	DASSERT((end - start) == (k1 / (sizeof(uint16_t) * 8))); // input must be 1024 bits long
+//	DASSERT((end - start) == (k1 / (sizeof(uint16_t) * 8))); // input must be 1024 bits long
 
-	DASSERT(numRounds == 2 || numRounds == 4);
+//	DASSERT(numRounds == 2 || numRounds == 4);
 	//cout << "Encryption input " << endl;
 	//printVector(input, 56, 65);
 
@@ -153,10 +153,435 @@ void replaceFoldCycles(vector<uint16_t>& input, uint32_t start, uint32_t end, in
 		// Process 1st section of 128 bits
 		uint16_t* bptr1 = input.data()+start;
 
-		uint16_t va1 = substitutionTable[*SA(0)];
-		uint16_t va2 = substitutionTable[*SA(1)];
-		uint16_t va3 = substitutionTable[*SA(2)];
-		uint16_t va4 = substitutionTable[*SA(3)];
+		*SA(0) = substitutionTable[*SA(0)];
+		*SA(1) = *SA(0) ^ substitutionTable[*SA(1)];
+		*SA(2) = *SA(1) ^ substitutionTable[*SA(2)];
+		*SA(3) = *SA(2) ^ substitutionTable[*SA(3)];
+
+		*SA(4) = *SA(3) ^ substitutionTable[*SA(4)];
+		*SA(5) = *SA(4) ^ substitutionTable[*SA(5)];
+		*SA(6) = *SA(5) ^ substitutionTable[*SA(6)];
+		*SA(7) = *SA(6) ^ substitutionTable[*SA(7)];
+
+		*SA(0) ^= *SA(7); //Circular-xor across section
+
+
+		uint64_t* ukptr1 = reinterpret_cast<uint64_t *>(EPUK.data()+start);
+
+#define EPUK_SHORT(a)	*(reinterpret_cast<uint16_t *>(ukptr1)+a)
+
+		uint16_t cachedEPUK = EPUK[startOTPSectionCount];
+
+		*SA(0) ^= EPUK_SHORT(0) ^ OTPs[cachedEPUK][0];
+		*SA(1) ^= EPUK_SHORT(1) ^ OTPs[cachedEPUK][1];
+		*SA(2) ^= EPUK_SHORT(2) ^ OTPs[cachedEPUK][2];
+		*SA(3) ^= EPUK_SHORT(3) ^ OTPs[cachedEPUK][3];
+		*SA(4) ^= EPUK_SHORT(4) ^ OTPs[cachedEPUK][4];
+		*SA(5) ^= EPUK_SHORT(5) ^ OTPs[cachedEPUK][5];
+		*SA(6) ^= EPUK_SHORT(6) ^ OTPs[cachedEPUK][6];
+		*SA(7) ^= EPUK_SHORT(7) ^ OTPs[cachedEPUK][7];
+
+
+		// Process 2nd section of 128 bits
+		*SB(0) = substitutionTable[*SB(0)];
+		*SB(1) = *SB(0) ^ substitutionTable[*SB(1)];
+		*SB(2) = *SB(1) ^ substitutionTable[*SB(2)];
+		*SB(3) = *SB(2) ^ substitutionTable[*SB(3)];
+
+		*SB(4) = *SB(3) ^ substitutionTable[*SB(4)];
+		*SB(5) = *SB(4) ^ substitutionTable[*SB(5)];
+		*SB(6) = *SB(5) ^ substitutionTable[*SB(6)];
+		*SB(7) = *SB(6) ^ substitutionTable[*SB(7)];
+
+		*SB(0) ^= *SB(7); //Circular-xor across section
+
+		*SB(0) ^= EPUK_SHORT(8) ^ OTPs[cachedEPUK][8];
+		*SB(1) ^= EPUK_SHORT(9) ^ OTPs[cachedEPUK][9];
+		*SB(2) ^= EPUK_SHORT(10) ^ OTPs[cachedEPUK][10];
+		*SB(3) ^= EPUK_SHORT(11) ^ OTPs[cachedEPUK][11];
+		*SB(4) ^= EPUK_SHORT(12) ^ OTPs[cachedEPUK][12];
+		*SB(5) ^= EPUK_SHORT(13) ^ OTPs[cachedEPUK][13];
+		*SB(6) ^= EPUK_SHORT(14) ^ OTPs[cachedEPUK][14];
+		*SB(7) ^= EPUK_SHORT(15) ^ OTPs[cachedEPUK][15];
+
+		// Process 3rd section of 128 bits
+		*SC(0) = substitutionTable[*SC(0)];
+		*SC(1) = *SC(0) ^ substitutionTable[*SC(1)];
+		*SC(2) = *SC(1) ^ substitutionTable[*SC(2)];
+		*SC(3) = *SC(2) ^ substitutionTable[*SC(3)];
+
+		*SC(4) = *SC(3) ^ substitutionTable[*SC(4)];
+		*SC(5) = *SC(4) ^ substitutionTable[*SC(5)];
+		*SC(6) = *SC(5) ^ substitutionTable[*SC(6)];
+		*SC(7) = *SC(6) ^ substitutionTable[*SC(7)];
+
+		*SC(0) ^= *SC(7); //Circular-xor across section
+
+		*SC(0) ^= EPUK_SHORT(16) ^ OTPs[cachedEPUK][16];
+		*SC(1) ^= EPUK_SHORT(17) ^ OTPs[cachedEPUK][17];
+		*SC(2) ^= EPUK_SHORT(18) ^ OTPs[cachedEPUK][18];
+		*SC(3) ^= EPUK_SHORT(19) ^ OTPs[cachedEPUK][19];
+		*SC(4) ^= EPUK_SHORT(20) ^ OTPs[cachedEPUK][20];
+		*SC(5) ^= EPUK_SHORT(21) ^ OTPs[cachedEPUK][21];
+		*SC(6) ^= EPUK_SHORT(22) ^ OTPs[cachedEPUK][22];
+		*SC(7) ^= EPUK_SHORT(23) ^ OTPs[cachedEPUK][23];
+
+		// Process 4th section of 128 bits
+		*SD(0) = substitutionTable[*SD(0)];
+		*SD(1) = *SD(0) ^ substitutionTable[*SD(1)];
+		*SD(2) = *SD(1) ^ substitutionTable[*SD(2)];
+		*SD(3) = *SD(2) ^ substitutionTable[*SD(3)];
+
+		*SD(4) = *SD(3) ^ substitutionTable[*SD(4)];
+		*SD(5) = *SD(4) ^ substitutionTable[*SD(5)];
+		*SD(6) = *SD(5) ^ substitutionTable[*SD(6)];
+		*SD(7) = *SD(6) ^ substitutionTable[*SD(7)];
+
+		*SD(0) ^= *SD(7); //Circular-xor across section
+
+		*SD(0) ^= EPUK_SHORT(24) ^ OTPs[cachedEPUK][24];
+		*SD(1) ^= EPUK_SHORT(25) ^ OTPs[cachedEPUK][25];
+		*SD(2) ^= EPUK_SHORT(26) ^ OTPs[cachedEPUK][26];
+		*SD(3) ^= EPUK_SHORT(27) ^ OTPs[cachedEPUK][27];
+		*SD(4) ^= EPUK_SHORT(28) ^ OTPs[cachedEPUK][28];
+		*SD(5) ^= EPUK_SHORT(29) ^ OTPs[cachedEPUK][29];
+		*SD(6) ^= EPUK_SHORT(30) ^ OTPs[cachedEPUK][30];
+		*SD(7) ^= EPUK_SHORT(31) ^ OTPs[cachedEPUK][31];
+		++startOTPSectionCount;
+		cachedEPUK = EPUK[startOTPSectionCount];
+
+		// Process 5th section of 128 bits
+		*SE(0) = substitutionTable[*SE(0)];
+		*SE(1) = *SE(0) ^ substitutionTable[*SE(1)];
+		*SE(2) = *SE(1) ^ substitutionTable[*SE(2)];
+		*SE(3) = *SE(2) ^ substitutionTable[*SE(3)];
+
+
+		*SE(4) = *SE(3) ^ substitutionTable[*SE(4)];
+		*SE(5) = *SE(4) ^ substitutionTable[*SE(5)];
+		*SE(6) = *SE(5) ^ substitutionTable[*SE(6)];
+		*SE(7) = *SE(6) ^ substitutionTable[*SE(7)];
+
+		*SE(0) ^= *SE(7); //Circular-xor across section
+
+		*SE(0) ^= EPUK_SHORT(32) ^ OTPs[cachedEPUK][0];
+		*SE(1) ^= EPUK_SHORT(33) ^ OTPs[cachedEPUK][1];
+		*SE(2) ^= EPUK_SHORT(34) ^ OTPs[cachedEPUK][2];
+		*SE(3) ^= EPUK_SHORT(35) ^ OTPs[cachedEPUK][3];
+		*SE(4) ^= EPUK_SHORT(36) ^ OTPs[cachedEPUK][4];
+		*SE(5) ^= EPUK_SHORT(37) ^ OTPs[cachedEPUK][5];
+		*SE(6) ^= EPUK_SHORT(38) ^ OTPs[cachedEPUK][6];
+		*SE(7) ^= EPUK_SHORT(39) ^ OTPs[cachedEPUK][7];
+
+		// Process 6th section of 128 bits
+		*SF(0) = substitutionTable[*SF(0)];
+		*SF(1) = *SF(0) ^ substitutionTable[*SF(1)];
+		*SF(2) = *SF(1) ^ substitutionTable[*SF(2)];
+		*SF(3) = *SF(2) ^ substitutionTable[*SF(3)];
+
+		*SF(4) = *SF(3) ^ substitutionTable[*SF(4)];
+		*SF(5) = *SF(4) ^ substitutionTable[*SF(5)];
+		*SF(6) = *SF(5) ^ substitutionTable[*SF(6)];
+		*SF(7) = *SF(6) ^ substitutionTable[*SF(7)];
+
+		*SF(0) ^= *SF(7); //Circular-xor across section
+
+		*SF(0) ^= EPUK_SHORT(40) ^ OTPs[cachedEPUK][8];
+		*SF(1) ^= EPUK_SHORT(41) ^ OTPs[cachedEPUK][9];
+		*SF(2) ^= EPUK_SHORT(42) ^ OTPs[cachedEPUK][10];
+		*SF(3) ^= EPUK_SHORT(43) ^ OTPs[cachedEPUK][11];
+		*SF(4) ^= EPUK_SHORT(44) ^ OTPs[cachedEPUK][12];
+		*SF(5) ^= EPUK_SHORT(45) ^ OTPs[cachedEPUK][13];
+		*SF(6) ^= EPUK_SHORT(46) ^ OTPs[cachedEPUK][14];
+		*SF(7) ^= EPUK_SHORT(47) ^ OTPs[cachedEPUK][15];
+
+		// Process 7th section of 128 bits
+		*SG(0) = substitutionTable[*SG(0)];
+		*SG(1) = *SG(0) ^ substitutionTable[*SG(1)];
+		*SG(2) = *SG(1) ^ substitutionTable[*SG(2)];
+		*SG(3) = *SG(2) ^ substitutionTable[*SG(3)];
+
+		*SG(4) = *SG(3) ^ substitutionTable[*SG(4)];
+		*SG(5) = *SG(4) ^ substitutionTable[*SG(5)];
+		*SG(6) = *SG(5) ^ substitutionTable[*SG(6)];
+		*SG(7) = *SG(6) ^ substitutionTable[*SG(7)];
+
+		*SG(0) ^= *SG(7); //Circular-xor across section
+
+		*SG(0) ^= EPUK_SHORT(48) ^ OTPs[cachedEPUK][16];
+		*SG(1) ^= EPUK_SHORT(49) ^ OTPs[cachedEPUK][17];
+		*SG(2) ^= EPUK_SHORT(50) ^ OTPs[cachedEPUK][18];
+		*SG(3) ^= EPUK_SHORT(51) ^ OTPs[cachedEPUK][19];
+		*SG(4) ^= EPUK_SHORT(52) ^ OTPs[cachedEPUK][20];
+		*SG(5) ^= EPUK_SHORT(53) ^ OTPs[cachedEPUK][21];
+		*SG(6) ^= EPUK_SHORT(54) ^ OTPs[cachedEPUK][22];
+		*SG(7) ^= EPUK_SHORT(55) ^ OTPs[cachedEPUK][23];
+
+		// Process 8th section of 128 bits
+		*SH(0) = substitutionTable[*SH(0)];
+		*SH(1) = *SH(0) ^ substitutionTable[*SH(1)];
+		*SH(2) = *SH(1) ^ substitutionTable[*SH(2)];
+		*SH(3) = *SH(2) ^ substitutionTable[*SH(3)];
+
+		*SH(4) = *SH(3) ^ substitutionTable[*SH(4)];
+		*SH(5) = *SH(4) ^ substitutionTable[*SH(5)];
+		*SH(6) = *SH(5) ^ substitutionTable[*SH(6)];
+		*SH(7) = *SH(6) ^ substitutionTable[*SH(7)];
+
+		*SH(0) ^= *SH(7); //Circular-xor across section
+		//cout << "1ENCRYPTION: circular xor *SH(0) with " << hex << *SH(7) << " to get " << *SH(0) << endl;
+
+		*SH(0) ^= EPUK_SHORT(56) ^ OTPs[cachedEPUK][24];
+		*SH(1) ^= EPUK_SHORT(57) ^ OTPs[cachedEPUK][25];
+		*SH(2) ^= EPUK_SHORT(58) ^ OTPs[cachedEPUK][26];
+		*SH(3) ^= EPUK_SHORT(59) ^ OTPs[cachedEPUK][27];
+		*SH(4) ^= EPUK_SHORT(60) ^ OTPs[cachedEPUK][28];
+		//cout << "1ENCRYPTION: PUK/OTP xor *SH(4) with " << hex << EPUK_SHORT(60) << " and " << OTPs[cachedEPUK][28] << "to get " << *SH(4) << endl;
+		*SH(5) ^= EPUK_SHORT(61) ^ OTPs[cachedEPUK][29];
+		//cout << "1ENCRYPTION: PUK/OTP xor *SH(5) with " << hex << EPUK_SHORT(61) << " and " << OTPs[cachedEPUK][29] << "to get " << *SH(5) << endl;
+		*SH(6) ^= EPUK_SHORT(62) ^ OTPs[cachedEPUK][30];
+		//cout << "1ENCRYPTION: PUK/OTP xor *SH(6) with " << hex << EPUK_SHORT(62) << " and " << OTPs[cachedEPUK][30] << "to get " << *SH(6) << endl;
+		*SH(7) ^= EPUK_SHORT(63) ^ OTPs[cachedEPUK][31];
+		//cout << "1ENCRYPTION: PUK/OTP xor *SH(7) with " << hex << EPUK_SHORT(63) << " and " << OTPs[cachedEPUK][31] << "to get " << *SH(7) << endl;
+		++startOTPSectionCount;
+		cachedEPUK = EPUK[startOTPSectionCount];
+
+		for (int i = 0; i < 3; ++i) {
+			++round;
+
+			// Section 1
+			*SA(0) = substitutionTable[*SA(0)];
+			*SA(1) = *SA(0) ^ substitutionTable[*SA(1)];
+			*SA(2) = *SA(1) ^ substitutionTable[*SA(2)];
+			*SA(3) = *SA(2) ^ substitutionTable[*SA(3)];
+
+			*SA(4) = *SA(3) ^ substitutionTable[*SA(4)];
+			*SA(5) = *SA(4) ^ substitutionTable[*SA(5)];
+			*SA(6) = *SA(5) ^ substitutionTable[*SA(6)];
+			*SA(7) = *SA(6) ^ substitutionTable[*SA(7)];
+			*SA(0) ^= *SA(7); //Circular-xor across section
+
+			*SA(0) ^= EPUK_SHORT(0) ^ OTPs[cachedEPUK][0];
+			*SA(1) ^= EPUK_SHORT(1) ^ OTPs[cachedEPUK][1];
+			*SA(2) ^= EPUK_SHORT(2) ^ OTPs[cachedEPUK][2];
+			*SA(3) ^= EPUK_SHORT(3) ^ OTPs[cachedEPUK][3];
+			*SA(4) ^= EPUK_SHORT(4) ^ OTPs[cachedEPUK][4];
+			*SA(5) ^= EPUK_SHORT(5) ^ OTPs[cachedEPUK][5];
+			*SA(6) ^= EPUK_SHORT(6) ^ OTPs[cachedEPUK][6];
+			*SA(7) ^= EPUK_SHORT(7) ^ OTPs[cachedEPUK][7];
+
+			// Section 2
+			*SB(0) = substitutionTable[*SB(0)];
+			*SB(1) = *SB(0) ^ substitutionTable[*SB(1)];
+			*SB(2) = *SB(1) ^ substitutionTable[*SB(2)];
+			*SB(3) = *SB(2) ^ substitutionTable[*SB(3)];
+
+			*SB(4) = *SB(3) ^ substitutionTable[*SB(4)];
+			*SB(5) = *SB(4) ^ substitutionTable[*SB(5)];
+			*SB(6) = *SB(5) ^ substitutionTable[*SB(6)];
+			*SB(7) = *SB(6) ^ substitutionTable[*SB(7)];
+			*SB(0) ^= *SB(7); //Circular-xor across section
+
+			*SB(0) ^= EPUK_SHORT(8) ^ OTPs[cachedEPUK][8];
+			*SB(1) ^= EPUK_SHORT(9) ^ OTPs[cachedEPUK][9];
+			*SB(2) ^= EPUK_SHORT(10) ^ OTPs[cachedEPUK][10];
+			*SB(3) ^= EPUK_SHORT(11) ^ OTPs[cachedEPUK][11];
+			*SB(4) ^= EPUK_SHORT(12) ^ OTPs[cachedEPUK][12];
+			*SB(5) ^= EPUK_SHORT(13) ^ OTPs[cachedEPUK][13];
+			*SB(6) ^= EPUK_SHORT(14) ^ OTPs[cachedEPUK][14];
+			*SB(7) ^= EPUK_SHORT(15) ^ OTPs[cachedEPUK][15];
+
+			// Section 3
+			*SC(0) =  substitutionTable[*SC(0)];
+			*SC(1) = *SC(0) ^ substitutionTable[*SC(1)];
+			*SC(2) = *SC(1) ^ substitutionTable[*SC(2)];
+			*SC(3) = *SC(2) ^ substitutionTable[*SC(3)];
+
+			*SC(4) = *SC(3) ^ substitutionTable[*SC(4)];
+			*SC(5) = *SC(4) ^ substitutionTable[*SC(5)];
+			*SC(6) = *SC(5) ^ substitutionTable[*SC(6)];
+			*SC(7) = *SC(6) ^ substitutionTable[*SC(7)];
+			*SC(0) ^= *SC(7); //Circular-xor across section
+
+			*SC(0) ^= EPUK_SHORT(16) ^ OTPs[cachedEPUK][16];
+			*SC(1) ^= EPUK_SHORT(17) ^ OTPs[cachedEPUK][17];
+			*SC(2) ^= EPUK_SHORT(18) ^ OTPs[cachedEPUK][18];
+			*SC(3) ^= EPUK_SHORT(19) ^ OTPs[cachedEPUK][19];
+			*SC(4) ^= EPUK_SHORT(20) ^ OTPs[cachedEPUK][20];
+			*SC(5) ^= EPUK_SHORT(21) ^ OTPs[cachedEPUK][21];
+			*SC(6) ^= EPUK_SHORT(22) ^ OTPs[cachedEPUK][22];
+			*SC(7) ^= EPUK_SHORT(23) ^ OTPs[cachedEPUK][23];
+
+			// Section 4
+			*SD(0) = substitutionTable[*SD(0)];
+			*SD(1) = *SD(0) ^ substitutionTable[*SD(1)];
+			*SD(2) = *SD(1) ^ substitutionTable[*SD(2)];
+			*SD(3) = *SD(2) ^ substitutionTable[*SD(3)];
+
+			*SD(4) = *SD(3) ^ substitutionTable[*SD(4)];
+			*SD(5) = *SD(4) ^ substitutionTable[*SD(5)];
+			*SD(6) = *SD(5) ^ substitutionTable[*SD(6)];
+			*SD(7) = *SD(6) ^ substitutionTable[*SD(7)];
+			*SD(0) ^= *SD(7); //Circular-xor across section
+
+			*SD(0) ^= EPUK_SHORT(24) ^ OTPs[cachedEPUK][24];
+			*SD(1) ^= EPUK_SHORT(25) ^ OTPs[cachedEPUK][25];
+			*SD(2) ^= EPUK_SHORT(26) ^ OTPs[cachedEPUK][26];
+			*SD(3) ^= EPUK_SHORT(27) ^ OTPs[cachedEPUK][27];
+			*SD(4) ^= EPUK_SHORT(28) ^ OTPs[cachedEPUK][28];
+			*SD(5) ^= EPUK_SHORT(29) ^ OTPs[cachedEPUK][29];
+			*SD(6) ^= EPUK_SHORT(30) ^ OTPs[cachedEPUK][30];
+			*SD(7) ^= EPUK_SHORT(31) ^ OTPs[cachedEPUK][31];
+			++startOTPSectionCount;
+			cachedEPUK = EPUK[startOTPSectionCount];
+
+			// Section 5
+			*SE(0) = substitutionTable[*SE(0)];
+			*SE(1) = *SE(0) ^ substitutionTable[*SE(1)];
+			*SE(2) = *SE(1) ^ substitutionTable[*SE(2)];
+			*SE(3) = *SE(2) ^ substitutionTable[*SE(3)];
+
+			*SE(4) = *SE(3) ^ substitutionTable[*SE(4)];
+			*SE(5) = *SE(4) ^ substitutionTable[*SE(5)];
+			*SE(6) = *SE(5) ^ substitutionTable[*SE(6)];
+			*SE(7) = *SE(6) ^ substitutionTable[*SE(7)];
+			*SE(0) ^= *SE(7); //Circular-xor across section
+
+			*SE(0) ^= EPUK_SHORT(32) ^ OTPs[cachedEPUK][0];
+			*SE(1) ^= EPUK_SHORT(33) ^ OTPs[cachedEPUK][1];
+			*SE(2) ^= EPUK_SHORT(34) ^ OTPs[cachedEPUK][2];
+			*SE(3) ^= EPUK_SHORT(35) ^ OTPs[cachedEPUK][3];
+			*SE(4) ^= EPUK_SHORT(36) ^ OTPs[cachedEPUK][4];
+			*SE(5) ^= EPUK_SHORT(37) ^ OTPs[cachedEPUK][5];
+			*SE(6) ^= EPUK_SHORT(38) ^ OTPs[cachedEPUK][6];
+			*SE(7) ^= EPUK_SHORT(39) ^ OTPs[cachedEPUK][7];
+
+			// Section 6
+			*SF(0) = substitutionTable[*SF(0)];
+			*SF(1) = *SF(0) ^ substitutionTable[*SF(1)];
+			*SF(2) = *SF(1) ^ substitutionTable[*SF(2)];
+			*SF(3) = *SF(2) ^ substitutionTable[*SF(3)];
+
+			*SF(4) = *SF(3) ^ substitutionTable[*SF(4)];
+			*SF(5) = *SF(4) ^ substitutionTable[*SF(5)];
+			*SF(6) = *SF(5) ^ substitutionTable[*SF(6)];
+			*SF(7) = *SF(6) ^ substitutionTable[*SF(7)];
+			*SF(0) ^= *SF(7); //Circular-xor across section
+
+			*SF(0) ^= EPUK_SHORT(40) ^ OTPs[cachedEPUK][8];
+			*SF(1) ^= EPUK_SHORT(41) ^ OTPs[cachedEPUK][9];
+			*SF(2) ^= EPUK_SHORT(42) ^ OTPs[cachedEPUK][10];
+			*SF(3) ^= EPUK_SHORT(43) ^ OTPs[cachedEPUK][11];
+			*SF(4) ^= EPUK_SHORT(44) ^ OTPs[cachedEPUK][12];
+			*SF(5) ^= EPUK_SHORT(45) ^ OTPs[cachedEPUK][13];
+			*SF(6) ^= EPUK_SHORT(46) ^ OTPs[cachedEPUK][14];
+			*SF(7) ^= EPUK_SHORT(47) ^ OTPs[cachedEPUK][15];
+
+			// Section 7
+			*SG(0) = substitutionTable[*SG(0)];
+			*SG(1) = *SG(0) ^ substitutionTable[*SG(1)];
+			*SG(2) = *SG(1) ^ substitutionTable[*SG(2)];
+			*SG(3) = *SG(2) ^ substitutionTable[*SG(3)];
+
+			*SG(4) = *SG(3) ^ substitutionTable[*SG(4)];
+			*SG(5) = *SG(4) ^ substitutionTable[*SG(5)];
+			*SG(6) = *SG(5) ^ substitutionTable[*SG(6)];
+			*SG(7) = *SG(6) ^ substitutionTable[*SG(7)];
+			*SG(0) ^= *SG(7); //Circular-xor across section
+
+			*SG(0) ^= EPUK_SHORT(48) ^ OTPs[cachedEPUK][16];
+			*SG(1) ^= EPUK_SHORT(49) ^ OTPs[cachedEPUK][17];
+			*SG(2) ^= EPUK_SHORT(50) ^ OTPs[cachedEPUK][18];
+			*SG(3) ^= EPUK_SHORT(51) ^ OTPs[cachedEPUK][19];
+			*SG(4) ^= EPUK_SHORT(52) ^ OTPs[cachedEPUK][20];
+			*SG(5) ^= EPUK_SHORT(53) ^ OTPs[cachedEPUK][21];
+			*SG(6) ^= EPUK_SHORT(54) ^ OTPs[cachedEPUK][22];
+			*SG(7) ^= EPUK_SHORT(55) ^ OTPs[cachedEPUK][23];
+
+			// Section 8
+			*SH(0) = substitutionTable[*SH(0)];
+			*SH(1) = *SH(0) ^ substitutionTable[*SH(1)];
+			*SH(2) = *SH(1) ^ substitutionTable[*SH(2)];
+			*SH(3) = *SH(2) ^ substitutionTable[*SH(3)];
+
+			*SH(4) = *SH(3) ^ substitutionTable[*SH(4)];
+			*SH(5) = *SH(4) ^ substitutionTable[*SH(5)];
+			*SH(6) = *SH(5) ^ substitutionTable[*SH(6)];
+			*SH(7) = *SH(6) ^ substitutionTable[*SH(7)];
+			*SH(0) ^= *SH(7); //Circular-xor across section
+
+			*SH(0) ^= EPUK_SHORT(56) ^ OTPs[cachedEPUK][24];
+			*SH(1) ^= EPUK_SHORT(57) ^ OTPs[cachedEPUK][25];
+			*SH(2) ^= EPUK_SHORT(58) ^ OTPs[cachedEPUK][26];
+			*SH(3) ^= EPUK_SHORT(59) ^ OTPs[cachedEPUK][27];
+			*SH(4) ^= EPUK_SHORT(60) ^ OTPs[cachedEPUK][28];
+			*SH(5) ^= EPUK_SHORT(61) ^ OTPs[cachedEPUK][29];
+			*SH(6) ^= EPUK_SHORT(62) ^ OTPs[cachedEPUK][30];
+			*SH(7) ^= EPUK_SHORT(63) ^ OTPs[cachedEPUK][31];
+			++startOTPSectionCount;
+			cachedEPUK = EPUK[startOTPSectionCount];
+
+			if (round == 2 && numRounds == 4) {
+				// Reflect rearrangement in memory
+				SWAP_SHORTS(*SA(1), *SB(0));
+				SWAP_SHORTS(*SA(2), *SC(0));
+				SWAP_SHORTS(*SA(3), *SD(0));
+				SWAP_SHORTS(*SA(4), *SE(0));
+				SWAP_SHORTS(*SA(5), *SF(0));
+				SWAP_SHORTS(*SA(6), *SG(0));
+				SWAP_SHORTS(*SA(7), *SH(0));
+
+				SWAP_SHORTS(*SB(2), *SC(1));
+				SWAP_SHORTS(*SB(3), *SD(1));
+				SWAP_SHORTS(*SB(4), *SE(1));
+				SWAP_SHORTS(*SB(5), *SF(1));
+				SWAP_SHORTS(*SB(6), *SG(1));
+				SWAP_SHORTS(*SB(7), *SH(1));
+
+				SWAP_SHORTS(*SC(3), *SD(2));
+				SWAP_SHORTS(*SC(4), *SE(2));
+				SWAP_SHORTS(*SC(5), *SF(2));
+				SWAP_SHORTS(*SC(6), *SG(2));
+				SWAP_SHORTS(*SC(7), *SH(2));
+
+				SWAP_SHORTS(*SD(4), *SE(3));
+				SWAP_SHORTS(*SD(5), *SF(3));
+				SWAP_SHORTS(*SD(6), *SG(3));
+				SWAP_SHORTS(*SD(7), *SH(3));
+
+				SWAP_SHORTS(*SE(5), *SF(4));
+				SWAP_SHORTS(*SE(6), *SG(4));
+				SWAP_SHORTS(*SE(7), *SH(4));
+
+				SWAP_SHORTS(*SF(6), *SG(5));
+				SWAP_SHORTS(*SF(7), *SH(5));
+
+				SWAP_SHORTS(*SG(7), *SH(6));
+			}
+		}
+
+	}
+}
+
+void replaceFoldCycles_old(vector<uint16_t>& input, uint32_t start, uint32_t end, int numRounds, vector<uint16_t>& EPUK, uint32_t& startOTPSectionCount) {
+	if (end == 0) end = input.size();
+//	DASSERT((end - start) == (k1 / (sizeof(uint16_t) * 8))); // input must be 1024 bits long
+
+//	DASSERT(numRounds == 2 || numRounds == 4);
+	//cout << "Encryption input " << endl;
+	//printVector(input, 56, 65);
+
+	//	chrono::duration<double, nano> duration;
+	int round = 1;
+	{
+
+		// Process 1st section of 128 bits
+		register uint16_t* bptr1 = input.data()+start;
+
+		register uint16_t va1 = substitutionTable[*SA(0)];
+		register uint16_t va2 = substitutionTable[*SA(1)];
+		register uint16_t va3 = substitutionTable[*SA(2)];
+		register uint16_t va4 = substitutionTable[*SA(3)];
 
 		//cout << hex << "Substutited va1 to get new va1 : " << va1 << endl;
 
@@ -164,10 +589,10 @@ void replaceFoldCycles(vector<uint16_t>& input, uint32_t start, uint32_t end, in
 		va3 ^= va2;
 		va4 ^= va3;
 
-		uint16_t va5 = substitutionTable[*SA(4)];
-		uint16_t va6 = substitutionTable[*SA(5)];
-		uint16_t va7 = substitutionTable[*SA(6)];
-		uint16_t va8 = substitutionTable[*SA(7)];
+		register uint16_t va5 = substitutionTable[*SA(4)];
+		register uint16_t va6 = substitutionTable[*SA(5)];
+		register uint16_t va7 = substitutionTable[*SA(6)];
+		register uint16_t va8 = substitutionTable[*SA(7)];
 
 		va5 ^= va4;
 		va6 ^= va5;
@@ -176,7 +601,7 @@ void replaceFoldCycles(vector<uint16_t>& input, uint32_t start, uint32_t end, in
 		va1 ^= va8; //Circular-xor across section
 
 
-		uint64_t* ukptr1 = reinterpret_cast<uint64_t *>(EPUK.data()+start);
+		register uint64_t* ukptr1 = reinterpret_cast<uint64_t *>(EPUK.data()+start);
 
 #define EPUK_SHORT(a)	*(reinterpret_cast<uint16_t *>(ukptr1)+a)
 
@@ -191,19 +616,19 @@ void replaceFoldCycles(vector<uint16_t>& input, uint32_t start, uint32_t end, in
 
 
 		// Process 2nd section of 128 bits
-		uint16_t vb1 = substitutionTable[*SB(0)];
-		uint16_t vb2 = substitutionTable[*SB(1)];
-		uint16_t vb3 = substitutionTable[*SB(2)];
-		uint16_t vb4 = substitutionTable[*SB(3)];
+		register uint16_t vb1 = substitutionTable[*SB(0)];
+		register uint16_t vb2 = substitutionTable[*SB(1)];
+		register uint16_t vb3 = substitutionTable[*SB(2)];
+		register uint16_t vb4 = substitutionTable[*SB(3)];
 
 		vb2 ^= vb1;
 		vb3 ^= vb2;
 		vb4 ^= vb3;
 
-		uint16_t vb5 = substitutionTable[*SB(4)];
-		uint16_t vb6 = substitutionTable[*SB(5)];
-		uint16_t vb7 = substitutionTable[*SB(6)];
-		uint16_t vb8 = substitutionTable[*SB(7)];
+		register uint16_t vb5 = substitutionTable[*SB(4)];
+		register uint16_t vb6 = substitutionTable[*SB(5)];
+		register uint16_t vb7 = substitutionTable[*SB(6)];
+		register uint16_t vb8 = substitutionTable[*SB(7)];
 
 		vb5 ^= vb4;
 		vb6 ^= vb5;
@@ -221,19 +646,19 @@ void replaceFoldCycles(vector<uint16_t>& input, uint32_t start, uint32_t end, in
 		vb8 ^= EPUK_SHORT(15) ^ OTPs[EPUK[startOTPSectionCount]][15];
 
 		// Process 3rd section of 128 bits
-		uint16_t vc1 = substitutionTable[*SC(0)];
-		uint16_t vc2 = substitutionTable[*SC(1)];
-		uint16_t vc3 = substitutionTable[*SC(2)];
-		uint16_t vc4 = substitutionTable[*SC(3)];
+		register uint16_t vc1 = substitutionTable[*SC(0)];
+		register uint16_t vc2 = substitutionTable[*SC(1)];
+		register uint16_t vc3 = substitutionTable[*SC(2)];
+		register uint16_t vc4 = substitutionTable[*SC(3)];
 
 		vc2 ^= vc1;
 		vc3 ^= vc2;
 		vc4 ^= vc3;
 
-		uint16_t vc5 = substitutionTable[*SC(4)];
-		uint16_t vc6 = substitutionTable[*SC(5)];
-		uint16_t vc7 = substitutionTable[*SC(6)];
-		uint16_t vc8 = substitutionTable[*SC(7)];
+		register uint16_t vc5 = substitutionTable[*SC(4)];
+		register uint16_t vc6 = substitutionTable[*SC(5)];
+		register uint16_t vc7 = substitutionTable[*SC(6)];
+		register uint16_t vc8 = substitutionTable[*SC(7)];
 
 		vc5 ^= vc4;
 		vc6 ^= vc5;
@@ -251,19 +676,19 @@ void replaceFoldCycles(vector<uint16_t>& input, uint32_t start, uint32_t end, in
 		vc8 ^= EPUK_SHORT(23) ^ OTPs[EPUK[startOTPSectionCount]][23];
 
 		// Process 4th section of 128 bits
-		uint16_t vd1 = substitutionTable[*SD(0)];
-		uint16_t vd2 = substitutionTable[*SD(1)];
-		uint16_t vd3 = substitutionTable[*SD(2)];
-		uint16_t vd4 = substitutionTable[*SD(3)];
+		register uint16_t vd1 = substitutionTable[*SD(0)];
+		register uint16_t vd2 = substitutionTable[*SD(1)];
+		register uint16_t vd3 = substitutionTable[*SD(2)];
+		register uint16_t vd4 = substitutionTable[*SD(3)];
 
 		vd2 ^= vd1;
 		vd3 ^= vd2;
 		vd4 ^= vd3;
 
-		uint16_t vd5 = substitutionTable[*SD(4)];
-		uint16_t vd6 = substitutionTable[*SD(5)];
-		uint16_t vd7 = substitutionTable[*SD(6)];
-		uint16_t vd8 = substitutionTable[*SD(7)];
+		register uint16_t vd5 = substitutionTable[*SD(4)];
+		register uint16_t vd6 = substitutionTable[*SD(5)];
+		register uint16_t vd7 = substitutionTable[*SD(6)];
+		register uint16_t vd8 = substitutionTable[*SD(7)];
 
 		vd5 ^= vd4;
 		vd6 ^= vd5;
@@ -282,20 +707,20 @@ void replaceFoldCycles(vector<uint16_t>& input, uint32_t start, uint32_t end, in
 		++startOTPSectionCount;
 
 		// Process 5th section of 128 bits
-		uint16_t ve1 = substitutionTable[*SE(0)];
-		uint16_t ve2 = substitutionTable[*SE(1)];
-		uint16_t ve3 = substitutionTable[*SE(2)];
-		uint16_t ve4 = substitutionTable[*SE(3)];
+		register uint16_t ve1 = substitutionTable[*SE(0)];
+		register uint16_t ve2 = substitutionTable[*SE(1)];
+		register uint16_t ve3 = substitutionTable[*SE(2)];
+		register uint16_t ve4 = substitutionTable[*SE(3)];
 
 
 		ve2 ^= ve1;
 		ve3 ^= ve2;
 		ve4 ^= ve3;
 
-		uint16_t ve5 = substitutionTable[*SE(4)];
-		uint16_t ve6 = substitutionTable[*SE(5)];
-		uint16_t ve7 = substitutionTable[*SE(6)];
-		uint16_t ve8 = substitutionTable[*SE(7)];
+		register uint16_t ve5 = substitutionTable[*SE(4)];
+		register uint16_t ve6 = substitutionTable[*SE(5)];
+		register uint16_t ve7 = substitutionTable[*SE(6)];
+		register uint16_t ve8 = substitutionTable[*SE(7)];
 
 		ve5 ^= ve4;
 		ve6 ^= ve5;
@@ -313,19 +738,19 @@ void replaceFoldCycles(vector<uint16_t>& input, uint32_t start, uint32_t end, in
 		ve8 ^= EPUK_SHORT(39) ^ OTPs[EPUK[startOTPSectionCount]][7];
 
 		// Process 6th section of 128 bits
-		uint16_t vf1 = substitutionTable[*SF(0)];
-		uint16_t vf2 = substitutionTable[*SF(1)];
-		uint16_t vf3 = substitutionTable[*SF(2)];
-		uint16_t vf4 = substitutionTable[*SF(3)];
+		register uint16_t vf1 = substitutionTable[*SF(0)];
+		register uint16_t vf2 = substitutionTable[*SF(1)];
+		register uint16_t vf3 = substitutionTable[*SF(2)];
+		register uint16_t vf4 = substitutionTable[*SF(3)];
 
 		vf2 ^= vf1;
 		vf3 ^= vf2;
 		vf4 ^= vf3;
 
-		uint16_t vf5 = substitutionTable[*SF(4)];
-		uint16_t vf6 = substitutionTable[*SF(5)];
-		uint16_t vf7 = substitutionTable[*SF(6)];
-		uint16_t vf8 = substitutionTable[*SF(7)];
+		register uint16_t vf5 = substitutionTable[*SF(4)];
+		register uint16_t vf6 = substitutionTable[*SF(5)];
+		register uint16_t vf7 = substitutionTable[*SF(6)];
+		register uint16_t vf8 = substitutionTable[*SF(7)];
 
 		vf5 ^= vf4;
 		vf6 ^= vf5;
@@ -343,19 +768,19 @@ void replaceFoldCycles(vector<uint16_t>& input, uint32_t start, uint32_t end, in
 		vf8 ^= EPUK_SHORT(47) ^ OTPs[EPUK[startOTPSectionCount]][15];
 
 		// Process 7th section of 128 bits
-		uint16_t vg1 = substitutionTable[*SG(0)];
-		uint16_t vg2 = substitutionTable[*SG(1)];
-		uint16_t vg3 = substitutionTable[*SG(2)];
-		uint16_t vg4 = substitutionTable[*SG(3)];
+		register uint16_t vg1 = substitutionTable[*SG(0)];
+		register uint16_t vg2 = substitutionTable[*SG(1)];
+		register uint16_t vg3 = substitutionTable[*SG(2)];
+		register uint16_t vg4 = substitutionTable[*SG(3)];
 
 		vg2 ^= vg1;
 		vg3 ^= vg2;
 		vg4 ^= vg3;
 
-		uint16_t vg5 = substitutionTable[*SG(4)];
-		uint16_t vg6 = substitutionTable[*SG(5)];
-		uint16_t vg7 = substitutionTable[*SG(6)];
-		uint16_t vg8 = substitutionTable[*SG(7)];
+		register uint16_t vg5 = substitutionTable[*SG(4)];
+		register uint16_t vg6 = substitutionTable[*SG(5)];
+		register uint16_t vg7 = substitutionTable[*SG(6)];
+		register uint16_t vg8 = substitutionTable[*SG(7)];
 
 		vg5 ^= vg4;
 		vg6 ^= vg5;
@@ -373,22 +798,22 @@ void replaceFoldCycles(vector<uint16_t>& input, uint32_t start, uint32_t end, in
 		vg8 ^= EPUK_SHORT(55) ^ OTPs[EPUK[startOTPSectionCount]][23];
 
 		// Process 8th section of 128 bits
-		uint16_t vh1 = substitutionTable[*SH(0)];
-		uint16_t vh2 = substitutionTable[*SH(1)];
-		uint16_t vh3 = substitutionTable[*SH(2)];
-		uint16_t vh4 = substitutionTable[*SH(3)];
+		register uint16_t vh1 = substitutionTable[*SH(0)];
+		register uint16_t vh2 = substitutionTable[*SH(1)];
+		register uint16_t vh3 = substitutionTable[*SH(2)];
+		register uint16_t vh4 = substitutionTable[*SH(3)];
 
 		vh2 ^= vh1;
 		vh3 ^= vh2;
 		vh4 ^= vh3;
 
-		uint16_t vh5 = substitutionTable[*SH(4)];
+		register uint16_t vh5 = substitutionTable[*SH(4)];
 		//cout << "1ENCRYPTION: starting vh5: " << hex << *SH(5) << " and substituted to: " << vh5 << dec << endl;
-		uint16_t vh6 = substitutionTable[*SH(5)];
+		register uint16_t vh6 = substitutionTable[*SH(5)];
 		//cout << "1ENCRYPTION: starting vh6: " << hex << *SH(6) << " and substituted to: " << vh6 << dec << endl;
-		uint16_t vh7 = substitutionTable[*SH(6)];
+		register uint16_t vh7 = substitutionTable[*SH(6)];
 		//cout << "1ENCRYPTION: starting vh7: " << hex << *SH(7) << " and substituted to: " << vh7 << dec << endl;
-		uint16_t vh8 = substitutionTable[*SH(7)];
+		register uint16_t vh8 = substitutionTable[*SH(7)];
 		//cout << "1ENCRYPTION: starting vh8: " << hex << *SH(8) << " and substituted to: " << vh8 << dec << endl;
 
 		vh5 ^= vh4;
@@ -2375,14 +2800,14 @@ SET_PORTION_ALT(type, ptr, 1984, 31)
 void encryption_1(vector<uint16_t>& input, vector<uint16_t>& EPUK, uint32_t& OTPsectionCount) {
 	uint32_t elementsIn1024bits = k1 / (sizeof(uint16_t) * 8);
 	for (uint32_t i = 0; i < 32; ++i){
-		replaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
+		replaceFoldCycles_old(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
 	}
 	uint16_t* ptr = input.data();
 	LOAD_PORTION_ALL_ALT(d, ptr);
 	SUPER_REARRANGEMENT_PORTION_ALL();
 	SET_PORTION_ALL_ALT(d, ptr);
 	for (uint32_t i = 0; i < 32; ++i){
-		replaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
+		replaceFoldCycles_old(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
 	}
 }
 
@@ -2423,18 +2848,46 @@ void decryption(vector<uint16_t>& input, vector<uint16_t>& EPUK, uint32_t& OTPse
 	}
 }
 
+void encryption_2(vector<uint16_t>& input, vector<uint16_t>& EPUK, uint32_t& OTPsectionCount) {
+	uint32_t elementsIn1024bits = k1 / (sizeof(uint16_t) * 8);
+	for (uint32_t i = 0; i < 32; ++i){
+		replaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
+	}
+	uint16_t* ptr = input.data();
+	LOAD_PORTION_ALL_ALT(d, ptr);
+	SUPER_REARRANGEMENT_PORTION_ALL();
+	SET_PORTION_ALL_ALT(d, ptr);
+	for (uint32_t i = 0; i < 32; ++i){
+		replaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
+	}
+}
+
+void decryption_2(vector<uint16_t>& input, vector<uint16_t>& EPUK, uint32_t& OTPsectionCount) {
+	uint32_t elementsIn1024bits = k1 / (sizeof(uint16_t) * 8);
+	for (int32_t i = 32 - 1; i >= 0; i -= 1) {
+		reverseReplaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
+	}
+	uint16_t* ptr = input.data();
+	LOAD_PORTION_ALL_ALT(d, ptr);
+	SUPER_REARRANGEMENT_PORTION_ALL();
+	SET_PORTION_ALL_ALT(d, ptr);
+	for (int32_t i = 32 - 1; i >= 0; i -= 1) {
+		reverseReplaceFoldCycles(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits, 4, EPUK, OTPsectionCount);
+	}
+}
+
 void initialize() {
 	initializeSubstitutionTable();
 	initializeOTPsections();
 	initializeSuperRearrangementTable();
 }
 
+static vector<uint16_t> EPUK;
 
 int main() {
 	initialize();
 
 	vector<uint16_t> original;
-	vector<uint16_t> EPUK;
 	uint32_t size = k4 / (sizeof(uint16_t)); // 4k bytes
 	original.resize(size);
 	EPUK.resize(size);
@@ -2557,6 +3010,8 @@ int main() {
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	int count = 1000000;
+	uint32_t copyOTPsectionCount = 0;
+	/***************************************************************************************************************
 	{
 		Timer timer("Time taken to encrypt " + to_string(count) + " times : ", duration);
 		for (int i = 0; i < count; ++i) {
@@ -2565,7 +3020,7 @@ int main() {
 		}
 	}
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
-	uint32_t copyOTPsectionCount = OTPsectionCount;
+	copyOTPsectionCount = OTPsectionCount;
 	{
 		Timer timer("Time taken to decrypt " + to_string(count) + " times : ", duration);
 		for (int i = count-1; i >= 0; i -= 1) {
@@ -2574,6 +3029,21 @@ int main() {
 		}
 	}
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	***************************************************************************************************************/
+	uint32_t k = 51;
+	{
+		Timer timer("Time taken to decrement: ", duration);
+		int32_t i = 0xffffffff;
+		uint32_t g = 0;
+		while(i > 0) {
+			uint32_t j = i*47;
+			j = j + 1;
+			g = j;	
+			uint32_t* l = &g;
+			*l = j;
+			i -= 1;
+		}
+	}
 
 	cout << endl << endl;
 
@@ -2595,6 +3065,28 @@ int main() {
 		}
 	}
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+
+	cout << endl << endl;
+
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	{
+		Timer timer("Time taken to encrypt " + to_string(count) + " times using encryption_2 : ", duration);
+		for (int i = 0; i < count; ++i) {
+			OTPsectionCount = 0;
+			encryption_2(input, EPUK, OTPsectionCount);
+		}
+	}
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	copyOTPsectionCount = OTPsectionCount;
+	{
+		Timer timer("Time taken to decrypt " + to_string(count) + " times using decryption_2 : ", duration);
+		for (int i = count-1; i >= 0; i -= 1) {
+			decryption_2(input, EPUK, OTPsectionCount);
+			OTPsectionCount = copyOTPsectionCount;
+		}
+	}
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+
 
 
 	return 0;
