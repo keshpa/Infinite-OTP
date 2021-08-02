@@ -27,7 +27,7 @@ bool CHECKASSERT = false;
 
 vector<uint16_t> substitutionTable;
 vector<vector<uint16_t>> OTPs;
-vector<uint16_t> loadedEPUK_OTP;
+vector<uint16_t> xoredEPUK_OTP;
 vector<uint16_t> superRearrangementTable;
 vector<uint16_t> reverseSuperRearrangementTable;
 static vector<uint16_t> EPUK;
@@ -58,6 +58,15 @@ void printVectorAsNibbles(vector<uint16_t>& input, uint32_t start, uint32_t end)
 		if (i && i % 4 == 0) cout << endl;
 	}
 	cout << endl;
+}
+
+void printDiff(vector<uint16_t>& vec1, vector<uint16_t>& vec2) {
+	uint32_t size = (vec1.size() < vec2.size() ? vec1.size() : vec2.size());
+	for (uint32_t i = 0; i < size; ++i) {
+		if (vec1[i] != vec2[i]) {
+			cout << hex << vec1[i] << " != " << vec2[i] << " at index " << i << dec << endl;
+		}
+	}
 }
 
 string convertDurationToString(chrono::duration<double, nano> nanoSeconds) {
@@ -132,24 +141,22 @@ void initializeOTPsections() {
 	}
 }
 
-void initializeLoadedEPUK_OTP() {
-	uint32_t sectionCount = 4;
-	uint32_t sectionSize = k4 / sizeof(uint16_t); // each section is 4K bytes
-	loadedEPUK_OTP.resize(sectionCount * sectionSize);
-	for (uint32_t i = 0; i < sectionCount; ++i) {
-
-		uint16_t OTPsectionCount = 0;
+void initializeXoredEPUK_OTP() {
+	uint32_t numRounds = 4;
+	uint32_t numShorts = k4 / sizeof(uint16_t); // each page is 4K bytes
+	xoredEPUK_OTP.resize(numRounds * numShorts);
+	uint16_t OTPsectionCount = 0;
+	for (uint32_t i = 0; i < numRounds; ++i) {
 		for (uint16_t m = 0; m < 32; ++m) {
 			uint16_t cachedEPUK = EPUK[OTPsectionCount];
 			for (uint16_t k = 0; k < 32; ++k) {
-				loadedEPUK_OTP[(i*sectionSize)+(m*64)+k] = EPUK[k] ^ OTPs[cachedEPUK][k];
+				xoredEPUK_OTP[(i*numShorts)+(m*64)+k] = EPUK[k] ^ OTPs[cachedEPUK][k];
 			}
 			cachedEPUK = EPUK[++OTPsectionCount];
 			for (uint16_t k = 32; k < 64; ++k) {
-				loadedEPUK_OTP[(i*sectionSize)+(m*64)+k] = EPUK[k] ^ OTPs[cachedEPUK][k-32];
+				xoredEPUK_OTP[(i*numShorts)+(m*64)+k] = EPUK[k] ^ OTPs[cachedEPUK][k-32];
 			}
 		}
-
 	}
 }
 
@@ -1226,7 +1233,7 @@ void replaceFoldCyclesCM(vector<uint16_t>& input, uint32_t start, uint32_t end) 
 	{
 		// Process 1st section of 128 bits
 		register uint16_t* bptr1 = input.data()+start;
-		register uint16_t* epuk_otp = loadedEPUK_OTP.data() + start;
+		register uint16_t* epuk_otp = xoredEPUK_OTP.data() + start;
 
 		register uint16_t va1 = substitutionTable[*SA(0) ^ epuk_otp[0]];
 		register uint16_t va2 = va1 ^ substitutionTable[*SA(1) ^ epuk_otp[1]];
@@ -1254,7 +1261,10 @@ void replaceFoldCyclesCM(vector<uint16_t>& input, uint32_t start, uint32_t end) 
 		register uint16_t vc4 = vc3 ^ substitutionTable[*SC(3) ^ epuk_otp[19]];
 		register uint16_t vc5 = vc4 ^ substitutionTable[*SC(4) ^ epuk_otp[20]];
 		register uint16_t vc6 = vc5 ^ substitutionTable[*SC(5) ^ epuk_otp[21]];
+		register uint16_t tmp = substitutionTable[*SC(6) ^ epuk_otp[22]];
+		//cout << hex << "E: Xored vc7 (" << *SC(6) << ") with " << epuk_otp[22] << " to get " << (*SC(6) ^ epuk_otp[22]) << " and substituted to " << tmp << dec << endl;
 		register uint16_t vc7 = vc6 ^ substitutionTable[*SC(6) ^ epuk_otp[22]];
+		//cout << hex << "E: Xored vc7 with " << vc6 << " to get " << vc7 << dec << endl;
 		register uint16_t vc8 = vc7 ^ substitutionTable[*SC(7) ^ epuk_otp[23]];
 
 
@@ -1314,8 +1324,8 @@ void replaceFoldCyclesCM(vector<uint16_t>& input, uint32_t start, uint32_t end) 
 
 		va1 ^= vh8;
 
-		for (int i = 1; i < 3; ++i) {
-			epuk_otp += 1984; // epuk_otp - 64 = starting value previous round; epuk_otp - 64 + 2048 = starting value for upcoming round
+		for (int i = 1; i < 0; ++i) {
+			epuk_otp += 2048; // epuk_otp - 64 = starting value previous round; epuk_otp - 64 + 2048 = starting value for upcoming round
 
 			// Section 1
 			va1 = substitutionTable[va1 ^ epuk_otp[0]];
@@ -1400,7 +1410,7 @@ void replaceFoldCyclesCM(vector<uint16_t>& input, uint32_t start, uint32_t end) 
 			va1 ^= vh8;
 		}
 
-		epuk_otp += 1984;
+		epuk_otp += 2048;
 		*SA(0) = va1 ^ epuk_otp[0];
 		*SA(1) = va2 ^ epuk_otp[1];
 		*SA(2) = va3 ^ epuk_otp[2];
@@ -1426,6 +1436,7 @@ void replaceFoldCyclesCM(vector<uint16_t>& input, uint32_t start, uint32_t end) 
 		*SC(4) = vc5 ^ epuk_otp[20];
 		*SC(5) = vc6 ^ epuk_otp[21];
 		*SC(6) = vc7 ^ epuk_otp[22];
+		//cout << "E: Xored vc7 with " << hex << epuk_otp[22] << " to get " << *SC(6) << dec << endl;
 		*SC(7) = vc8 ^ epuk_otp[23];
 
 		*SD(0) = vd1 ^ epuk_otp[24];
@@ -1473,7 +1484,6 @@ void replaceFoldCyclesCM(vector<uint16_t>& input, uint32_t start, uint32_t end) 
 		*SH(6) = vh7 ^ epuk_otp[62];
 		*SH(7) = vh8 ^ epuk_otp[63];
 
-		//cout << "Encrypted " << endl;
 		//printVector(input, 56, 65);
 	}
 }
@@ -1482,12 +1492,13 @@ void reverseReplaceFoldCyclesCM(vector<uint16_t>& input, uint32_t start, uint32_
 	if (end == 0) end = input.size();
 	{
 		register uint16_t* bptr1 = input.data()+start;
-		register uint16_t* epuk_otp4 = loadedEPUK_OTP.data() + start + (2048*3);
-		register uint16_t* epuk_otp = loadedEPUK_OTP.data() + start;
+		register uint16_t* epuk_otp4 = xoredEPUK_OTP.data() + start + (2048*1);
+		register uint16_t* epuk_otp = xoredEPUK_OTP.data() + start;
 
 		// Process 8th section of 128 bits
 		register uint16_t vh8 = *SH(7) ^ epuk_otp4[63]; 
 		register uint16_t va1 = *SA(0) ^ epuk_otp4[0] ^ vh8; 
+//		cout << "D: Xored va1 with " << hex << epuk_otp4[0] << " and " << vh8 <<" to get " << va1 << dec << endl;
 		register uint16_t vh7 = *SH(6) ^ epuk_otp4[62]; 
 		register uint16_t vh6 = *SH(5) ^ epuk_otp4[61]; 
 		register uint16_t vh5 = *SH(4) ^ epuk_otp4[60]; 
@@ -1593,7 +1604,10 @@ void reverseReplaceFoldCyclesCM(vector<uint16_t>& input, uint32_t start, uint32_
 		register uint16_t vc1 = *SC(0) ^ epuk_otp4[16]; 
 
 		vc8 = substitutionTable[vc8 ^ vc7] ^ epuk_otp[23];
-		vc7 = substitutionTable[vc7 ^ vc6] ^ epuk_otp[32];
+				//cout << hex << "D: Xored vc7 (" << *SC(6) << ") with " << epuk_otp4[22] << " to get " << vc7 << dec << endl;
+		//cout << "Xored vc7 with " << vc6 << " and substituted to to " << substitutionTable[vc7 ^ vc6] << " and xored with " << epuk_otp[22] << " to get " << dec;
+		vc7 = substitutionTable[vc7 ^ vc6] ^ epuk_otp[22];
+		//cout << hex << vc7 << endl;
 		vc6 = substitutionTable[vc6 ^ vc5] ^ epuk_otp[21];
 		vc5 = substitutionTable[vc5 ^ vc4] ^ epuk_otp[20];
 		vc4 = substitutionTable[vc4 ^ vc3] ^ epuk_otp[19];
@@ -1637,8 +1651,9 @@ void reverseReplaceFoldCyclesCM(vector<uint16_t>& input, uint32_t start, uint32_
 		va3 = substitutionTable[va3 ^ va2] ^ epuk_otp[2];
 		va2 = substitutionTable[va2 ^ va1] ^ epuk_otp[1];
 		va1 = substitutionTable[va1] ^ epuk_otp[0];
+		//cout << hex << va1 << dec << endl;
 
-		for (int i = 1; i < 3; ++i) {
+		for (int i = 1; i < 0; ++i) {
 			epuk_otp -= 1984; // epuk_otp - 64 = starting value previous round; epuk_otp - 64 + 256 = starting value for upcoming round
 
 			// Process 8th section of 128 bits
@@ -1745,6 +1760,7 @@ void reverseReplaceFoldCyclesCM(vector<uint16_t>& input, uint32_t start, uint32_
 		*SB(7) = vb8;
 
 		*SC(0) = vc1;
+		//cout << "D: " << hex << vc1 << dec << endl;
 		*SC(1) = vc2;
 		*SC(2) = vc3;
 		*SC(3) = vc4;
@@ -3497,7 +3513,7 @@ void initialize() {
 		EPUK[i] = rand();
 	}
 
-	initializeLoadedEPUK_OTP();
+	initializeXoredEPUK_OTP();
 }
 
 int main() {
@@ -3591,6 +3607,24 @@ int main() {
 
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 	{
+		Timer timer("Time taken for forward CM replace and fold : ", duration);
+		for (int32_t i = 0; i < 32; i += 1) {
+			replaceFoldCyclesCM(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits);
+		}
+	}
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
+	{
+		Timer timer("Time taken for reverse CM replace and fold : ", duration);
+		for (int32_t i = 0; i < 32; i += 1) {
+			reverseReplaceFoldCyclesCM(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits);
+		}
+	}
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+
+	cout << endl << endl;
+
+	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
+	{
 		Timer timer("Time taken for encryption : ", duration);
 		encryption(input, EPUK, OTPsectionCount);
 	}
@@ -3612,24 +3646,6 @@ int main() {
 	{
 		Timer timer("Time taken for decryption_1 : ", duration);
 		decryption_1(input, EPUK, OTPsectionCount);
-	}
-	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
-
-	cout << endl << endl;
-
-	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
-	{
-		Timer timer("Time taken for forward CM replace and fold : ", duration);
-		for (int32_t i = 0; i <= 32; i += 1) {
-			replaceFoldCyclesCM(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits);
-		}
-	}
-	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) != 0);
-	{
-		Timer timer("Time taken for reverse CM replace and fold : ", duration);
-		for (int32_t i = 32 - 1; i >= 0; i -= 1) {
-			reverseReplaceFoldCyclesCM(input, i*elementsIn1024bits, (i+1)*elementsIn1024bits);
-		}
 	}
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
