@@ -30,7 +30,7 @@ string convertDurationToString(chrono::duration<double, nano> nanoSeconds) {
 	if (timeDuration > uint64_t(100000UL*1000*1000*60)) {
 		return to_string(chrono::duration_cast<chrono::minutes>(nanoSeconds).count()) + " minutes";
 	}
-	return to_string(chrono::duration_cast<chrono::nanoseconds>(nanoSeconds).count()) + " nanoSeconds";  
+	return to_string(chrono::duration_cast<chrono::nanoseconds>(nanoSeconds).count()) + " nanoSeconds"; 
 }
 
 class Timer {
@@ -217,6 +217,7 @@ void loadVariables(uint16_t* ptr, uint32_t size) {
 		v15 ^= x15;
 
 		// Store
+		/*
 		*(ptr) = v0;
 		*(ptr+1) = v1;
 		*(ptr+2) = v2;
@@ -233,10 +234,14 @@ void loadVariables(uint16_t* ptr, uint32_t size) {
 		*(ptr+13) = v13;
 		*(ptr+14) = v14;
 		*(ptr+15) = v15;
+		*/
 
 		ptr += 16;	
 	}
 }
+
+__m512i testsimd;
+__m512i testsimd1;
 
 void simdLoad(uint16_t* ptr, uint32_t size) {
 	vector<uint64_t> temp;
@@ -250,14 +255,14 @@ void simdLoad(uint16_t* ptr, uint32_t size) {
 
 	uint32_t i = 0;
 	{
-		chrono::duration<double, nano> duration;
-		Timer timer("Times to load array of size " + to_string(size) + " using SIMD: ", duration);
-
 		__m512i loadedOTP_EPUK = _mm512_xor_epi32(_mm512_load_epi32(OTPptr), _mm512_load_epi32(EPUKptr));
 		loadedOTP_EPUK = _mm512_and_epi32(loadedOTP_EPUK, _mm512_set1_epi32(0x0000FFFF));
 
 		__m512i tmp4 = _mm512_set_epi32(0x0000000F, 0x0000000F, 0x0000000E, 0x0000000D, 0x0000000C, 0x0000000B, 0x0000000A, 0x00000009, 0x00000008, 0x00000007, 0x00000006, 0x00000005, 0x00000004, 0x00000003, 0x00000002, 0x00000001);
 		__m512i circularXORtmpl = _mm512_set_epi32(0x00000000, 0x0000000F, 0x0000000E, 0x0000000D, 0x0000000C, 0x0000000B, 0x0000000A, 0x00000009, 0x00000008, 0x00000007, 0x00000006, 0x00000005, 0x00000004, 0x00000003, 0x00000002, 0x00000001);
+
+		chrono::duration<double, nano> duration;
+		Timer timer("Times to load array of size " + to_string(size) + " using SIMD: ", duration);
 
 		for(i = 0; i < size; i += 16) {
 			// loads 256-bits (16 shorts), that we will be working with.
@@ -268,6 +273,7 @@ void simdLoad(uint16_t* ptr, uint32_t size) {
 			tmp2 = _mm512_and_epi32(tmp2, _mm512_set1_epi32(0x0000FFFF));
 			// Perform substitution
 			tmp2 = _mm512_i32gather_epi32(tmp2, subsTablePtr, 4);
+			/*
 			// We have to move 32 bits to the right and XOR everything except the top 32 bits with tmp2.
 			__m512i tmp3 = _mm512_permutexvar_epi32(tmp4, tmp2);
 			tmp2 = _mm512_mask_xor_epi32 (tmp2, 0x7FFF, tmp2, tmp3);
@@ -318,57 +324,117 @@ void simdLoad(uint16_t* ptr, uint32_t size) {
 			tmp2 = _mm512_mask_xor_epi32(tmp2, 0x8000, tmp2, tmp3);
 			// XOR with EPUK and OTP
 			tmp2 = _mm512_xor_epi32(tmp2, loadedOTP_EPUK); 
+			*/
 
 
-			// TEST =====
+			testsimd = tmp2;
+			testsimd1 = testsimd;
+
+
+			// Stores
+
+			// TEST ===== ~4000 micro
 			/*
-			uint16_t* tmpPtr = reinterpret_cast<uint16_t*>(&tmp2);
+			 uint16_t* tmpPtr = reinterpret_cast<uint16_t*>(&tmp2);
 			uint16_t* dptrcpy = reinterpret_cast<uint16_t*>(dptr)+i;
-			*(dptrcpy) = *tmpPtr;
-			//cout << "V0: " << hex << v0 << dec << endl;
-			*(dptrcpy+1) = *(tmpPtr+2);
-			//cout << "V1: " << hex << v1 << dec << endl;
-			*(dptrcpy+2) = *(tmpPtr+4);
-			//cout << "V2: " << hex << v2 << dec << endl;
-			*(dptrcpy+3) = *(tmpPtr+6);
-			//cout << "V3: " << hex << v3 << dec << endl;
-			*(dptrcpy+4) = *(tmpPtr+8);
-			//cout << "V4: " << hex << v4 << dec << endl;
-			*(dptrcpy+5) = *(tmpPtr+10);
-			//cout << "V5: " << hex << v5 << dec << endl;
-			*(dptrcpy+6) = *(tmpPtr+12);
-			//cout << "V6: " << hex << v6 << dec << endl;
-			*(dptrcpy+7) = *(tmpPtr+14);
-			//cout << "V7: " << hex << v7 << dec << endl;
-			*(dptrcpy+8) = *(tmpPtr+16);
-			//cout << "V8: " << hex << v8 << dec << endl;
-			*(dptrcpy+9) = *(tmpPtr+18);
-			//cout << "V9: " << hex << v9 << dec << endl;
-			*(dptrcpy+10) = *(tmpPtr+20);
-			//cout << "V10: " << hex << v10 << dec << endl;
-			*(dptrcpy+11) = *(tmpPtr+22);
-			//cout << "V11: " << hex << v11 << dec << endl;
-			*(dptrcpy+12) = *(tmpPtr+24);
-			//cout << "V12: " << hex << v12 << dec << endl;
-			*(dptrcpy+13) = *(tmpPtr+26);
-			//cout << "V13: " << hex << v13 << dec << endl;
-			*(dptrcpy+14) = *(tmpPtr+28);
-			//cout << "V14: " << hex << v14 << dec << endl;
-			*(dptrcpy+15) = *(tmpPtr+30);
-			//cout << "V15: " << hex << v15 << dec << endl;
+			 *(dptrcpy) = *tmpPtr;
+			 *(dptrcpy+1) = *(tmpPtr+2);
+			 *(dptrcpy+2) = *(tmpPtr+4);
+			 *(dptrcpy+3) = *(tmpPtr+6);
+			 *(dptrcpy+4) = *(tmpPtr+8);
+			 *(dptrcpy+5) = *(tmpPtr+10);
+			 *(dptrcpy+6) = *(tmpPtr+12);
+			 *(dptrcpy+7) = *(tmpPtr+14);
+			 *(dptrcpy+8) = *(tmpPtr+16);
+			 *(dptrcpy+9) = *(tmpPtr+18);
+			 *(dptrcpy+10) = *(tmpPtr+20);
+			 *(dptrcpy+11) = *(tmpPtr+22);
+			 *(dptrcpy+12) = *(tmpPtr+24);
+			 *(dptrcpy+13) = *(tmpPtr+26);
+			 *(dptrcpy+14) = *(tmpPtr+28);
+			 *(dptrcpy+15) = *(tmpPtr+30);
+			 */
+			// TEST =====
+
+			// TEST ===== ~4000 micro
+			/*
+			uint32_t v0 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+0) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v1 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+1) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v2 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+2) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v3 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+3) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v4 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+4) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v5 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+5) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v6 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+6) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v7 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+7) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v8 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+8) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v9 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+9) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v10 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+10) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v11 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+11) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v12 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+12) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v13 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+13) = v0;
+			//tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v14 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+14) = v0;
+			//			tmp2 = _mm512_permutexvar_epi32(tmp4, tmp2);
+			uint32_t v15 = _mm_cvtsi128_si32(_mm512_castsi512_si128(tmp2));
+			//			*(dptrcpy+15) = v0;
+			*(ptr) = v0;
+			*(ptr+1) = v1;
+			*(ptr+2) = v2;
+			*(ptr+3) = v3;
+			*(ptr+4) = v4;
+			*(ptr+5) = v5;
+			*(ptr+6) = v6;
+			*(ptr+7) = v7;
+			*(ptr+8) = v8;
+			*(ptr+9) = v9;
+			*(ptr+10) = v10;
+			*(ptr+11) = v11;
+			*(ptr+12) = v12;
+			*(ptr+13) = v13;
+			*(ptr+14) = v14;
+			*(ptr+15) = v15;
 			*/
 			// TEST =====
 
-			// Store
-			//			_mm512_mask_i32scatter_epi32((reinterpret_cast<uint16_t*>(dptr))+i, 0xFFFF, tmp2, tmp2, 4); DOES NOT WORK
-			//			_mm512_stream_si512(reinterpret_cast<__m512i*>(dptr+i), tmp2); ~2000 micro
-						_mm512_storeu_si512(reinterpret_cast<__m512i*>(dptr+i), tmp2); //~2000 micro
-			//			_mm512_mask_cvtepi32_storeu_epi16(dptr+i, 0xFFFF, tmp2); ~2000 micro
+			// Simd stores
+			//	_mm512_mask_i32scatter_epi32((reinterpret_cast<uint16_t*>(dptr))+i, 0xFFFF, tmp2, tmp2, 4); DOES NOT WORK
+			//	_mm512_stream_si512(reinterpret_cast<__m512i*>(dptr+i), tmp2); ~2000 micro
+			//	_mm512_storeu_si512(reinterpret_cast<__m512i*>(dptr+i), tmp2); //~2000 micro
+			//	_mm512_mask_cvtepi32_storeu_epi16(dptr+i, 0xFFFF, tmp2); ~2000 micro
 		}
 	}
 	//	printType<uint16_t>(reinterpret_cast<uint16_t*>(ptr), 16, "Source 256 bits as shorts.");
 	//	printType<uint32_t>(reinterpret_cast<uint32_t*>(subsTablePtr), 16, "Substitution table contents.");
-	printType<uint16_t>(reinterpret_cast<uint16_t*>(dptr), 16, "simdLoad values as shorts after one subs and XOR.");
+	//	printType<uint16_t>(reinterpret_cast<uint16_t*>(dptr), 16, "simdLoad values as shorts after one subs and XOR.");
+	printType<uint16_t>(reinterpret_cast<uint16_t*>(ptr), 16, "simdLoad values as shorts after one subs and XOR.");
 }
 
 /* AA BB CC DD EE FF ... */
