@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <cstdint>
+#include <fstream>
 #include <iostream>
 #include <vector>
 
@@ -7,8 +8,8 @@ using namespace std;
 
 constexpr uint32_t k64 = 64*1024;
 
-vector<int32_t> substitutionTable;
-vector<int32_t> reverseSubstitutionTable;
+vector<int16_t> substitutionTable;
+vector<int16_t> reverseSubstitutionTable;
 vector<int8_t> galoisTable;
 
 void initializeGaloisTable() {
@@ -24,6 +25,21 @@ void initialize() {
 	fill(reverseSubstitutionTable.begin(), reverseSubstitutionTable.end(), -1);
 	galoisTable.resize(256);
 	initializeGaloisTable();
+}
+
+void printReverseTable(uint32_t start = 0, uint32_t end = k64) {
+	for(uint32_t i = start; i < end; ++i) {
+		cout << hex << i << " => " << reverseSubstitutionTable.at(i) << dec << endl;
+	}
+}
+
+void storeSubsTable(vector<int16_t>& table, string fileName) {
+	ofstream myfile;
+	myfile.open (fileName);
+	for(uint32_t i = 0; i < table.size(); ++i) {
+		myfile << "0x" << hex << table.at(i) << dec << ", "; 
+	}
+	myfile.close();
 }
 
 void printTable(uint32_t start = 0, uint32_t end = k64) {
@@ -149,7 +165,9 @@ void correctSpread() {
 				if ((val & 0xFF) == (j & 0xFF) || (val & 0xFF00) == (j & 0xFF00) || 
 						(temp & 0xFF) == (i & 0xFF) || (temp & 0xFF00) == (i & 0xFF00)) {
 				} else {
-					substitutionTable.at(j) = substitutionTable.at(i);
+					reverseSubstitutionTable.at(temp) = i;
+					reverseSubstitutionTable.at(val) = j;
+					substitutionTable.at(j) = val;
 					substitutionTable.at(i) = temp;
 					j = -1;
 				}
@@ -170,6 +188,16 @@ void verifySpread() {
 	}
 }
 
+void verifyReverse() {
+	cout << "Pairs that don't reverse : " << endl;
+	for (uint32_t i = 0; i < k64; ++i) {
+		uint16_t val = substitutionTable.at(i);
+		if ((uint16_t)(reverseSubstitutionTable.at(val)) != i && reverseSubstitutionTable.at(val) != -1 ) {
+			cout << hex << i << " substitutes to " << val << " which reverses to " << reverseSubstitutionTable.at(val) << "." << endl;
+		}
+	}
+}
+
 void ultraSpecialCase() {
 	// I know for a fact that currently after doing verfySpread twice, c1a2 is the only value who has a byte with its 
 	// substituted value. So, here I have hard-coded a swap between c1a2 and fff0, as a way to ensure no number has any byte in 
@@ -182,8 +210,10 @@ void ultraSpecialCase() {
 			(temp & 0xFF) == (i & 0xFF) || (temp & 0xFF00) == (i & 0xFF00)) {
 		assert(false);
 	}
-	substitutionTable.at(j) = substitutionTable.at(i);
+	substitutionTable.at(j) = val;
 	substitutionTable.at(i) = temp;
+	reverseSubstitutionTable.at(val) = j;
+	reverseSubstitutionTable.at(temp) = i;
 
 }
 
@@ -191,15 +221,13 @@ int main() {
 	initialize();
 	//	printGaloisTable();
 	createTable();
-	cout << "Created Table " << endl;
 	correctSpread();
-	cout << "Corrected spread" << endl;
 	correctSpread();
-	cout << "Corrected spread again" << endl;
 	ultraSpecialCase();
+	verifyReverse();
 	verifySpread();
-	cout << "Done " << endl;
-	//cout << "Success: " << endl;
-	//printTable();
+	//	printTable();
+	storeSubsTable(substitutionTable, "forwardSubsTable.txt");
+	storeSubsTable(reverseSubstitutionTable, "reverseSubsTable.txt");
 	return 0;
 }
