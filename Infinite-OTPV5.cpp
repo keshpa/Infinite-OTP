@@ -3760,7 +3760,25 @@ int main() {
 	}
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
+	/************************************************************************************************************************/
+	// Check if the cipher texts show any probabilistic similarities between themselves with any periodicity
+	struct portion {
+		uint32_t bytes[32];
+	};
+	typedef portion ciphertext;
+	typedef portion plaintext;
 
+	plaintext ptext;
+
+	for (uint32_t i = 1; i < 32; ++i) {
+		ptext.bytes[i] = rand();
+	}
+
+	vector<ciphertext> ciphertexts;
+
+
+
+	/************************************************************************************************************************/
 
 	return 0;
 }
