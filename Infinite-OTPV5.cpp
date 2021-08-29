@@ -108,16 +108,6 @@ class Timer {
 	}
 };
 
-/***
-void initializeSubstitutionTable() {
-	substitutionTable.resize(k64);
-	for(uint16_t i = 0; i < k64 / 2; ++i) {
-		substitutionTable[i] = (i + (k64/2));
-		substitutionTable[i + (k64/2)] = i;
-	}
-}
-***/
-
 uint16_t getSuperIndex(uint16_t j, uint16_t i) { // Note: i and j should be 1-indexed
 	uint16_t newIndex = i + (256 * (j - 1)) - 1;
 	return newIndex;
@@ -151,15 +141,14 @@ void initializeXoredEPUK_OTP() {
 	uint32_t numShorts = k4 / sizeof(uint16_t); // each page is 4K bytes
 	xoredEPUK_OTP.resize(numRounds * numShorts);
 	uint16_t OTPsectionCount = 0;
-	for (uint32_t i = 0; i < numRounds; ++i) {
-		for (uint16_t m = 0; m < 32; ++m) {
-			uint16_t cachedEPUK = EPUK[OTPsectionCount];
-			for (uint16_t k = 0; k < 32; ++k) {
-				xoredEPUK_OTP[(i*numShorts)+(m*64)+k] = EPUK[k] ^ OTPs[cachedEPUK][k];
-			}
-			cachedEPUK = EPUK[++OTPsectionCount];
-			for (uint16_t k = 32; k < 64; ++k) {
-				xoredEPUK_OTP[(i*numShorts)+(m*64)+k] = EPUK[k] ^ OTPs[cachedEPUK][k-32];
+	for (uint32_t i = 0; i < numRounds; ++i) { // works on rounds of xor
+		for (uint32_t j = 0; j < 32; ++j) { // words on 4K page
+			for (uint32_t m = 0; m < 16; ++m) { // works on a portion
+				uint16_t cachedEPUK = EPUK[OTPsectionCount];
+				uint16_t cached8ByteSecInd = (EPUK[++OTPsectionCount] & 0x7000) * 4; // 4 shorts in 8 bytes
+				for (int k = 0; k < 4; ++k) { // words on 8 bytes
+					xoredEPUK_OTP[(i*numShorts) + (k*m) + (j*64)] = EPUK[(k*m) + (j*64)] ^ OTPs[cachedEPUK][cached8ByteSecInd+k];
+				}
 			}
 		}
 	}
@@ -1494,7 +1483,7 @@ void replaceFoldCyclesCM(uint16_t* input, uint16_t* epuk_otpp, uint32_t start, u
 
 //void reverseReplaceFoldCyclesCM(vector<uint16_t>& input, uint32_t start, uint32_t end) {
 void reverseReplaceFoldCyclesCM(uint16_t* input, uint16_t* epuk_otpp, uint32_t start, uint32_t end) {
-//	if (end == 0) end = input.size();
+	//	if (end == 0) end = input.size();
 
 	{
 		register uint16_t* bptr1 = input+start;
@@ -3508,7 +3497,6 @@ void decryption_2(vector<uint16_t>& input, vector<uint16_t>& EPUK, uint32_t& OTP
 }
 
 void initialize() {
-	//initializeSubstitutionTable();
 	initializeOTPsections();
 	initializeSuperRearrangementTable();
 
