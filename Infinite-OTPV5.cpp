@@ -2705,716 +2705,716 @@ void superRearrangementUpdated1(vector<uint16_t>& input, bool forwardRearrangeme
 
 #define SUPER_REARRANGEMENT_PORTION_ALL()											\
 	SUPER_REARRANGEMENT_PORTION0(d);											\
-SUPER_REARRANGEMENT_PORTION1(d);											\
-SUPER_REARRANGEMENT_PORTION2(d);											\
-SUPER_REARRANGEMENT_PORTION3(d);											\
-SUPER_REARRANGEMENT_PORTION4(d);											\
-SUPER_REARRANGEMENT_PORTION5(d);											\
-SUPER_REARRANGEMENT_PORTION6(d);											\
-SUPER_REARRANGEMENT_PORTION7(d);											\
-SUPER_REARRANGEMENT_PORTION8(d);											\
-SUPER_REARRANGEMENT_PORTION9(d);											\
-SUPER_REARRANGEMENT_PORTION10(d);											\
-SUPER_REARRANGEMENT_PORTION11(d);											\
-SUPER_REARRANGEMENT_PORTION12(d);											\
-SUPER_REARRANGEMENT_PORTION13(d);											\
-SUPER_REARRANGEMENT_PORTION14(d);											\
-SUPER_REARRANGEMENT_PORTION15(d);											\
-SUPER_REARRANGEMENT_PORTION16(d);											\
-SUPER_REARRANGEMENT_PORTION17(d);											\
-SUPER_REARRANGEMENT_PORTION18(d);											\
-SUPER_REARRANGEMENT_PORTION19(d);											\
-SUPER_REARRANGEMENT_PORTION20(d);											\
-SUPER_REARRANGEMENT_PORTION21(d);											\
-SUPER_REARRANGEMENT_PORTION22(d);											\
-SUPER_REARRANGEMENT_PORTION23(d);											\
-SUPER_REARRANGEMENT_PORTION24(d);											\
-SUPER_REARRANGEMENT_PORTION25(d);											\
-SUPER_REARRANGEMENT_PORTION26(d);											\
-SUPER_REARRANGEMENT_PORTION27(d);											\
-SUPER_REARRANGEMENT_PORTION28(d);											\
-SUPER_REARRANGEMENT_PORTION29(d);											\
-SUPER_REARRANGEMENT_PORTION30(d);											\
+	SUPER_REARRANGEMENT_PORTION1(d);											\
+	SUPER_REARRANGEMENT_PORTION2(d);											\
+	SUPER_REARRANGEMENT_PORTION3(d);											\
+	SUPER_REARRANGEMENT_PORTION4(d);											\
+	SUPER_REARRANGEMENT_PORTION5(d);											\
+	SUPER_REARRANGEMENT_PORTION6(d);											\
+	SUPER_REARRANGEMENT_PORTION7(d);											\
+	SUPER_REARRANGEMENT_PORTION8(d);											\
+	SUPER_REARRANGEMENT_PORTION9(d);											\
+	SUPER_REARRANGEMENT_PORTION10(d);											\
+	SUPER_REARRANGEMENT_PORTION11(d);											\
+	SUPER_REARRANGEMENT_PORTION12(d);											\
+	SUPER_REARRANGEMENT_PORTION13(d);											\
+	SUPER_REARRANGEMENT_PORTION14(d);											\
+	SUPER_REARRANGEMENT_PORTION15(d);											\
+	SUPER_REARRANGEMENT_PORTION16(d);											\
+	SUPER_REARRANGEMENT_PORTION17(d);											\
+	SUPER_REARRANGEMENT_PORTION18(d);											\
+	SUPER_REARRANGEMENT_PORTION19(d);											\
+	SUPER_REARRANGEMENT_PORTION20(d);											\
+	SUPER_REARRANGEMENT_PORTION21(d);											\
+	SUPER_REARRANGEMENT_PORTION22(d);											\
+	SUPER_REARRANGEMENT_PORTION23(d);											\
+	SUPER_REARRANGEMENT_PORTION24(d);											\
+	SUPER_REARRANGEMENT_PORTION25(d);											\
+	SUPER_REARRANGEMENT_PORTION26(d);											\
+	SUPER_REARRANGEMENT_PORTION27(d);											\
+	SUPER_REARRANGEMENT_PORTION28(d);											\
+	SUPER_REARRANGEMENT_PORTION29(d);											\
+	SUPER_REARRANGEMENT_PORTION30(d);											\
 
 #define SUPER_REARRANGEMENT_PORTION0_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 0, sectionN, 0), V(type, MUL(sectionN, 4), 0, 0));							\
-SWAP_SHORTS(V(type, 0, sectionN, 1), V(type, MUL(sectionN, 4), 0, 1));							\
-SWAP_SHORTS(V(type, 0, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 0, 0));						\
-SWAP_SHORTS(V(type, 0, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 0, 1));						\
-SWAP_SHORTS(V(type, 0, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 0, 0));						\
-SWAP_SHORTS(V(type, 0, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 0, 1));						\
-SWAP_SHORTS(V(type, 0, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 0, 0));						\
-SWAP_SHORTS(V(type, 0, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 0, 1))
+	SWAP_SHORTS(V(type, 0, sectionN, 1), V(type, MUL(sectionN, 4), 0, 1));							\
+	SWAP_SHORTS(V(type, 0, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 0, 0));						\
+	SWAP_SHORTS(V(type, 0, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 0, 1));						\
+	SWAP_SHORTS(V(type, 0, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 0, 0));						\
+	SWAP_SHORTS(V(type, 0, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 0, 1));						\
+	SWAP_SHORTS(V(type, 0, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 0, 0));						\
+	SWAP_SHORTS(V(type, 0, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 0, 1))
 
 #define SUPER_REARRANGEMENT_PORTION0(type) 											\
 	SWAP_SHORTS(V(type, 0, 0, 2), V(type, 1, 0, 0));									\
-SWAP_SHORTS(V(type, 0, 0, 3), V(type, 1, 0, 1));									\
-SWAP_SHORTS(V(type, 0, 0, 4), V(type, 2, 0, 0));									\
-SWAP_SHORTS(V(type, 0, 0, 5), V(type, 2, 0, 1));									\
-SWAP_SHORTS(V(type, 0, 0, 6), V(type, 3, 0, 0));									\
-SWAP_SHORTS(V(type, 0, 0, 7), V(type, 3, 0, 1));									\
-\
-SUPER_REARRANGEMENT_PORTION0_HELPER(type, 1);										\
-SUPER_REARRANGEMENT_PORTION0_HELPER(type, 2);										\
-SUPER_REARRANGEMENT_PORTION0_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION0_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION0_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION0_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION0_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 0, 0, 3), V(type, 1, 0, 1));									\
+	SWAP_SHORTS(V(type, 0, 0, 4), V(type, 2, 0, 0));									\
+	SWAP_SHORTS(V(type, 0, 0, 5), V(type, 2, 0, 1));									\
+	SWAP_SHORTS(V(type, 0, 0, 6), V(type, 3, 0, 0));									\
+	SWAP_SHORTS(V(type, 0, 0, 7), V(type, 3, 0, 1));									\
+	\
+	SUPER_REARRANGEMENT_PORTION0_HELPER(type, 1);										\
+	SUPER_REARRANGEMENT_PORTION0_HELPER(type, 2);										\
+	SUPER_REARRANGEMENT_PORTION0_HELPER(type, 3);										\
+	SUPER_REARRANGEMENT_PORTION0_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION0_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION0_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION0_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION1_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 1, sectionN, 0), V(type, MUL(sectionN, 4), 0, 2));							\
-SWAP_SHORTS(V(type, 1, sectionN, 1), V(type, MUL(sectionN, 4), 0, 3));							\
-SWAP_SHORTS(V(type, 1, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 0, 2));						\
-SWAP_SHORTS(V(type, 1, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 0, 3));						\
-SWAP_SHORTS(V(type, 1, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 0, 2));						\
-SWAP_SHORTS(V(type, 1, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 0, 3));						\
-SWAP_SHORTS(V(type, 1, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 0, 2));						\
-SWAP_SHORTS(V(type, 1, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 0, 3))
+	SWAP_SHORTS(V(type, 1, sectionN, 1), V(type, MUL(sectionN, 4), 0, 3));							\
+	SWAP_SHORTS(V(type, 1, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 0, 2));						\
+	SWAP_SHORTS(V(type, 1, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 0, 3));						\
+	SWAP_SHORTS(V(type, 1, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 0, 2));						\
+	SWAP_SHORTS(V(type, 1, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 0, 3));						\
+	SWAP_SHORTS(V(type, 1, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 0, 2));						\
+	SWAP_SHORTS(V(type, 1, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 0, 3))
 
 #define SUPER_REARRANGEMENT_PORTION1(type) 											\
 	SWAP_SHORTS(V(type, 1, 0, 4), V(type, 2, 0, 2));									\
-SWAP_SHORTS(V(type, 1, 0, 5), V(type, 2, 0, 3));									\
-SWAP_SHORTS(V(type, 1, 0, 6), V(type, 3, 0, 2));									\
-SWAP_SHORTS(V(type, 1, 0, 7), V(type, 3, 0, 3));									\
-\
-SUPER_REARRANGEMENT_PORTION1_HELPER(type, 1);										\
-SUPER_REARRANGEMENT_PORTION1_HELPER(type, 2);										\
-SUPER_REARRANGEMENT_PORTION1_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION1_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION1_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION1_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION1_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 1, 0, 5), V(type, 2, 0, 3));									\
+	SWAP_SHORTS(V(type, 1, 0, 6), V(type, 3, 0, 2));									\
+	SWAP_SHORTS(V(type, 1, 0, 7), V(type, 3, 0, 3));									\
+	\
+	SUPER_REARRANGEMENT_PORTION1_HELPER(type, 1);										\
+	SUPER_REARRANGEMENT_PORTION1_HELPER(type, 2);										\
+	SUPER_REARRANGEMENT_PORTION1_HELPER(type, 3);										\
+	SUPER_REARRANGEMENT_PORTION1_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION1_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION1_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION1_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION2_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 2, sectionN, 0), V(type, MUL(sectionN, 4), 0, 4));							\
-SWAP_SHORTS(V(type, 2, sectionN, 1), V(type, MUL(sectionN, 4), 0, 5));							\
-SWAP_SHORTS(V(type, 2, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 0, 4));						\
-SWAP_SHORTS(V(type, 2, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 0, 5));						\
-SWAP_SHORTS(V(type, 2, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 0, 4));						\
-SWAP_SHORTS(V(type, 2, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 0, 5));						\
-SWAP_SHORTS(V(type, 2, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 0, 4));						\
-SWAP_SHORTS(V(type, 2, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 0, 5))
+	SWAP_SHORTS(V(type, 2, sectionN, 1), V(type, MUL(sectionN, 4), 0, 5));							\
+	SWAP_SHORTS(V(type, 2, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 0, 4));						\
+	SWAP_SHORTS(V(type, 2, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 0, 5));						\
+	SWAP_SHORTS(V(type, 2, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 0, 4));						\
+	SWAP_SHORTS(V(type, 2, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 0, 5));						\
+	SWAP_SHORTS(V(type, 2, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 0, 4));						\
+	SWAP_SHORTS(V(type, 2, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 0, 5))
 
 #define SUPER_REARRANGEMENT_PORTION2(type) 											\
 	SWAP_SHORTS(V(type, 2, 0, 6), V(type, 3, 0, 4));									\
-SWAP_SHORTS(V(type, 2, 0, 7), V(type, 3, 0, 5));									\
-\
-SUPER_REARRANGEMENT_PORTION2_HELPER(type, 1);										\
-SUPER_REARRANGEMENT_PORTION2_HELPER(type, 2);										\
-SUPER_REARRANGEMENT_PORTION2_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION2_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION2_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION2_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION2_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 2, 0, 7), V(type, 3, 0, 5));									\
+	\
+	SUPER_REARRANGEMENT_PORTION2_HELPER(type, 1);										\
+	SUPER_REARRANGEMENT_PORTION2_HELPER(type, 2);										\
+	SUPER_REARRANGEMENT_PORTION2_HELPER(type, 3);										\
+	SUPER_REARRANGEMENT_PORTION2_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION2_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION2_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION2_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION3_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 3, sectionN, 0), V(type, MUL(sectionN, 4), 0, 6));							\
-SWAP_SHORTS(V(type, 3, sectionN, 1), V(type, MUL(sectionN, 4), 0, 7));							\
-SWAP_SHORTS(V(type, 3, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 0, 6));						\
-SWAP_SHORTS(V(type, 3, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 0, 7));						\
-SWAP_SHORTS(V(type, 3, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 0, 6));						\
-SWAP_SHORTS(V(type, 3, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 0, 7));						\
-SWAP_SHORTS(V(type, 3, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 0, 6));						\
-SWAP_SHORTS(V(type, 3, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 0, 7))
+	SWAP_SHORTS(V(type, 3, sectionN, 1), V(type, MUL(sectionN, 4), 0, 7));							\
+	SWAP_SHORTS(V(type, 3, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 0, 6));						\
+	SWAP_SHORTS(V(type, 3, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 0, 7));						\
+	SWAP_SHORTS(V(type, 3, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 0, 6));						\
+	SWAP_SHORTS(V(type, 3, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 0, 7));						\
+	SWAP_SHORTS(V(type, 3, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 0, 6));						\
+	SWAP_SHORTS(V(type, 3, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 0, 7))
 
 #define SUPER_REARRANGEMENT_PORTION3(type) 											\
 	SUPER_REARRANGEMENT_PORTION3_HELPER(type, 1);										\
-SUPER_REARRANGEMENT_PORTION3_HELPER(type, 2);										\
-SUPER_REARRANGEMENT_PORTION3_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION3_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION3_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION3_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION3_HELPER(type, 7)
+	SUPER_REARRANGEMENT_PORTION3_HELPER(type, 2);										\
+	SUPER_REARRANGEMENT_PORTION3_HELPER(type, 3);										\
+	SUPER_REARRANGEMENT_PORTION3_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION3_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION3_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION3_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION4_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 4, sectionN, 0), V(type, MUL(sectionN, 4), 1, 0));							\
-SWAP_SHORTS(V(type, 4, sectionN, 1), V(type, MUL(sectionN, 4), 1, 1));							\
-SWAP_SHORTS(V(type, 4, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 1, 0));						\
-SWAP_SHORTS(V(type, 4, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 1, 1));						\
-SWAP_SHORTS(V(type, 4, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 1, 0));						\
-SWAP_SHORTS(V(type, 4, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 1, 1));						\
-SWAP_SHORTS(V(type, 4, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 1, 0));						\
-SWAP_SHORTS(V(type, 4, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 1, 1))
+	SWAP_SHORTS(V(type, 4, sectionN, 1), V(type, MUL(sectionN, 4), 1, 1));							\
+	SWAP_SHORTS(V(type, 4, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 1, 0));						\
+	SWAP_SHORTS(V(type, 4, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 1, 1));						\
+	SWAP_SHORTS(V(type, 4, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 1, 0));						\
+	SWAP_SHORTS(V(type, 4, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 1, 1));						\
+	SWAP_SHORTS(V(type, 4, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 1, 0));						\
+	SWAP_SHORTS(V(type, 4, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 1, 1))
 
 #define SUPER_REARRANGEMENT_PORTION4(type) 											\
 	SWAP_SHORTS(V(type, 4, 1, 2), V(type, 5, 1, 0)); 									\
-SWAP_SHORTS(V(type, 4, 1, 3), V(type, 5, 1, 1)); 									\
-SWAP_SHORTS(V(type, 4, 1, 4), V(type, 6, 1, 0)); 									\
-SWAP_SHORTS(V(type, 4, 1, 5), V(type, 6, 1, 1)); 									\
-SWAP_SHORTS(V(type, 4, 1, 6), V(type, 7, 1, 0)); 									\
-SWAP_SHORTS(V(type, 4, 1, 7), V(type, 7, 1, 1)); 									\
-\
-SUPER_REARRANGEMENT_PORTION4_HELPER(type, 2);										\
-SUPER_REARRANGEMENT_PORTION4_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION4_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION4_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION4_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION4_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 4, 1, 3), V(type, 5, 1, 1)); 									\
+	SWAP_SHORTS(V(type, 4, 1, 4), V(type, 6, 1, 0)); 									\
+	SWAP_SHORTS(V(type, 4, 1, 5), V(type, 6, 1, 1)); 									\
+	SWAP_SHORTS(V(type, 4, 1, 6), V(type, 7, 1, 0)); 									\
+	SWAP_SHORTS(V(type, 4, 1, 7), V(type, 7, 1, 1)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION4_HELPER(type, 2);										\
+	SUPER_REARRANGEMENT_PORTION4_HELPER(type, 3);										\
+	SUPER_REARRANGEMENT_PORTION4_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION4_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION4_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION4_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION5_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 5, sectionN, 0), V(type, MUL(sectionN, 4), 1, 2));							\
-SWAP_SHORTS(V(type, 5, sectionN, 1), V(type, MUL(sectionN, 4), 1, 3));							\
-SWAP_SHORTS(V(type, 5, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 1, 2));						\
-SWAP_SHORTS(V(type, 5, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 1, 3));						\
-SWAP_SHORTS(V(type, 5, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 1, 2));						\
-SWAP_SHORTS(V(type, 5, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 1, 3));						\
-SWAP_SHORTS(V(type, 5, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 1, 2));						\
-SWAP_SHORTS(V(type, 5, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 1, 3))
+	SWAP_SHORTS(V(type, 5, sectionN, 1), V(type, MUL(sectionN, 4), 1, 3));							\
+	SWAP_SHORTS(V(type, 5, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 1, 2));						\
+	SWAP_SHORTS(V(type, 5, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 1, 3));						\
+	SWAP_SHORTS(V(type, 5, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 1, 2));						\
+	SWAP_SHORTS(V(type, 5, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 1, 3));						\
+	SWAP_SHORTS(V(type, 5, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 1, 2));						\
+	SWAP_SHORTS(V(type, 5, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 1, 3))
 
 #define SUPER_REARRANGEMENT_PORTION5(type) 											\
 	SWAP_SHORTS(V(type, 5, 1, 4), V(type, 6, 1, 2)); 									\
-SWAP_SHORTS(V(type, 5, 1, 5), V(type, 6, 1, 3)); 									\
-SWAP_SHORTS(V(type, 5, 1, 6), V(type, 7, 1, 2)); 									\
-SWAP_SHORTS(V(type, 5, 1, 7), V(type, 7, 1, 3)); 									\
-\
-SUPER_REARRANGEMENT_PORTION5_HELPER(type, 2);										\
-SUPER_REARRANGEMENT_PORTION5_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION5_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION5_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION5_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION5_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 5, 1, 5), V(type, 6, 1, 3)); 									\
+	SWAP_SHORTS(V(type, 5, 1, 6), V(type, 7, 1, 2)); 									\
+	SWAP_SHORTS(V(type, 5, 1, 7), V(type, 7, 1, 3)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION5_HELPER(type, 2);										\
+	SUPER_REARRANGEMENT_PORTION5_HELPER(type, 3);										\
+	SUPER_REARRANGEMENT_PORTION5_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION5_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION5_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION5_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION6_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 6, sectionN, 0), V(type, MUL(sectionN, 4), 1, 4));							\
-SWAP_SHORTS(V(type, 6, sectionN, 1), V(type, MUL(sectionN, 4), 1, 5));							\
-SWAP_SHORTS(V(type, 6, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 1, 4));						\
-SWAP_SHORTS(V(type, 6, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 1, 5));						\
-SWAP_SHORTS(V(type, 6, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 1, 4));						\
-SWAP_SHORTS(V(type, 6, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 1, 5));						\
-SWAP_SHORTS(V(type, 6, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 1, 4));						\
-SWAP_SHORTS(V(type, 6, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 1, 5))
+	SWAP_SHORTS(V(type, 6, sectionN, 1), V(type, MUL(sectionN, 4), 1, 5));							\
+	SWAP_SHORTS(V(type, 6, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 1, 4));						\
+	SWAP_SHORTS(V(type, 6, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 1, 5));						\
+	SWAP_SHORTS(V(type, 6, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 1, 4));						\
+	SWAP_SHORTS(V(type, 6, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 1, 5));						\
+	SWAP_SHORTS(V(type, 6, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 1, 4));						\
+	SWAP_SHORTS(V(type, 6, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 1, 5))
 
 #define SUPER_REARRANGEMENT_PORTION6(type) 											\
 	SWAP_SHORTS(V(type, 6, 1, 6), V(type, 7, 1, 4)); 									\
-SWAP_SHORTS(V(type, 6, 1, 7), V(type, 7, 1, 5)); 									\
-\
-SUPER_REARRANGEMENT_PORTION6_HELPER(type, 2);										\
-SUPER_REARRANGEMENT_PORTION6_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION6_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION6_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION6_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION6_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 6, 1, 7), V(type, 7, 1, 5)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION6_HELPER(type, 2);										\
+	SUPER_REARRANGEMENT_PORTION6_HELPER(type, 3);										\
+	SUPER_REARRANGEMENT_PORTION6_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION6_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION6_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION6_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION7_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 7, sectionN, 0), V(type, MUL(sectionN, 4), 1, 6));							\
-SWAP_SHORTS(V(type, 7, sectionN, 1), V(type, MUL(sectionN, 4), 1, 7));							\
-SWAP_SHORTS(V(type, 7, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 1, 6));						\
-SWAP_SHORTS(V(type, 7, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 1, 7));						\
-SWAP_SHORTS(V(type, 7, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 1, 6));						\
-SWAP_SHORTS(V(type, 7, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 1, 7));						\
-SWAP_SHORTS(V(type, 7, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 1, 6));						\
-SWAP_SHORTS(V(type, 7, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 1, 7))
+	SWAP_SHORTS(V(type, 7, sectionN, 1), V(type, MUL(sectionN, 4), 1, 7));							\
+	SWAP_SHORTS(V(type, 7, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 1, 6));						\
+	SWAP_SHORTS(V(type, 7, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 1, 7));						\
+	SWAP_SHORTS(V(type, 7, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 1, 6));						\
+	SWAP_SHORTS(V(type, 7, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 1, 7));						\
+	SWAP_SHORTS(V(type, 7, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 1, 6));						\
+	SWAP_SHORTS(V(type, 7, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 1, 7))
 
 #define SUPER_REARRANGEMENT_PORTION7(type) 											\
 	SUPER_REARRANGEMENT_PORTION7_HELPER(type, 2);										\
-SUPER_REARRANGEMENT_PORTION7_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION7_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION7_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION7_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION7_HELPER(type, 7)
+	SUPER_REARRANGEMENT_PORTION7_HELPER(type, 3);										\
+	SUPER_REARRANGEMENT_PORTION7_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION7_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION7_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION7_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION8_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 8, sectionN, 0), V(type, MUL(sectionN, 4), 2, 0));							\
-SWAP_SHORTS(V(type, 8, sectionN, 1), V(type, MUL(sectionN, 4), 2, 1));							\
-SWAP_SHORTS(V(type, 8, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 2, 0));						\
-SWAP_SHORTS(V(type, 8, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 2, 1));						\
-SWAP_SHORTS(V(type, 8, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 2, 0));						\
-SWAP_SHORTS(V(type, 8, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 2, 1));						\
-SWAP_SHORTS(V(type, 8, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 2, 0));						\
-SWAP_SHORTS(V(type, 8, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 2, 1))
+	SWAP_SHORTS(V(type, 8, sectionN, 1), V(type, MUL(sectionN, 4), 2, 1));							\
+	SWAP_SHORTS(V(type, 8, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 2, 0));						\
+	SWAP_SHORTS(V(type, 8, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 2, 1));						\
+	SWAP_SHORTS(V(type, 8, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 2, 0));						\
+	SWAP_SHORTS(V(type, 8, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 2, 1));						\
+	SWAP_SHORTS(V(type, 8, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 2, 0));						\
+	SWAP_SHORTS(V(type, 8, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 2, 1))
 
 #define SUPER_REARRANGEMENT_PORTION8(type) 											\
 	SWAP_SHORTS(V(type, 8, 2, 2), V(type, 9, 2, 0)); 									\
-SWAP_SHORTS(V(type, 8, 2, 3), V(type, 9, 2, 1)); 									\
-SWAP_SHORTS(V(type, 8, 2, 4), V(type, 10, 2, 0)); 									\
-SWAP_SHORTS(V(type, 8, 2, 5), V(type, 10, 2, 1)); 									\
-SWAP_SHORTS(V(type, 8, 2, 6), V(type, 11, 2, 0)); 									\
-SWAP_SHORTS(V(type, 8, 2, 7), V(type, 11, 2, 1)); 									\
-\
-SUPER_REARRANGEMENT_PORTION8_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION8_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION8_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION8_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION8_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 8, 2, 3), V(type, 9, 2, 1)); 									\
+	SWAP_SHORTS(V(type, 8, 2, 4), V(type, 10, 2, 0)); 									\
+	SWAP_SHORTS(V(type, 8, 2, 5), V(type, 10, 2, 1)); 									\
+	SWAP_SHORTS(V(type, 8, 2, 6), V(type, 11, 2, 0)); 									\
+	SWAP_SHORTS(V(type, 8, 2, 7), V(type, 11, 2, 1)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION8_HELPER(type, 3);										\
+	SUPER_REARRANGEMENT_PORTION8_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION8_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION8_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION8_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION9_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 9, sectionN, 0), V(type, MUL(sectionN, 4), 2, 2));							\
-SWAP_SHORTS(V(type, 9, sectionN, 1), V(type, MUL(sectionN, 4), 2, 3));							\
-SWAP_SHORTS(V(type, 9, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 2, 2));						\
-SWAP_SHORTS(V(type, 9, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 2, 3));						\
-SWAP_SHORTS(V(type, 9, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 2, 2));						\
-SWAP_SHORTS(V(type, 9, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 2, 3));						\
-SWAP_SHORTS(V(type, 9, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 2, 2));						\
-SWAP_SHORTS(V(type, 9, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 2, 3))
+	SWAP_SHORTS(V(type, 9, sectionN, 1), V(type, MUL(sectionN, 4), 2, 3));							\
+	SWAP_SHORTS(V(type, 9, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 2, 2));						\
+	SWAP_SHORTS(V(type, 9, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 2, 3));						\
+	SWAP_SHORTS(V(type, 9, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 2, 2));						\
+	SWAP_SHORTS(V(type, 9, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 2, 3));						\
+	SWAP_SHORTS(V(type, 9, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 2, 2));						\
+	SWAP_SHORTS(V(type, 9, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 2, 3))
 
 #define SUPER_REARRANGEMENT_PORTION9(type) 											\
 	SWAP_SHORTS(V(type, 9, 2, 4), V(type, 10, 2, 2)); 									\
-SWAP_SHORTS(V(type, 9, 2, 5), V(type, 10, 2, 3)); 									\
-SWAP_SHORTS(V(type, 9, 2, 6), V(type, 11, 2, 2)); 									\
-SWAP_SHORTS(V(type, 9, 2, 7), V(type, 11, 2, 3)); 									\
-\
-SUPER_REARRANGEMENT_PORTION9_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION9_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION9_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION9_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION9_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 9, 2, 5), V(type, 10, 2, 3)); 									\
+	SWAP_SHORTS(V(type, 9, 2, 6), V(type, 11, 2, 2)); 									\
+	SWAP_SHORTS(V(type, 9, 2, 7), V(type, 11, 2, 3)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION9_HELPER(type, 3);										\
+	SUPER_REARRANGEMENT_PORTION9_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION9_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION9_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION9_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION10_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 10, sectionN, 0), V(type, MUL(sectionN, 4), 2, 4));							\
-SWAP_SHORTS(V(type, 10, sectionN, 1), V(type, MUL(sectionN, 4), 2, 5));							\
-SWAP_SHORTS(V(type, 10, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 2, 4));						\
-SWAP_SHORTS(V(type, 10, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 2, 5));						\
-SWAP_SHORTS(V(type, 10, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 2, 4));						\
-SWAP_SHORTS(V(type, 10, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 2, 5));						\
-SWAP_SHORTS(V(type, 10, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 2, 4));						\
-SWAP_SHORTS(V(type, 10, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 2, 5))
+	SWAP_SHORTS(V(type, 10, sectionN, 1), V(type, MUL(sectionN, 4), 2, 5));							\
+	SWAP_SHORTS(V(type, 10, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 2, 4));						\
+	SWAP_SHORTS(V(type, 10, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 2, 5));						\
+	SWAP_SHORTS(V(type, 10, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 2, 4));						\
+	SWAP_SHORTS(V(type, 10, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 2, 5));						\
+	SWAP_SHORTS(V(type, 10, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 2, 4));						\
+	SWAP_SHORTS(V(type, 10, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 2, 5))
 
 #define SUPER_REARRANGEMENT_PORTION10(type) 											\
 	SWAP_SHORTS(V(type, 10, 2, 6), V(type, 11, 2, 4)); 									\
-SWAP_SHORTS(V(type, 10, 2, 7), V(type, 11, 2, 5)); 									\
-\
-SUPER_REARRANGEMENT_PORTION10_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION10_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION10_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION10_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION10_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 10, 2, 7), V(type, 11, 2, 5)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 3);										\
+	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION10_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION11_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 11, sectionN, 0), V(type, MUL(sectionN, 4), 2, 6));							\
-SWAP_SHORTS(V(type, 11, sectionN, 1), V(type, MUL(sectionN, 4), 2, 7));							\
-SWAP_SHORTS(V(type, 11, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 2, 6));						\
-SWAP_SHORTS(V(type, 11, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 2, 7));						\
-SWAP_SHORTS(V(type, 11, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 2, 6));						\
-SWAP_SHORTS(V(type, 11, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 2, 7));						\
-SWAP_SHORTS(V(type, 11, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 2, 6));						\
-SWAP_SHORTS(V(type, 11, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 2, 7))
+	SWAP_SHORTS(V(type, 11, sectionN, 1), V(type, MUL(sectionN, 4), 2, 7));							\
+	SWAP_SHORTS(V(type, 11, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 2, 6));						\
+	SWAP_SHORTS(V(type, 11, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 2, 7));						\
+	SWAP_SHORTS(V(type, 11, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 2, 6));						\
+	SWAP_SHORTS(V(type, 11, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 2, 7));						\
+	SWAP_SHORTS(V(type, 11, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 2, 6));						\
+	SWAP_SHORTS(V(type, 11, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 2, 7))
 
 #define SUPER_REARRANGEMENT_PORTION11(type) 											\
 	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 3);										\
-SUPER_REARRANGEMENT_PORTION11_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION11_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION11_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION11_HELPER(type, 7)
+	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION11_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION12_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 12, sectionN, 0), V(type, MUL(sectionN, 4), 3, 0));							\
-SWAP_SHORTS(V(type, 12, sectionN, 1), V(type, MUL(sectionN, 4), 3, 1));							\
-SWAP_SHORTS(V(type, 12, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 3, 0));						\
-SWAP_SHORTS(V(type, 12, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 3, 1));						\
-SWAP_SHORTS(V(type, 12, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 3, 0));						\
-SWAP_SHORTS(V(type, 12, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 3, 1));						\
-SWAP_SHORTS(V(type, 12, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 3, 0));						\
-SWAP_SHORTS(V(type, 12, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 3, 1))
+	SWAP_SHORTS(V(type, 12, sectionN, 1), V(type, MUL(sectionN, 4), 3, 1));							\
+	SWAP_SHORTS(V(type, 12, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 3, 0));						\
+	SWAP_SHORTS(V(type, 12, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 3, 1));						\
+	SWAP_SHORTS(V(type, 12, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 3, 0));						\
+	SWAP_SHORTS(V(type, 12, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 3, 1));						\
+	SWAP_SHORTS(V(type, 12, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 3, 0));						\
+	SWAP_SHORTS(V(type, 12, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 3, 1))
 
 #define SUPER_REARRANGEMENT_PORTION12(type) 											\
 	SWAP_SHORTS(V(type, 12, 3, 2), V(type, 13, 3, 0)); 									\
-SWAP_SHORTS(V(type, 12, 3, 3), V(type, 13, 3, 1)); 									\
-SWAP_SHORTS(V(type, 12, 3, 4), V(type, 14, 3, 0)); 									\
-SWAP_SHORTS(V(type, 12, 3, 5), V(type, 14, 3, 1)); 									\
-SWAP_SHORTS(V(type, 12, 3, 6), V(type, 15, 3, 0)); 									\
-SWAP_SHORTS(V(type, 12, 3, 7), V(type, 15, 3, 1)); 									\
-\
-SUPER_REARRANGEMENT_PORTION12_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION12_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION12_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION12_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 12, 3, 3), V(type, 13, 3, 1)); 									\
+	SWAP_SHORTS(V(type, 12, 3, 4), V(type, 14, 3, 0)); 									\
+	SWAP_SHORTS(V(type, 12, 3, 5), V(type, 14, 3, 1)); 									\
+	SWAP_SHORTS(V(type, 12, 3, 6), V(type, 15, 3, 0)); 									\
+	SWAP_SHORTS(V(type, 12, 3, 7), V(type, 15, 3, 1)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION12_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION12_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION12_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION12_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION13_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 13, sectionN, 0), V(type, MUL(sectionN, 4), 3, 2));							\
-SWAP_SHORTS(V(type, 13, sectionN, 1), V(type, MUL(sectionN, 4), 3, 3));							\
-SWAP_SHORTS(V(type, 13, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 3, 2));						\
-SWAP_SHORTS(V(type, 13, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 3, 3));						\
-SWAP_SHORTS(V(type, 13, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 3, 2));						\
-SWAP_SHORTS(V(type, 13, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 3, 3));						\
-SWAP_SHORTS(V(type, 13, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 3, 2));						\
-SWAP_SHORTS(V(type, 13, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 3, 3))
+	SWAP_SHORTS(V(type, 13, sectionN, 1), V(type, MUL(sectionN, 4), 3, 3));							\
+	SWAP_SHORTS(V(type, 13, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 3, 2));						\
+	SWAP_SHORTS(V(type, 13, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 3, 3));						\
+	SWAP_SHORTS(V(type, 13, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 3, 2));						\
+	SWAP_SHORTS(V(type, 13, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 3, 3));						\
+	SWAP_SHORTS(V(type, 13, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 3, 2));						\
+	SWAP_SHORTS(V(type, 13, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 3, 3))
 
 #define SUPER_REARRANGEMENT_PORTION13(type) 											\
 	SWAP_SHORTS(V(type, 13, 3, 4), V(type, 14, 3, 2)); 									\
-SWAP_SHORTS(V(type, 13, 3, 5), V(type, 14, 3, 3)); 									\
-SWAP_SHORTS(V(type, 13, 3, 6), V(type, 15, 3, 2)); 									\
-SWAP_SHORTS(V(type, 13, 3, 7), V(type, 15, 3, 3)); 									\
-\
-SUPER_REARRANGEMENT_PORTION13_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION13_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION13_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION13_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 13, 3, 5), V(type, 14, 3, 3)); 									\
+	SWAP_SHORTS(V(type, 13, 3, 6), V(type, 15, 3, 2)); 									\
+	SWAP_SHORTS(V(type, 13, 3, 7), V(type, 15, 3, 3)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION13_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION13_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION13_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION13_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION14_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 14, sectionN, 0), V(type, MUL(sectionN, 4), 3, 4));							\
-SWAP_SHORTS(V(type, 14, sectionN, 1), V(type, MUL(sectionN, 4), 3, 5));							\
-SWAP_SHORTS(V(type, 14, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 3, 4));						\
-SWAP_SHORTS(V(type, 14, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 3, 5));						\
-SWAP_SHORTS(V(type, 14, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 3, 4));						\
-SWAP_SHORTS(V(type, 14, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 3, 5));						\
-SWAP_SHORTS(V(type, 14, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 3, 4));						\
-SWAP_SHORTS(V(type, 14, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 3, 5))
+	SWAP_SHORTS(V(type, 14, sectionN, 1), V(type, MUL(sectionN, 4), 3, 5));							\
+	SWAP_SHORTS(V(type, 14, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 3, 4));						\
+	SWAP_SHORTS(V(type, 14, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 3, 5));						\
+	SWAP_SHORTS(V(type, 14, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 3, 4));						\
+	SWAP_SHORTS(V(type, 14, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 3, 5));						\
+	SWAP_SHORTS(V(type, 14, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 3, 4));						\
+	SWAP_SHORTS(V(type, 14, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 3, 5))
 
 #define SUPER_REARRANGEMENT_PORTION14(type) 											\
 	SWAP_SHORTS(V(type, 14, 3, 6), V(type, 15, 3, 4)); 									\
-SWAP_SHORTS(V(type, 14, 3, 7), V(type, 15, 3, 5)); 									\
-\
-SUPER_REARRANGEMENT_PORTION14_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION14_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION14_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION14_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 14, 3, 7), V(type, 15, 3, 5)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION14_HELPER(type, 4);										\
+	SUPER_REARRANGEMENT_PORTION14_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION14_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION14_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION15_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 15, sectionN, 0), V(type, MUL(sectionN, 4), 3, 6));							\
-SWAP_SHORTS(V(type, 15, sectionN, 1), V(type, MUL(sectionN, 4), 3, 7));							\
-SWAP_SHORTS(V(type, 15, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 3, 6));						\
-SWAP_SHORTS(V(type, 15, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 3, 7));						\
-SWAP_SHORTS(V(type, 15, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 3, 6));						\
-SWAP_SHORTS(V(type, 15, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 3, 7));						\
-SWAP_SHORTS(V(type, 15, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 3, 6));						\
-SWAP_SHORTS(V(type, 15, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 3, 7))
+	SWAP_SHORTS(V(type, 15, sectionN, 1), V(type, MUL(sectionN, 4), 3, 7));							\
+	SWAP_SHORTS(V(type, 15, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 3, 6));						\
+	SWAP_SHORTS(V(type, 15, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 3, 7));						\
+	SWAP_SHORTS(V(type, 15, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 3, 6));						\
+	SWAP_SHORTS(V(type, 15, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 3, 7));						\
+	SWAP_SHORTS(V(type, 15, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 3, 6));						\
+	SWAP_SHORTS(V(type, 15, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 3, 7))
 
 #define SUPER_REARRANGEMENT_PORTION15(type) 											\
 	SUPER_REARRANGEMENT_PORTION15_HELPER(type, 4);										\
-SUPER_REARRANGEMENT_PORTION15_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION15_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION15_HELPER(type, 7)
+	SUPER_REARRANGEMENT_PORTION15_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION15_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION15_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION16_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 16, sectionN, 0), V(type, MUL(sectionN, 4), 4, 0));							\
-SWAP_SHORTS(V(type, 16, sectionN, 1), V(type, MUL(sectionN, 4), 4, 1));							\
-SWAP_SHORTS(V(type, 16, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 4, 0));						\
-SWAP_SHORTS(V(type, 16, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 4, 1));						\
-SWAP_SHORTS(V(type, 16, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 4, 0));						\
-SWAP_SHORTS(V(type, 16, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 4, 1));						\
-SWAP_SHORTS(V(type, 16, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 4, 0));						\
-SWAP_SHORTS(V(type, 16, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 4, 1))
+	SWAP_SHORTS(V(type, 16, sectionN, 1), V(type, MUL(sectionN, 4), 4, 1));							\
+	SWAP_SHORTS(V(type, 16, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 4, 0));						\
+	SWAP_SHORTS(V(type, 16, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 4, 1));						\
+	SWAP_SHORTS(V(type, 16, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 4, 0));						\
+	SWAP_SHORTS(V(type, 16, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 4, 1));						\
+	SWAP_SHORTS(V(type, 16, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 4, 0));						\
+	SWAP_SHORTS(V(type, 16, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 4, 1))
 
 #define SUPER_REARRANGEMENT_PORTION16(type) 											\
 	SWAP_SHORTS(V(type, 16, 4, 2), V(type, 17, 4, 0)); 									\
-SWAP_SHORTS(V(type, 16, 4, 3), V(type, 17, 4, 1)); 									\
-SWAP_SHORTS(V(type, 16, 4, 4), V(type, 18, 4, 0)); 									\
-SWAP_SHORTS(V(type, 16, 4, 5), V(type, 18, 4, 1)); 									\
-SWAP_SHORTS(V(type, 16, 4, 6), V(type, 19, 4, 0)); 									\
-SWAP_SHORTS(V(type, 16, 4, 7), V(type, 19, 4, 1)); 									\
-\
-SUPER_REARRANGEMENT_PORTION16_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION16_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION16_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 16, 4, 3), V(type, 17, 4, 1)); 									\
+	SWAP_SHORTS(V(type, 16, 4, 4), V(type, 18, 4, 0)); 									\
+	SWAP_SHORTS(V(type, 16, 4, 5), V(type, 18, 4, 1)); 									\
+	SWAP_SHORTS(V(type, 16, 4, 6), V(type, 19, 4, 0)); 									\
+	SWAP_SHORTS(V(type, 16, 4, 7), V(type, 19, 4, 1)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION16_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION16_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION16_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION17_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 17, sectionN, 0), V(type, MUL(sectionN, 4), 4, 2));							\
-SWAP_SHORTS(V(type, 17, sectionN, 1), V(type, MUL(sectionN, 4), 4, 3));							\
-SWAP_SHORTS(V(type, 17, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 4, 2));						\
-SWAP_SHORTS(V(type, 17, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 4, 3));						\
-SWAP_SHORTS(V(type, 17, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 4, 2));						\
-SWAP_SHORTS(V(type, 17, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 4, 3));						\
-SWAP_SHORTS(V(type, 17, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 4, 2));						\
-SWAP_SHORTS(V(type, 17, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 4, 3))
+	SWAP_SHORTS(V(type, 17, sectionN, 1), V(type, MUL(sectionN, 4), 4, 3));							\
+	SWAP_SHORTS(V(type, 17, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 4, 2));						\
+	SWAP_SHORTS(V(type, 17, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 4, 3));						\
+	SWAP_SHORTS(V(type, 17, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 4, 2));						\
+	SWAP_SHORTS(V(type, 17, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 4, 3));						\
+	SWAP_SHORTS(V(type, 17, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 4, 2));						\
+	SWAP_SHORTS(V(type, 17, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 4, 3))
 
 #define SUPER_REARRANGEMENT_PORTION17(type) 											\
 	SWAP_SHORTS(V(type, 17, 4, 4), V(type, 18, 4, 2)); 									\
-SWAP_SHORTS(V(type, 17, 4, 5), V(type, 18, 4, 3)); 									\
-SWAP_SHORTS(V(type, 17, 4, 6), V(type, 19, 4, 2)); 									\
-SWAP_SHORTS(V(type, 17, 4, 7), V(type, 19, 4, 3)); 									\
-\
-SUPER_REARRANGEMENT_PORTION17_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION17_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION17_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 17, 4, 5), V(type, 18, 4, 3)); 									\
+	SWAP_SHORTS(V(type, 17, 4, 6), V(type, 19, 4, 2)); 									\
+	SWAP_SHORTS(V(type, 17, 4, 7), V(type, 19, 4, 3)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION17_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION17_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION17_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION18_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 18, sectionN, 0), V(type, MUL(sectionN, 4), 4, 4));							\
-SWAP_SHORTS(V(type, 18, sectionN, 1), V(type, MUL(sectionN, 4), 4, 5));							\
-SWAP_SHORTS(V(type, 18, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 4, 4));						\
-SWAP_SHORTS(V(type, 18, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 4, 5));						\
-SWAP_SHORTS(V(type, 18, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 4, 4));						\
-SWAP_SHORTS(V(type, 18, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 4, 5));						\
-SWAP_SHORTS(V(type, 18, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 4, 4));						\
-SWAP_SHORTS(V(type, 18, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 4, 5))
+	SWAP_SHORTS(V(type, 18, sectionN, 1), V(type, MUL(sectionN, 4), 4, 5));							\
+	SWAP_SHORTS(V(type, 18, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 4, 4));						\
+	SWAP_SHORTS(V(type, 18, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 4, 5));						\
+	SWAP_SHORTS(V(type, 18, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 4, 4));						\
+	SWAP_SHORTS(V(type, 18, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 4, 5));						\
+	SWAP_SHORTS(V(type, 18, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 4, 4));						\
+	SWAP_SHORTS(V(type, 18, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 4, 5))
 
 #define SUPER_REARRANGEMENT_PORTION18(type) 											\
 	SWAP_SHORTS(V(type, 18, 4, 6), V(type, 19, 4, 4)); 									\
-SWAP_SHORTS(V(type, 18, 4, 7), V(type, 19, 4, 5)); 									\
-\
-SUPER_REARRANGEMENT_PORTION18_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION18_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION18_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 18, 4, 7), V(type, 19, 4, 5)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION18_HELPER(type, 5);										\
+	SUPER_REARRANGEMENT_PORTION18_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION18_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION19_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 19, sectionN, 0), V(type, MUL(sectionN, 4), 4, 6));							\
-SWAP_SHORTS(V(type, 19, sectionN, 1), V(type, MUL(sectionN, 4), 4, 7));							\
-SWAP_SHORTS(V(type, 19, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 4, 6));						\
-SWAP_SHORTS(V(type, 19, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 4, 7));						\
-SWAP_SHORTS(V(type, 19, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 4, 6));						\
-SWAP_SHORTS(V(type, 19, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 4, 7));						\
-SWAP_SHORTS(V(type, 19, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 4, 6));						\
-SWAP_SHORTS(V(type, 19, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 4, 7))
+	SWAP_SHORTS(V(type, 19, sectionN, 1), V(type, MUL(sectionN, 4), 4, 7));							\
+	SWAP_SHORTS(V(type, 19, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 4, 6));						\
+	SWAP_SHORTS(V(type, 19, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 4, 7));						\
+	SWAP_SHORTS(V(type, 19, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 4, 6));						\
+	SWAP_SHORTS(V(type, 19, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 4, 7));						\
+	SWAP_SHORTS(V(type, 19, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 4, 6));						\
+	SWAP_SHORTS(V(type, 19, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 4, 7))
 
 #define SUPER_REARRANGEMENT_PORTION19(type) 											\
 	SUPER_REARRANGEMENT_PORTION19_HELPER(type, 5);										\
-SUPER_REARRANGEMENT_PORTION19_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION19_HELPER(type, 7)
+	SUPER_REARRANGEMENT_PORTION19_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION19_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION20_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 20, sectionN, 0), V(type, MUL(sectionN, 4), 5, 0));							\
-SWAP_SHORTS(V(type, 20, sectionN, 1), V(type, MUL(sectionN, 4), 5, 1));							\
-SWAP_SHORTS(V(type, 20, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 5, 0));						\
-SWAP_SHORTS(V(type, 20, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 5, 1));						\
-SWAP_SHORTS(V(type, 20, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 5, 0));						\
-SWAP_SHORTS(V(type, 20, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 5, 1));						\
-SWAP_SHORTS(V(type, 20, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 5, 0));						\
-SWAP_SHORTS(V(type, 20, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 5, 1))
+	SWAP_SHORTS(V(type, 20, sectionN, 1), V(type, MUL(sectionN, 4), 5, 1));							\
+	SWAP_SHORTS(V(type, 20, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 5, 0));						\
+	SWAP_SHORTS(V(type, 20, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 5, 1));						\
+	SWAP_SHORTS(V(type, 20, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 5, 0));						\
+	SWAP_SHORTS(V(type, 20, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 5, 1));						\
+	SWAP_SHORTS(V(type, 20, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 5, 0));						\
+	SWAP_SHORTS(V(type, 20, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 5, 1))
 
 #define SUPER_REARRANGEMENT_PORTION20(type) 											\
 	SWAP_SHORTS(V(type, 20, 5, 2), V(type, 21, 5, 0)); 									\
-SWAP_SHORTS(V(type, 20, 5, 3), V(type, 21, 5, 1)); 									\
-SWAP_SHORTS(V(type, 20, 5, 4), V(type, 22, 5, 0)); 									\
-SWAP_SHORTS(V(type, 20, 5, 5), V(type, 22, 5, 1)); 									\
-SWAP_SHORTS(V(type, 20, 5, 6), V(type, 23, 5, 0)); 									\
-SWAP_SHORTS(V(type, 20, 5, 7), V(type, 23, 5, 1)); 									\
-\
-SUPER_REARRANGEMENT_PORTION20_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION20_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 20, 5, 3), V(type, 21, 5, 1)); 									\
+	SWAP_SHORTS(V(type, 20, 5, 4), V(type, 22, 5, 0)); 									\
+	SWAP_SHORTS(V(type, 20, 5, 5), V(type, 22, 5, 1)); 									\
+	SWAP_SHORTS(V(type, 20, 5, 6), V(type, 23, 5, 0)); 									\
+	SWAP_SHORTS(V(type, 20, 5, 7), V(type, 23, 5, 1)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION20_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION20_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION21_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 21, sectionN, 0), V(type, MUL(sectionN, 4), 5, 2));							\
-SWAP_SHORTS(V(type, 21, sectionN, 1), V(type, MUL(sectionN, 4), 5, 3));							\
-SWAP_SHORTS(V(type, 21, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 5, 2));						\
-SWAP_SHORTS(V(type, 21, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 5, 3));						\
-SWAP_SHORTS(V(type, 21, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 5, 2));						\
-SWAP_SHORTS(V(type, 21, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 5, 3));						\
-SWAP_SHORTS(V(type, 21, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 5, 2));						\
-SWAP_SHORTS(V(type, 21, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 5, 3))
+	SWAP_SHORTS(V(type, 21, sectionN, 1), V(type, MUL(sectionN, 4), 5, 3));							\
+	SWAP_SHORTS(V(type, 21, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 5, 2));						\
+	SWAP_SHORTS(V(type, 21, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 5, 3));						\
+	SWAP_SHORTS(V(type, 21, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 5, 2));						\
+	SWAP_SHORTS(V(type, 21, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 5, 3));						\
+	SWAP_SHORTS(V(type, 21, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 5, 2));						\
+	SWAP_SHORTS(V(type, 21, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 5, 3))
 
 #define SUPER_REARRANGEMENT_PORTION21(type) 											\
 	SWAP_SHORTS(V(type, 21, 5, 4), V(type, 22, 5, 2)); 									\
-SWAP_SHORTS(V(type, 21, 5, 5), V(type, 22, 5, 3)); 									\
-SWAP_SHORTS(V(type, 21, 5, 6), V(type, 23, 5, 2)); 									\
-SWAP_SHORTS(V(type, 21, 5, 7), V(type, 23, 5, 3)); 									\
-\
-SUPER_REARRANGEMENT_PORTION21_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION21_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 21, 5, 5), V(type, 22, 5, 3)); 									\
+	SWAP_SHORTS(V(type, 21, 5, 6), V(type, 23, 5, 2)); 									\
+	SWAP_SHORTS(V(type, 21, 5, 7), V(type, 23, 5, 3)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION21_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION21_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION22_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 22, sectionN, 0), V(type, MUL(sectionN, 4), 5, 4));							\
-SWAP_SHORTS(V(type, 22, sectionN, 1), V(type, MUL(sectionN, 4), 5, 5));							\
-SWAP_SHORTS(V(type, 22, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 5, 4));						\
-SWAP_SHORTS(V(type, 22, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 5, 5));						\
-SWAP_SHORTS(V(type, 22, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 5, 4));						\
-SWAP_SHORTS(V(type, 22, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 5, 5));						\
-SWAP_SHORTS(V(type, 22, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 5, 4));						\
-SWAP_SHORTS(V(type, 22, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 5, 5))
+	SWAP_SHORTS(V(type, 22, sectionN, 1), V(type, MUL(sectionN, 4), 5, 5));							\
+	SWAP_SHORTS(V(type, 22, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 5, 4));						\
+	SWAP_SHORTS(V(type, 22, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 5, 5));						\
+	SWAP_SHORTS(V(type, 22, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 5, 4));						\
+	SWAP_SHORTS(V(type, 22, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 5, 5));						\
+	SWAP_SHORTS(V(type, 22, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 5, 4));						\
+	SWAP_SHORTS(V(type, 22, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 5, 5))
 
 #define SUPER_REARRANGEMENT_PORTION22(type) 											\
 	SWAP_SHORTS(V(type, 22, 5, 6), V(type, 23, 5, 4)); 									\
-SWAP_SHORTS(V(type, 22, 5, 7), V(type, 23, 5, 5)); 									\
-\
-SUPER_REARRANGEMENT_PORTION22_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION22_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 22, 5, 7), V(type, 23, 5, 5)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION22_HELPER(type, 6);										\
+	SUPER_REARRANGEMENT_PORTION22_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION23_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 23, sectionN, 0), V(type, MUL(sectionN, 4), 5, 6));							\
-SWAP_SHORTS(V(type, 23, sectionN, 1), V(type, MUL(sectionN, 4), 5, 7));							\
-SWAP_SHORTS(V(type, 23, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 5, 6));						\
-SWAP_SHORTS(V(type, 23, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 5, 7));						\
-SWAP_SHORTS(V(type, 23, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 5, 6));						\
-SWAP_SHORTS(V(type, 23, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 5, 7));						\
-SWAP_SHORTS(V(type, 23, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 5, 6));						\
-SWAP_SHORTS(V(type, 23, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 5, 7))
+	SWAP_SHORTS(V(type, 23, sectionN, 1), V(type, MUL(sectionN, 4), 5, 7));							\
+	SWAP_SHORTS(V(type, 23, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 5, 6));						\
+	SWAP_SHORTS(V(type, 23, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 5, 7));						\
+	SWAP_SHORTS(V(type, 23, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 5, 6));						\
+	SWAP_SHORTS(V(type, 23, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 5, 7));						\
+	SWAP_SHORTS(V(type, 23, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 5, 6));						\
+	SWAP_SHORTS(V(type, 23, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 5, 7))
 
 #define SUPER_REARRANGEMENT_PORTION23(type) 											\
 	SUPER_REARRANGEMENT_PORTION23_HELPER(type, 6);										\
-SUPER_REARRANGEMENT_PORTION23_HELPER(type, 7)
+	SUPER_REARRANGEMENT_PORTION23_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION24_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 24, sectionN, 0), V(type, MUL(sectionN, 4), 6, 0));							\
-SWAP_SHORTS(V(type, 24, sectionN, 1), V(type, MUL(sectionN, 4), 6, 1));							\
-SWAP_SHORTS(V(type, 24, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 6, 0));						\
-SWAP_SHORTS(V(type, 24, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 6, 1));						\
-SWAP_SHORTS(V(type, 24, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 6, 0));						\
-SWAP_SHORTS(V(type, 24, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 6, 1));						\
-SWAP_SHORTS(V(type, 24, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 6, 0));						\
-SWAP_SHORTS(V(type, 24, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 6, 1))
+	SWAP_SHORTS(V(type, 24, sectionN, 1), V(type, MUL(sectionN, 4), 6, 1));							\
+	SWAP_SHORTS(V(type, 24, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 6, 0));						\
+	SWAP_SHORTS(V(type, 24, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 6, 1));						\
+	SWAP_SHORTS(V(type, 24, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 6, 0));						\
+	SWAP_SHORTS(V(type, 24, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 6, 1));						\
+	SWAP_SHORTS(V(type, 24, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 6, 0));						\
+	SWAP_SHORTS(V(type, 24, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 6, 1))
 
 #define SUPER_REARRANGEMENT_PORTION24(type) 											\
 	SWAP_SHORTS(V(type, 24, 6, 2), V(type, 25, 6, 0)); 									\
-SWAP_SHORTS(V(type, 24, 6, 3), V(type, 25, 6, 1)); 									\
-SWAP_SHORTS(V(type, 24, 6, 4), V(type, 26, 6, 0)); 									\
-SWAP_SHORTS(V(type, 24, 6, 5), V(type, 26, 6, 1)); 									\
-SWAP_SHORTS(V(type, 24, 6, 6), V(type, 27, 6, 0)); 									\
-SWAP_SHORTS(V(type, 24, 6, 7), V(type, 27, 6, 1)); 									\
-\
-SUPER_REARRANGEMENT_PORTION24_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 24, 6, 3), V(type, 25, 6, 1)); 									\
+	SWAP_SHORTS(V(type, 24, 6, 4), V(type, 26, 6, 0)); 									\
+	SWAP_SHORTS(V(type, 24, 6, 5), V(type, 26, 6, 1)); 									\
+	SWAP_SHORTS(V(type, 24, 6, 6), V(type, 27, 6, 0)); 									\
+	SWAP_SHORTS(V(type, 24, 6, 7), V(type, 27, 6, 1)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION24_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION25_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 25, sectionN, 0), V(type, MUL(sectionN, 4), 6, 2));							\
-SWAP_SHORTS(V(type, 25, sectionN, 1), V(type, MUL(sectionN, 4), 6, 3));							\
-SWAP_SHORTS(V(type, 25, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 6, 2));						\
-SWAP_SHORTS(V(type, 25, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 6, 3));						\
-SWAP_SHORTS(V(type, 25, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 6, 2));						\
-SWAP_SHORTS(V(type, 25, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 6, 3));						\
-SWAP_SHORTS(V(type, 25, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 6, 2));						\
-SWAP_SHORTS(V(type, 25, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 6, 3))
+	SWAP_SHORTS(V(type, 25, sectionN, 1), V(type, MUL(sectionN, 4), 6, 3));							\
+	SWAP_SHORTS(V(type, 25, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 6, 2));						\
+	SWAP_SHORTS(V(type, 25, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 6, 3));						\
+	SWAP_SHORTS(V(type, 25, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 6, 2));						\
+	SWAP_SHORTS(V(type, 25, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 6, 3));						\
+	SWAP_SHORTS(V(type, 25, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 6, 2));						\
+	SWAP_SHORTS(V(type, 25, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 6, 3))
 
 #define SUPER_REARRANGEMENT_PORTION25(type) 											\
 	SWAP_SHORTS(V(type, 25, 6, 4), V(type, 26, 6, 2)); 									\
-SWAP_SHORTS(V(type, 25, 6, 5), V(type, 26, 6, 3)); 									\
-SWAP_SHORTS(V(type, 25, 6, 6), V(type, 27, 6, 2)); 									\
-SWAP_SHORTS(V(type, 25, 6, 7), V(type, 27, 6, 3)); 									\
-\
-SUPER_REARRANGEMENT_PORTION25_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 25, 6, 5), V(type, 26, 6, 3)); 									\
+	SWAP_SHORTS(V(type, 25, 6, 6), V(type, 27, 6, 2)); 									\
+	SWAP_SHORTS(V(type, 25, 6, 7), V(type, 27, 6, 3)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION25_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION26_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 26, sectionN, 0), V(type, MUL(sectionN, 4), 6, 4));							\
-SWAP_SHORTS(V(type, 26, sectionN, 1), V(type, MUL(sectionN, 4), 6, 5));							\
-SWAP_SHORTS(V(type, 26, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 6, 4));						\
-SWAP_SHORTS(V(type, 26, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 6, 5));						\
-SWAP_SHORTS(V(type, 26, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 6, 4));						\
-SWAP_SHORTS(V(type, 26, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 6, 5));						\
-SWAP_SHORTS(V(type, 26, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 6, 4));						\
-SWAP_SHORTS(V(type, 26, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 6, 5))
+	SWAP_SHORTS(V(type, 26, sectionN, 1), V(type, MUL(sectionN, 4), 6, 5));							\
+	SWAP_SHORTS(V(type, 26, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 6, 4));						\
+	SWAP_SHORTS(V(type, 26, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 6, 5));						\
+	SWAP_SHORTS(V(type, 26, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 6, 4));						\
+	SWAP_SHORTS(V(type, 26, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 6, 5));						\
+	SWAP_SHORTS(V(type, 26, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 6, 4));						\
+	SWAP_SHORTS(V(type, 26, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 6, 5))
 
 #define SUPER_REARRANGEMENT_PORTION26(type) 											\
 	SWAP_SHORTS(V(type, 26, 6, 6), V(type, 27, 6, 4)); 									\
-SWAP_SHORTS(V(type, 26, 6, 7), V(type, 27, 6, 5)); 									\
-\
-SUPER_REARRANGEMENT_PORTION26_HELPER(type, 7)
+	SWAP_SHORTS(V(type, 26, 6, 7), V(type, 27, 6, 5)); 									\
+	\
+	SUPER_REARRANGEMENT_PORTION26_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION27_HELPER(type, sectionN)									\
 	SWAP_SHORTS(V(type, 27, sectionN, 0), V(type, MUL(sectionN, 4), 6, 6));							\
-SWAP_SHORTS(V(type, 27, sectionN, 1), V(type, MUL(sectionN, 4), 6, 7));							\
-SWAP_SHORTS(V(type, 27, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 6, 6));						\
-SWAP_SHORTS(V(type, 27, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 6, 7));						\
-SWAP_SHORTS(V(type, 27, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 6, 6));						\
-SWAP_SHORTS(V(type, 27, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 6, 7));						\
-SWAP_SHORTS(V(type, 27, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 6, 6));						\
-SWAP_SHORTS(V(type, 27, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 6, 7))
+	SWAP_SHORTS(V(type, 27, sectionN, 1), V(type, MUL(sectionN, 4), 6, 7));							\
+	SWAP_SHORTS(V(type, 27, sectionN, 2), V(type, ADD(MUL(sectionN, 4), 1), 6, 6));						\
+	SWAP_SHORTS(V(type, 27, sectionN, 3), V(type, ADD(MUL(sectionN, 4), 1), 6, 7));						\
+	SWAP_SHORTS(V(type, 27, sectionN, 4), V(type, ADD(MUL(sectionN, 4), 2), 6, 6));						\
+	SWAP_SHORTS(V(type, 27, sectionN, 5), V(type, ADD(MUL(sectionN, 4), 2), 6, 7));						\
+	SWAP_SHORTS(V(type, 27, sectionN, 6), V(type, ADD(MUL(sectionN, 4), 3), 6, 6));						\
+	SWAP_SHORTS(V(type, 27, sectionN, 7), V(type, ADD(MUL(sectionN, 4), 3), 6, 7))
 
 #define SUPER_REARRANGEMENT_PORTION27(type) 											\
 	SUPER_REARRANGEMENT_PORTION27_HELPER(type, 7)
 
 #define SUPER_REARRANGEMENT_PORTION28(type) 											\
 	SWAP_SHORTS(V(type, 28, 7, 2), V(type, 29, 7, 0)); 									\
-SWAP_SHORTS(V(type, 28, 7, 3), V(type, 29, 7, 1)); 									\
-SWAP_SHORTS(V(type, 28, 7, 4), V(type, 30, 7, 0)); 									\
-SWAP_SHORTS(V(type, 28, 7, 5), V(type, 30, 7, 1)); 									\
-SWAP_SHORTS(V(type, 28, 7, 6), V(type, 31, 7, 0)); 									\
-SWAP_SHORTS(V(type, 28, 7, 7), V(type, 31, 7, 1));
+	SWAP_SHORTS(V(type, 28, 7, 3), V(type, 29, 7, 1)); 									\
+	SWAP_SHORTS(V(type, 28, 7, 4), V(type, 30, 7, 0)); 									\
+	SWAP_SHORTS(V(type, 28, 7, 5), V(type, 30, 7, 1)); 									\
+	SWAP_SHORTS(V(type, 28, 7, 6), V(type, 31, 7, 0)); 									\
+	SWAP_SHORTS(V(type, 28, 7, 7), V(type, 31, 7, 1));
 
 #define SUPER_REARRANGEMENT_PORTION29(type) 											\
 	SWAP_SHORTS(V(type, 29, 7, 4), V(type, 30, 7, 2)); 									\
-SWAP_SHORTS(V(type, 29, 7, 5), V(type, 30, 7, 3)); 									\
-SWAP_SHORTS(V(type, 29, 7, 6), V(type, 31, 7, 2)); 									\
-SWAP_SHORTS(V(type, 29, 7, 7), V(type, 31, 7, 3))
+	SWAP_SHORTS(V(type, 29, 7, 5), V(type, 30, 7, 3)); 									\
+	SWAP_SHORTS(V(type, 29, 7, 6), V(type, 31, 7, 2)); 									\
+	SWAP_SHORTS(V(type, 29, 7, 7), V(type, 31, 7, 3))
 
 #define SUPER_REARRANGEMENT_PORTION30(type) 											\
 	SWAP_SHORTS(V(type, 30, 7, 6), V(type, 31, 7, 4)); 									\
-SWAP_SHORTS(V(type, 30, 7, 7), V(type, 31, 7, 5))
+	SWAP_SHORTS(V(type, 30, 7, 7), V(type, 31, 7, 5))
 
 
 #define LOAD_SECTION_ALT(type, ptr, increment, portionN, sectionN)										\
 	uint16_t V(type, portionN, sectionN, 0) = *S_ALT(ptr, increment); 						\
-uint16_t V(type, portionN, sectionN, 1) = *S_ALT(ptr, increment+1); 						\
-uint16_t V(type, portionN, sectionN, 2) = *S_ALT(ptr, increment+2); 						\
-uint16_t V(type, portionN, sectionN, 3) = *S_ALT(ptr, increment+3); 						\
-uint16_t V(type, portionN, sectionN, 4) = *S_ALT(ptr, increment+4); 						\
-uint16_t V(type, portionN, sectionN, 5) = *S_ALT(ptr, increment+5); 						\
-uint16_t V(type, portionN, sectionN, 6) = *S_ALT(ptr, increment+6); 						\
-uint16_t V(type, portionN, sectionN, 7) = *S_ALT(ptr, increment+7)
+	uint16_t V(type, portionN, sectionN, 1) = *S_ALT(ptr, increment+1); 						\
+	uint16_t V(type, portionN, sectionN, 2) = *S_ALT(ptr, increment+2); 						\
+	uint16_t V(type, portionN, sectionN, 3) = *S_ALT(ptr, increment+3); 						\
+	uint16_t V(type, portionN, sectionN, 4) = *S_ALT(ptr, increment+4); 						\
+	uint16_t V(type, portionN, sectionN, 5) = *S_ALT(ptr, increment+5); 						\
+	uint16_t V(type, portionN, sectionN, 6) = *S_ALT(ptr, increment+6); 						\
+	uint16_t V(type, portionN, sectionN, 7) = *S_ALT(ptr, increment+7)
 
 #define LOAD_PORTION_ALT(type, ptr, increment, portionN)											\
 	LOAD_SECTION_ALT(type, ptr, increment, portionN, 0);											\
-LOAD_SECTION_ALT(type, ptr, increment+8, portionN, 1);											\
-LOAD_SECTION_ALT(type, ptr, increment+16, portionN, 2);											\
-LOAD_SECTION_ALT(type, ptr, increment+24, portionN, 3);											\
-LOAD_SECTION_ALT(type, ptr, increment+32, portionN, 4);											\
-LOAD_SECTION_ALT(type, ptr, increment+40, portionN, 5);											\
-LOAD_SECTION_ALT(type, ptr, increment+48, portionN, 6);											\
-LOAD_SECTION_ALT(type, ptr, increment+56, portionN, 7);
+	LOAD_SECTION_ALT(type, ptr, increment+8, portionN, 1);											\
+	LOAD_SECTION_ALT(type, ptr, increment+16, portionN, 2);											\
+	LOAD_SECTION_ALT(type, ptr, increment+24, portionN, 3);											\
+	LOAD_SECTION_ALT(type, ptr, increment+32, portionN, 4);											\
+	LOAD_SECTION_ALT(type, ptr, increment+40, portionN, 5);											\
+	LOAD_SECTION_ALT(type, ptr, increment+48, portionN, 6);											\
+	LOAD_SECTION_ALT(type, ptr, increment+56, portionN, 7);
 
 #define LOAD_PORTION_ALL_ALT(type, ptr)												\
 	LOAD_PORTION_ALT(type, ptr, 0, 0);												\
-LOAD_PORTION_ALT(type, ptr, 64, 1);												\
-LOAD_PORTION_ALT(type, ptr, 128, 2);												\
-LOAD_PORTION_ALT(type, ptr, 192, 3);												\
-LOAD_PORTION_ALT(type, ptr, 256, 4);												\
-LOAD_PORTION_ALT(type, ptr, 320, 5);												\
-LOAD_PORTION_ALT(type, ptr, 384, 6);												\
-LOAD_PORTION_ALT(type, ptr, 448, 7);												\
-LOAD_PORTION_ALT(type, ptr, 512, 8);												\
-LOAD_PORTION_ALT(type, ptr, 576, 9);												\
-LOAD_PORTION_ALT(type, ptr, 640, 10);												\
-LOAD_PORTION_ALT(type, ptr, 704, 11);												\
-LOAD_PORTION_ALT(type, ptr, 768, 12);												\
-LOAD_PORTION_ALT(type, ptr, 832, 13);												\
-LOAD_PORTION_ALT(type, ptr, 896, 14);												\
-LOAD_PORTION_ALT(type, ptr, 960, 15);												\
-LOAD_PORTION_ALT(type, ptr, 1024, 16);												\
-LOAD_PORTION_ALT(type, ptr, 1088, 17);												\
-LOAD_PORTION_ALT(type, ptr, 1152, 18);												\
-LOAD_PORTION_ALT(type, ptr, 1216, 19);												\
-LOAD_PORTION_ALT(type, ptr, 1280, 20);												\
-LOAD_PORTION_ALT(type, ptr, 1344, 21);												\
-LOAD_PORTION_ALT(type, ptr, 1408, 22);												\
-LOAD_PORTION_ALT(type, ptr, 1472, 23);												\
-LOAD_PORTION_ALT(type, ptr, 1536, 24);												\
-LOAD_PORTION_ALT(type, ptr, 1600, 25);												\
-LOAD_PORTION_ALT(type, ptr, 1664, 26);												\
-LOAD_PORTION_ALT(type, ptr, 1728, 27);												\
-LOAD_PORTION_ALT(type, ptr, 1792, 28);												\
-LOAD_PORTION_ALT(type, ptr, 1856, 29);												\
-LOAD_PORTION_ALT(type, ptr, 1920, 30);												\
-LOAD_PORTION_ALT(type, ptr, 1984, 31)
+	LOAD_PORTION_ALT(type, ptr, 64, 1);												\
+	LOAD_PORTION_ALT(type, ptr, 128, 2);												\
+	LOAD_PORTION_ALT(type, ptr, 192, 3);												\
+	LOAD_PORTION_ALT(type, ptr, 256, 4);												\
+	LOAD_PORTION_ALT(type, ptr, 320, 5);												\
+	LOAD_PORTION_ALT(type, ptr, 384, 6);												\
+	LOAD_PORTION_ALT(type, ptr, 448, 7);												\
+	LOAD_PORTION_ALT(type, ptr, 512, 8);												\
+	LOAD_PORTION_ALT(type, ptr, 576, 9);												\
+	LOAD_PORTION_ALT(type, ptr, 640, 10);												\
+	LOAD_PORTION_ALT(type, ptr, 704, 11);												\
+	LOAD_PORTION_ALT(type, ptr, 768, 12);												\
+	LOAD_PORTION_ALT(type, ptr, 832, 13);												\
+	LOAD_PORTION_ALT(type, ptr, 896, 14);												\
+	LOAD_PORTION_ALT(type, ptr, 960, 15);												\
+	LOAD_PORTION_ALT(type, ptr, 1024, 16);												\
+	LOAD_PORTION_ALT(type, ptr, 1088, 17);												\
+	LOAD_PORTION_ALT(type, ptr, 1152, 18);												\
+	LOAD_PORTION_ALT(type, ptr, 1216, 19);												\
+	LOAD_PORTION_ALT(type, ptr, 1280, 20);												\
+	LOAD_PORTION_ALT(type, ptr, 1344, 21);												\
+	LOAD_PORTION_ALT(type, ptr, 1408, 22);												\
+	LOAD_PORTION_ALT(type, ptr, 1472, 23);												\
+	LOAD_PORTION_ALT(type, ptr, 1536, 24);												\
+	LOAD_PORTION_ALT(type, ptr, 1600, 25);												\
+	LOAD_PORTION_ALT(type, ptr, 1664, 26);												\
+	LOAD_PORTION_ALT(type, ptr, 1728, 27);												\
+	LOAD_PORTION_ALT(type, ptr, 1792, 28);												\
+	LOAD_PORTION_ALT(type, ptr, 1856, 29);												\
+	LOAD_PORTION_ALT(type, ptr, 1920, 30);												\
+	LOAD_PORTION_ALT(type, ptr, 1984, 31)
 
 #define SET_SECTION_ALT(type, ptr, increment, portionN, sectionN)							\
 	*S_ALT(ptr, increment) = V(type, portionN, sectionN, 0);						\
-*S_ALT(ptr, increment+1) = V(type, portionN, sectionN, 1);						\
-*S_ALT(ptr, increment+2) = V(type, portionN, sectionN, 2);						\
-*S_ALT(ptr, increment+3) = V(type, portionN, sectionN, 3);						\
-*S_ALT(ptr, increment+4) = V(type, portionN, sectionN, 4);						\
-*S_ALT(ptr, increment+5) = V(type, portionN, sectionN, 5);						\
-*S_ALT(ptr, increment+6) = V(type, portionN, sectionN, 6);						\
-*S_ALT(ptr, increment+7) = V(type, portionN, sectionN, 7);						\
+	*S_ALT(ptr, increment+1) = V(type, portionN, sectionN, 1);						\
+	*S_ALT(ptr, increment+2) = V(type, portionN, sectionN, 2);						\
+	*S_ALT(ptr, increment+3) = V(type, portionN, sectionN, 3);						\
+	*S_ALT(ptr, increment+4) = V(type, portionN, sectionN, 4);						\
+	*S_ALT(ptr, increment+5) = V(type, portionN, sectionN, 5);						\
+	*S_ALT(ptr, increment+6) = V(type, portionN, sectionN, 6);						\
+	*S_ALT(ptr, increment+7) = V(type, portionN, sectionN, 7);						\
 
 #define SET_PORTION_ALT(type, ptr, increment, portionN)											\
 	SET_SECTION_ALT(type, ptr, increment, portionN, 0);										\
-SET_SECTION_ALT(type, ptr, increment+8, portionN, 1);										\
-SET_SECTION_ALT(type, ptr, increment+16, portionN, 2);										\
-SET_SECTION_ALT(type, ptr, increment+24, portionN, 3);										\
-SET_SECTION_ALT(type, ptr, increment+32, portionN, 4);										\
-SET_SECTION_ALT(type, ptr, increment+40, portionN, 5);										\
-SET_SECTION_ALT(type, ptr, increment+48, portionN, 6);										\
-SET_SECTION_ALT(type, ptr, increment+56, portionN, 7)
+	SET_SECTION_ALT(type, ptr, increment+8, portionN, 1);										\
+	SET_SECTION_ALT(type, ptr, increment+16, portionN, 2);										\
+	SET_SECTION_ALT(type, ptr, increment+24, portionN, 3);										\
+	SET_SECTION_ALT(type, ptr, increment+32, portionN, 4);										\
+	SET_SECTION_ALT(type, ptr, increment+40, portionN, 5);										\
+	SET_SECTION_ALT(type, ptr, increment+48, portionN, 6);										\
+	SET_SECTION_ALT(type, ptr, increment+56, portionN, 7)
 
 #define SET_PORTION_ALL_ALT(type, ptr)												\
 	SET_PORTION_ALT(type, ptr, 0, 0);												\
-SET_PORTION_ALT(type, ptr, 64, 1);												\
-SET_PORTION_ALT(type, ptr, 128, 2);												\
-SET_PORTION_ALT(type, ptr, 192, 3);												\
-SET_PORTION_ALT(type, ptr, 256, 4);												\
-SET_PORTION_ALT(type, ptr, 320, 5);												\
-SET_PORTION_ALT(type, ptr, 384, 6);												\
-SET_PORTION_ALT(type, ptr, 448, 7);												\
-SET_PORTION_ALT(type, ptr, 512, 8);												\
-SET_PORTION_ALT(type, ptr, 576, 9);												\
-SET_PORTION_ALT(type, ptr, 640, 10);												\
-SET_PORTION_ALT(type, ptr, 704, 11);												\
-SET_PORTION_ALT(type, ptr, 768, 12);												\
-SET_PORTION_ALT(type, ptr, 832, 13);												\
-SET_PORTION_ALT(type, ptr, 896, 14);												\
-SET_PORTION_ALT(type, ptr, 960, 15);												\
-SET_PORTION_ALT(type, ptr, 1024, 16);												\
-SET_PORTION_ALT(type, ptr, 1088, 17);												\
-SET_PORTION_ALT(type, ptr, 1152, 18);												\
-SET_PORTION_ALT(type, ptr, 1216, 19);												\
-SET_PORTION_ALT(type, ptr, 1280, 20);												\
-SET_PORTION_ALT(type, ptr, 1344, 21);												\
-SET_PORTION_ALT(type, ptr, 1408, 22);												\
-SET_PORTION_ALT(type, ptr, 1472, 23);												\
-SET_PORTION_ALT(type, ptr, 1536, 24);												\
-SET_PORTION_ALT(type, ptr, 1600, 25);												\
-SET_PORTION_ALT(type, ptr, 1664, 26);												\
-SET_PORTION_ALT(type, ptr, 1728, 27);												\
-SET_PORTION_ALT(type, ptr, 1792, 28);												\
-SET_PORTION_ALT(type, ptr, 1856, 29);												\
-SET_PORTION_ALT(type, ptr, 1920, 30);												\
-SET_PORTION_ALT(type, ptr, 1984, 31)
+	SET_PORTION_ALT(type, ptr, 64, 1);												\
+	SET_PORTION_ALT(type, ptr, 128, 2);												\
+	SET_PORTION_ALT(type, ptr, 192, 3);												\
+	SET_PORTION_ALT(type, ptr, 256, 4);												\
+	SET_PORTION_ALT(type, ptr, 320, 5);												\
+	SET_PORTION_ALT(type, ptr, 384, 6);												\
+	SET_PORTION_ALT(type, ptr, 448, 7);												\
+	SET_PORTION_ALT(type, ptr, 512, 8);												\
+	SET_PORTION_ALT(type, ptr, 576, 9);												\
+	SET_PORTION_ALT(type, ptr, 640, 10);												\
+	SET_PORTION_ALT(type, ptr, 704, 11);												\
+	SET_PORTION_ALT(type, ptr, 768, 12);												\
+	SET_PORTION_ALT(type, ptr, 832, 13);												\
+	SET_PORTION_ALT(type, ptr, 896, 14);												\
+	SET_PORTION_ALT(type, ptr, 960, 15);												\
+	SET_PORTION_ALT(type, ptr, 1024, 16);												\
+	SET_PORTION_ALT(type, ptr, 1088, 17);												\
+	SET_PORTION_ALT(type, ptr, 1152, 18);												\
+	SET_PORTION_ALT(type, ptr, 1216, 19);												\
+	SET_PORTION_ALT(type, ptr, 1280, 20);												\
+	SET_PORTION_ALT(type, ptr, 1344, 21);												\
+	SET_PORTION_ALT(type, ptr, 1408, 22);												\
+	SET_PORTION_ALT(type, ptr, 1472, 23);												\
+	SET_PORTION_ALT(type, ptr, 1536, 24);												\
+	SET_PORTION_ALT(type, ptr, 1600, 25);												\
+	SET_PORTION_ALT(type, ptr, 1664, 26);												\
+	SET_PORTION_ALT(type, ptr, 1728, 27);												\
+	SET_PORTION_ALT(type, ptr, 1792, 28);												\
+	SET_PORTION_ALT(type, ptr, 1856, 29);												\
+	SET_PORTION_ALT(type, ptr, 1920, 30);												\
+	SET_PORTION_ALT(type, ptr, 1984, 31)
 
 
 void encryption_1(vector<uint16_t>& input, vector<uint16_t>& EPUK, uint32_t& OTPsectionCount) {
@@ -3761,23 +3761,34 @@ int main() {
 	assert(memcmp(reinterpret_cast<const char*>(input.data()), reinterpret_cast<const char*>(original.data()), size) == 0);
 
 	/************************************************************************************************************************/
-	// Check if the cipher texts show any probabilistic similarities between themselves with any periodicity
-	struct portion {
-		uint32_t bytes[32];
-	};
-	typedef portion ciphertext;
-	typedef portion plaintext;
+	{
+		// Check if the cipher texts show any probabilistic similarities between themselves with any periodicity
+		struct portion {
+			uint16_t bytes[64]; // we must use uint16_t as the encryption algorithm works with shorts
+		};
+		typedef portion ciphertext;
+		typedef portion plaintext;
 
-	plaintext ptext;
+		plaintext ptext;
 
-	for (uint32_t i = 1; i < 32; ++i) {
-		ptext.bytes[i] = rand();
+		for (uint32_t i = 0; i < 64; ++i) {
+			ptext.bytes[i] = rand();
+		}
+
+		vector<ciphertext> ciphertexts;
+
+		uint16_t cycles = 20;
+		ciphertexts.resize(cycles);
+
+		// Create cipher texts
+		for (uint32_t i = 0; i < cycles; ++i) {
+			replaceFoldCyclesCM(ptext.bytes, xoredEPUK_OTP.data(), 0, 64);
+			ciphertexts[i] = ptext.bytes;
+			++ptext.bytes[63 - (i / 16)];
+			reverseReplaceFoldCyclesCM(ptext.bytes, xoredEPUK_OTP.data(), 0, 64);
+		}
+
 	}
-
-	vector<ciphertext> ciphertexts;
-
-
-
 	/************************************************************************************************************************/
 
 	return 0;
