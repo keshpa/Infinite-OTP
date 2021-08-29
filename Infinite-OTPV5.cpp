@@ -1,8 +1,10 @@
 #include "SampleSubstitutionTable.hpp"
 
 #include <assert.h>
+#include <boost/preprocessor/arithmetic/mul.hpp>
 #include <chrono>
 #include <cstdint>
+#include <immintrin.h>
 #include <iomanip>
 #include <iostream>
 #include <stdlib.h>
@@ -11,7 +13,6 @@
 #include <strings.h>
 #include <unistd.h>
 #include <vector>
-#include <boost/preprocessor/arithmetic/mul.hpp>
 
 using namespace std;
 
@@ -3764,28 +3765,87 @@ int main() {
 	{
 		// Check if the cipher texts show any probabilistic similarities between themselves with any periodicity
 		struct portion {
-			uint16_t bytes[64]; // we must use uint16_t as the encryption algorithm works with shorts
+			uint32_t bytes[16]; // we must use uint16_t as the encryption algorithm works with shorts
 		};
-		typedef portion ciphertext;
 		typedef portion plaintext;
+		uint16_t numCipherTexts = 20;
 
-		plaintext ptext;
+		struct Ciphertexts {
+			Ciphertexts(uint64_t size) {
+				cipher.resize(size);
+				minimumDistanceInput.resize(size);
+				numMatchingBits.resize(size);
+			}
+			void insert(uint64_t index, plaintext& pt) {
+				this->cipher[index] = pt;
+				if (index == numInputs) {
+					++numInputs;
+				}
+				minimumDistanceInput[index] = 0;
+				numMatchingBits[index] = 512;
+			}
 
-		for (uint32_t i = 0; i < 64; ++i) {
+			void setMinDistanceBits(uint64_t index, uint64_t refIndex) {
+				uint64_t* rptr = reinterpret_cast<uint64_t *>(&(cipher[refIndex].bytes[0]));
+				__m512i cr1 = _mm512_maskz_expandloadu_epi32(0xFFFF, rptr);
+				__m512i cr2 = _mm512_maskz_expandloadu_epi32(0xFFFF, rptr + 8);
+				uint32_t maximumMatched = 0;
+
+				for (uint64_t counter = 0; counter < numInputs; ++counter) {
+					if (counter == refIndex) {
+						continue;
+					}
+					uint64_t* iptr = reinterpret_cast<uint64_t *>(&(cipher[index].bytes[0]));
+					__m512i ci1 = _mm512_maskz_expandloadu_epi32(0xFFFF, iptr);
+					__m512i ci2 = _mm512_maskz_expandloadu_epi32(0xFFFF, iptr + 8);
+
+					__m512i r1 = _mm512_and_epi32(ci1, cr1);
+					__m512i count = _mm512_popcnt_epi32(r1);
+
+					r1 = _mm512_and_epi32(ci2, cr2);
+					__m512i temp = _mm512_popcnt_epi32(r1);
+					count = _mm512_add_epi32(count, temp);
+
+					// horizontal sum of register count
+					uint32_t tmp[16] __attribute__((aligned(64)));
+					_mm512_store_si512((__m512i*)tmp, count);
+
+					uint64_t totalUnmatchedBits = 0;
+					for (size_t i=0; i < 16; i++) {
+						totalUnmatchedBits += tmp[i];
+					}
+					uint64_t totalMatchedBits = 512 - totalUnmatchedBits;
+
+					if (totalMatchedBits > maximumMatched) {
+						maximumMatched = totalMatchedBits;
+						minimumDistanceInput[refIndex] = index;
+						numMatchingBits[refIndex] = totalMatchedBits;
+					}
+				}
+			}
+
+			vector<portion> cipher;
+			vector<uint64_t> minimumDistanceInput;
+			vector<uint32_t> numMatchingBits;
+			uint64_t numInputs;
+		};
+
+		plaintext ptext, originalInput;
+
+		for (uint32_t i = 2; i < 16; ++i) {
 			ptext.bytes[i] = rand();
 		}
+		ptext.bytes[0] = 0;
+		ptext.bytes[1] = 0;
+		originalInput = ptext;
 
-		vector<ciphertext> ciphertexts;
-
-		uint16_t cycles = 20;
-		ciphertexts.resize(cycles);
+		Ciphertexts ctexts(numCipherTexts);
 
 		// Create cipher texts
-		for (uint32_t i = 0; i < cycles; ++i) {
-			replaceFoldCyclesCM(ptext.bytes, xoredEPUK_OTP.data(), 0, 64);
-			ciphertexts[i] = ptext.bytes;
-			++ptext.bytes[63 - (i / 16)];
-			reverseReplaceFoldCyclesCM(ptext.bytes, xoredEPUK_OTP.data(), 0, 64);
+		for (uint64_t i = 0; i < numCipherTexts; ++i) {
+			replaceFoldCyclesCM(reinterpret_cast<uint16_t *>(&(ptext.bytes)), xoredEPUK_OTP.data(), 0, 64);
+			ctexts.insert(i, ptext);
+			*(reinterpret_cast<uint64_t *>(&originalInput.bytes[0])) = i;
 		}
 
 	}
